@@ -174,7 +174,7 @@ _Focuses on building the primary, static UI screens for the application based on
 
 _Focuses on migrating the application's entire data structure and business logic to the Firebase ecosystem. This includes setting up the project, modeling the data for Firestore, and implementing and testing the core business rules for users, transactions, and investments._
 
-### [US1] Set Up and Configure Firebase Project | [Joelton]
+### ✅ [US1] Set Up and Configure Firebase Project | [Joelton]
 
 - **As a** developer,
 - **I want to** initialize and configure a new Firebase project with all necessary services enabled,
@@ -189,7 +189,7 @@ _Focuses on migrating the application's entire data structure and business logic
 - **And** Firebase Storage must be set up with default security rules.
 - **And** the Firebase SDK must be correctly configured in a local development environment for testing.
 
-### [US2] Model Application Data for Firestore
+### ✅ [US2] Model Application Data for Firestore | [Joelton]
 
 - **As a** developer,
 - **I want to** define and document the NoSQL data structure for the entire application,
@@ -204,7 +204,7 @@ _Focuses on migrating the application's entire data structure and business logic
 - **And** a structure for an `investments` sub-collection must be defined.
 - **And** the strategy for managing account balances must be documented (e.g., as a field in the user document or in a separate `balances` collection).
 
-### [US3] Implement Firestore Security Rules
+### [US3] Implement Firestore Security Rules | [Joelton]
 
 - **As a** developer,
 - **I want to** implement robust security rules for the entire Firestore database,
