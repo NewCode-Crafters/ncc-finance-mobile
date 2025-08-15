@@ -1,14 +1,39 @@
 # Flutter Widgets
 
-<!-- start doc template -->
-
-## Template
+## BoxDecoration
 
 ### Documentation
 
+- https://api.flutter.dev/flutter/painting/BoxDecoration-class.html
+
 ### Properties
 
-<!-- end doc template -->
+- borderRadius: BorderRadius.circular(10.0)
+- color: Colors.Blue
+- border: Border.all(color: Colors.red, width: 2.0)
+
+## Center
+
+### Documentation
+
+- https://api.flutter.dev/flutter/widgets/Center-class.html
+
+### Properties
+
+- child:
+
+## Container
+
+### Documentation & useful
+
+- https://api.flutter.dev/flutter/widgets/Container-class.html
+
+### Properties
+
+- child
+- color
+- width
+- height
 
 ## Padding
 
@@ -19,6 +44,7 @@
 ### Properties
 
 - padding: EdgeInsets.all(16.0)
+- child: Container()
 
 ### tips
 
@@ -123,19 +149,6 @@ Use `ListView` when you need a scrollable list of widgets, especially when the n
 - crossAxisAlignment
 <!-- others -->
 
-## Container
-
-### Documentation & useful
-
-- https://api.flutter.dev/flutter/widgets/Container-class.html
-
-### Properties
-
-- child
-- color
-- width
-- height
-
 ## Stack
 
 ### Documentation
@@ -167,3 +180,149 @@ class MyStatelessWidget extends StatelessWidget {
     }
 }
 ```
+
+## Stateful Widget
+
+### Documentation
+
+- https://api.flutter.dev/flutter/widgets/StatefulWidget-class.html
+
+### Example of implementation:
+
+```dart
+class MyStatefulWidget extends StatefulWidget {
+    final String title;
+
+    const MyStatefulWidget({Key? key, required this.title}) : super(key: key);
+
+    @override
+    _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
+}
+
+class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+    int _counter = 0;
+
+    void _incrementCounter() {
+        setState(() {
+            _counter++;
+        });
+    }
+
+    @override
+    Widget build(BuildContext context) {
+        return Scaffold(
+            appBar: AppBar(
+                title: Text(widget.title),
+            ),
+            body: Center(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                        Text('You have pushed the button this many times:'),
+                        Text(
+                            '$_counter',
+                            style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                    ],
+                ),
+            ),
+            floatingActionButton: FloatingActionButton(
+                onPressed: _incrementCounter,
+                tooltip: 'Increment',
+                child: Icon(Icons.add),
+            ),
+        );
+    }
+}
+```
+
+## LinearProgressIndicator
+
+### Documentation
+
+- https://api.flutter.dev/flutter/material/LinearProgressIndicator-class.html
+
+### Properties
+
+- color: Colors.blue
+- value: 0.5
+
+## Image
+
+### Documentation
+
+- https://api.flutter.dev/flutter/widgets/Image-class.html
+
+### Example of use
+
+```dart
+// From asset
+Image.asset('assets/images/my_image.png')
+
+// From network
+Image.network('https://example.com/image.png')
+
+// From file
+import 'dart:io';
+Image.file(File('/path/to/image.png'))
+
+// From memory
+Image.memory(myImageBytes)
+```
+
+## ClipRRect
+
+### Documentation
+
+- https://api.flutter.dev/flutter/painting/ClipRRect-class.html
+- used when child does not inherit the BoxDecoration properties
+
+### Properties
+
+- borderRadius: BorderRadius.circular(10.0)
+- child: Container()
+
+## AnimatedOpacity
+
+### Documentation
+
+- https://api.flutter.dev/flutter/widgets/AnimatedOpacity-class.html
+
+### Properties
+
+- opacity
+- duration: Duration(seconds: 1)
+- child: Container()
+
+## SizedBox
+
+### Documentation
+
+- https://api.flutter.dev/flutter/widgets/SizedBox-class.html
+
+### Tips
+
+- Use `SizedBox` when you want to add empty space between widgets.
+
+### Properties
+
+- height
+- width
+- child
+
+# App Organization
+
+- root/assets/images: require to edit pubspec.yaml. assets: - assets/images
+- root/lib/
+- lib/components
+- lib/screens
+- main.dart
+
+# Firebase
+
+- BaaS
+- CloudFirestore: what is? Database in the Cloud
+- CloudStorage: what is? Storage in the Cloud
+
+## Documentation
+

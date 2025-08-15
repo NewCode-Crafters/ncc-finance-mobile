@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_application_1/firebase_options.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() {
+void main() async {
+  // Ensure that Flutter bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const MyApp());
 }
 
@@ -56,13 +65,22 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
+  Future<void> _incrementCounter() async {
+    // This method now tests Firebase connection instead of incrementing the counter.
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        print(
+          '✅ Firebase connection successful. No user is currently logged in.',
+        );
+        // Optionally show a SnackBar or toast here
+      } else {
+        print('✅ Firebase connection successful. User UID: ' + user.uid);
+      }
+    } catch (e) {
+      print('❌ Error connecting to Firebase: ' + e.toString());
+    }
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
     });
   }
