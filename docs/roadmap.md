@@ -2,6 +2,10 @@
 
 This document outlines all the epics and user stories for the project.
 
+## Deadlines
+
+- Wednesday, 30/07-25 ~ Tuesday, 07/10/25
+
 ## Syncs
 
 - 05/08/2025: Alignment, Flutter vs React Native, API vs Firebase. Actions Point: Create a wireframe/prototype of the app.

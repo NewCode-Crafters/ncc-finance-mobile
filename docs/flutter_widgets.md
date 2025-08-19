@@ -1,5 +1,13 @@
 # Flutter Widgets
 
+## Useful Libraries
+
+- [Flutter Packages & Plugins](https://pub.dev/)
+- [Flutter Official Documentation](https://docs.flutter.dev/)
+- [Flutter API Reference](https://api.flutter.dev/)
+- [Dart Packages](https://pub.dev/flutter/packages)
+- Examples of common one: Uuid, Firebase, Dart Data Class Generator
+
 ## BoxDecoration
 
 ### Documentation
@@ -310,19 +318,54 @@ Image.memory(myImageBytes)
 - width
 - child
 
+## TextFormField
+
+### Documentation
+
+- https://api.flutter.dev/flutter/material/TextFormField-class.html
+
+## Visibility
+
+### Documentation
+
+- https://api.flutter.dev/flutter/widgets/Visibility-class.html
+
+### Properties
+
+- visible: true
+- child: Container()
+
+## AlertDialog
+
+## Documentation
+
+- https://api.flutter.dev/flutter/material/AlertDialog-class.html
+
+### Properties
+
+- title: Text("Title")
+- content: Text("Content")
+
+## StreamBuilder
+
+### Documentation
+
+- https://api.flutter.dev/flutter/widgets/StreamBuilder-class.html
+
 # App Organization
 
 - root/assets/images: require to edit pubspec.yaml. assets: - assets/images
 - root/lib/
 - lib/components
 - lib/screens
+- lib/models
 - main.dart
 
-# Firebase
+## Firebase Authentication
 
-- BaaS
-- CloudFirestore: what is? Database in the Cloud
-- CloudStorage: what is? Storage in the Cloud
-
-## Documentation
-
+- Necessary to Enable Authentication in Firebase
+- FirebaseAuthException
+- Email template can be customized on Firebase: language, message etc...
+- Connect Auth x Firestore - use uid to connect and create the connections
+- Enable Storage for upload files in Firebase
+- Package: firebase_storage, image_picker
