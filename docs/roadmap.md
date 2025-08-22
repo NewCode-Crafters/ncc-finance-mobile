@@ -32,7 +32,7 @@ _Focuses on building the primary, static UI screens for the application based on
 - **And** wireframes for the creation forms (Create Transaction, Create Investment) must be produced.
 - **And** these wireframes must be approved before development begins.
 
-### [US2] Build Static User Login Screen | [Carlos]
+### ✅ [US2] Build Static User Login Screen | [Joelton]
 
 - **As a** user,
 - **I want to** see a dedicated login screen,
