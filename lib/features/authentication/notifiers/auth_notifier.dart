@@ -8,27 +8,36 @@ class AuthState extends Equatable {
   final bool isLoading;
   final String? errorMessage;
   final bool isAuthenticated;
+  final String? successMessage;
 
   const AuthState({
     this.isLoading = false,
     this.errorMessage,
     this.isAuthenticated = false,
+    this.successMessage,
   });
 
   AuthState copyWith({
     bool? isLoading,
     String? errorMessage,
     bool? isAuthenticated,
+    String? successMessage,
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage ?? this.errorMessage,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
+      successMessage: successMessage ?? this.successMessage,
     );
   }
 
   @override
-  List<Object?> get props => [isLoading, errorMessage, isAuthenticated];
+  List<Object?> get props => [
+    isLoading,
+    errorMessage,
+    isAuthenticated,
+    successMessage,
+  ];
 }
 
 class AuthNotifier extends ChangeNotifier {
@@ -95,6 +104,47 @@ class AuthNotifier extends ChangeNotifier {
         isLoading: false,
         isAuthenticated: false,
         errorMessage: 'An unknown error occurred.',
+      );
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    _state = _state.copyWith(
+      isLoading: true,
+      successMessage: null,
+      errorMessage: null,
+    );
+    notifyListeners();
+
+    try {
+      await _authService.sendPasswordResetEmail(email: email);
+      _state = _state.copyWith(
+        isLoading: false,
+        successMessage: 'Password reset email sent. Please check your inbox.',
+      );
+    } catch (e) {
+      _state = _state.copyWith(
+        isLoading: false,
+        errorMessage: 'An unknown error occurred.',
+      );
+    }
+
+    notifyListeners();
+  }
+
+  Future<void> logout() async {
+    _state = _state.copyWith(isLoading: true);
+    notifyListeners();
+
+    try {
+      await _authService.logout();
+      _state = const AuthState();
+    } catch (e) {
+      _state = _state.copyWith(
+        isLoading: false,
+        errorMessage: 'Logout failed. Please try again.',
       );
     }
 

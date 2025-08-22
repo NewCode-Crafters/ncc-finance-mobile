@@ -6,4 +6,7 @@ abstract class AuthService {
     required String email,
     required String password,
   });
+
+  Future<void> sendPasswordResetEmail({required String email});
+  Future<void> logout();
 }

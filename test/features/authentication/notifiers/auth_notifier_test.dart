@@ -104,5 +104,36 @@ void main() {
       expect(authNotifier.state.isLoading, isFalse);
       expect(authNotifier.state.errorMessage, isNull);
     });
+
+    test(
+      'sendPasswordResetEmail succeeds and sets a success message ',
+      () async {
+        when(
+          mockAuthService.sendPasswordResetEmail(email: anyNamed('email')),
+        ).thenAnswer((_) async {});
+
+        await authNotifier.sendPasswordResetEmail(email: 'test@test.com');
+
+        expect(
+          authNotifier.state.successMessage,
+          'Password reset email sent. Please check your inbox.',
+        );
+        expect(authNotifier.state.isLoading, isFalse);
+        expect(authNotifier.state.errorMessage, isNull);
+      },
+    );
+
+    test("logout succeeds and clears authentication state", () async {
+      when(mockAuthService.logout()).thenAnswer((_) async {});
+
+      await authNotifier.logout();
+
+      expect(authNotifier.state.isAuthenticated, isFalse);
+      expect(authNotifier.state.isLoading, isFalse);
+      expect(authNotifier.state.errorMessage, isNull);
+      expect(authNotifier.state.successMessage, isNull);
+
+      verify(mockAuthService.logout()).called(1);
+    });
   });
 }

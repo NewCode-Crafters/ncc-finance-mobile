@@ -36,4 +36,16 @@ class FirebaseAuthService implements AuthService {
     // TODO: implement signUp
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> sendPasswordResetEmail({required String email}) {
+    // TODO: implement sendPasswordResetEmail
+    throw UnimplementedError();
+  }
+  
+  @override
+  Future<void> logout() {
+    // TODO: implement logout
+    throw UnimplementedError();
+  }
 }
