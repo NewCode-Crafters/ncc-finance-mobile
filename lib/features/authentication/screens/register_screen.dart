@@ -95,6 +95,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   text: "Criar conta",
                   onPressed: isLoading ? null : _handleSignUp,
                 ),
+          const SizedBox(height: 16),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text("Já tem uma conta? Acesse"),
+          ),
         ],
       ),
     );

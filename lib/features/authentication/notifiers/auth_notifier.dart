@@ -79,8 +79,6 @@ class AuthNotifier extends ChangeNotifier {
 
     return await _executeAuthAction(() async {
       await _authService.signUp(name: name, email: email, password: password);
-      // After sign up, also log in:
-      await _authService.login(email, password);
     });
   }
 
