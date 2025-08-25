@@ -45,7 +45,7 @@ _Focuses on building the primary, static UI screens for the application based on
 - **Then** it must contain a logo, and input fields for "Email" and "Senha" (Password).
 - **And** it must have a primary button for "Acessar" (Access) and a link for "Esqueci a senha?" (Forgot password?).
 
-### [US3] Build Static User Registration (Cadastro) Screen | [Carlos]
+### ✅ [US3] Build Static User Registration (Cadastro) Screen | [Carlos]
 
 - **As a** new user,
 - **I want to** see a dedicated screen to create a new account,
