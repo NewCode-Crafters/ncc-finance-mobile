@@ -45,7 +45,7 @@ _Focuses on building the primary, static UI screens for the application based on
 - **Then** it must contain a logo, and input fields for "Email" and "Senha" (Password).
 - **And** it must have a primary button for "Acessar" (Access) and a link for "Esqueci a senha?" (Forgot password?).
 
-### ✅ [US3] Build Static User Registration (Cadastro) Screen | [Carlos]
+### ✅ [US3] Build Static User Registration (Cadastro) Screen | [Joelton]
 
 - **As a** new user,
 - **I want to** see a dedicated screen to create a new account,
@@ -59,7 +59,7 @@ _Focuses on building the primary, static UI screens for the application based on
 - **And** it must contain input fields for "Nome" (Name), "Email", and "Senha" (Password).
 - **And** it must have a primary button labeled "Criar conta" (Create account).
 
-### [US4] Build Static 'Update Account' Screen | [Carlos]
+### ✅ [US4] Build Static 'Update Account' Screen | [Joelton]
 
 - **As a** user,
 - **I want to** have a screen to view and update my profile information,
@@ -172,6 +172,19 @@ _Focuses on building the primary, static UI screens for the application based on
 - **Then** a new UI element, such as a button or an icon link with the label "Anexar comprovante" (Attach receipt), must be present on the form.
 - **And** this story only covers the visual creation of the button; tapping it is not required to have any functionality at this stage.
 
+### [US12] Add 'Change Password' Button to Update Account Screen
+
+- **As a** user,
+- **I want to** see a clear option to change my password on my account screen,
+- **so that** I can initiate the process of securing my account.
+
+**Acceptance Criteria:**
+
+- **Given** the 'Update Account' screen is built,
+- **When** the screen is displayed,
+- **Then** a button or link with the text "Change Password" must be present.
+- **And** this story only covers the visual creation of the button; it does not need to be functional yet.
+
 ---
 
 ## Epic 2: Backend Migration & Logic with Firebase
@@ -208,7 +221,7 @@ _Focuses on migrating the application's entire data structure and business logic
 - **And** a structure for an `investments` sub-collection must be defined.
 - **And** the strategy for managing account balances must be documented (e.g., as a field in the user document or in a separate `balances` collection).
 
-### [US3] Implement Firestore Security Rules | [Joelton]
+### ✅ [US3] Implement Firestore Security Rules | [Joelton]
 
 - **As a** developer,
 - **I want to** implement robust security rules for the entire Firestore database,
@@ -632,3 +645,9 @@ _Focuses on fulfilling all the non-code deliverables required for the project su
 - **And** it should highlight the main features implemented.
 - **And** it should discuss at least one major challenge faced and how the team overcame it.
 - **And** it should conclude with key learnings and potential future improvements.
+
+### Additional Backlog
+
+- Updating an Email: You don't just change the email in the database. For security, you call a special Firebase function (currentUser.verifyBeforeUpdateEmail()). This sends a verification link to the new email address to confirm the user actually owns it. The email is only updated after they click that link.
+
+- Updating a Password: This is also a special, secure function (currentUser.updatePassword()). To prevent someone from picking up an unlocked phone and changing the password, Firebase requires the user to have logged in recently. If they haven't, the app must ask them to re-enter their old password before they can set a new one.
