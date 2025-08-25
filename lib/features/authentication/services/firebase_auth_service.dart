@@ -1,11 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/features/authentication/services/auth_exceptions.dart';
 import 'package:flutter_application_1/features/authentication/services/auth_service.dart';
 
 class FirebaseAuthService implements AuthService {
   final FirebaseAuth _firebaseAuth;
+  final FirebaseFirestore _firestore;
 
-  FirebaseAuthService(this._firebaseAuth);
+  FirebaseAuthService({
+    FirebaseAuth? firebaseAuth,
+    FirebaseFirestore? firestore,
+  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
+       _firestore = firestore ?? FirebaseFirestore.instance;
 
   @override
   Future<void> login(String email, String password) async {
@@ -32,9 +38,35 @@ class FirebaseAuthService implements AuthService {
     required String name,
     required String email,
     required String password,
-  }) {
-    // TODO: implement signUp
-    throw UnimplementedError();
+  }) async {
+    try {
+      final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      final user = userCredential.user;
+
+      if (user == null) {
+        throw Exception('User creation failed, please try again later.');
+      }
+
+      await _firestore.collection("users").doc(user.uid).set({
+        "name": name,
+        "email": email,
+        "createdAt": FieldValue.serverTimestamp(),
+      });
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        throw WeakPasswordException();
+      } else if (e.code == 'email-already-in-use') {
+        throw EmailAlreadyInUseException();
+      } else {
+        throw Exception('An unknown Firebase error occurred: ${e.code}');
+      }
+    } catch (e) {
+      throw Exception('An unknown error occurred');
+    }
   }
 
   @override
@@ -42,10 +74,13 @@ class FirebaseAuthService implements AuthService {
     // TODO: implement sendPasswordResetEmail
     throw UnimplementedError();
   }
-  
+
   @override
-  Future<void> logout() {
-    // TODO: implement logout
-    throw UnimplementedError();
+  Future<void> logout() async {
+    try {
+      await _firebaseAuth.signOut();
+    } catch (e) {
+      throw Exception('An error occurred during logout.');
+    }
   }
 }

@@ -48,7 +48,7 @@ class AuthNotifier extends ChangeNotifier {
 
   AuthNotifier(this._authService);
 
-  Future<void> login(String email, String password) async {
+  Future<bool> login(String email, String password) async {
     if (!Validators.isValidEmail(email)) {
       _state = _state.copyWith(
         isLoading: false,
@@ -56,13 +56,13 @@ class AuthNotifier extends ChangeNotifier {
         errorMessage: 'Please enter a valid email.',
       );
       notifyListeners();
-      return;
+      return false;
     }
 
-    await _executeAuthAction(() => _authService.login(email, password));
+    return await _executeAuthAction(() => _authService.login(email, password));
   }
 
-  Future<void> signUp({
+  Future<bool> signUp({
     required String name,
     required String email,
     required String password,
@@ -74,47 +74,81 @@ class AuthNotifier extends ChangeNotifier {
         errorMessage: 'Please enter a valid email.',
       );
       notifyListeners();
-      return;
+      return false;
     }
-    await _executeAuthAction(
-      () => _authService.signUp(name: name, email: email, password: password),
-    );
+
+    return await _executeAuthAction(() async {
+      await _authService.signUp(name: name, email: email, password: password);
+      // After sign up, also log in:
+      await _authService.login(email, password);
+    });
   }
 
-  Future<void> _executeAuthAction(Future<void> Function() authAction) async {
-    _state = _state.copyWith(isLoading: true, errorMessage: null);
+  Future<bool> _executeAuthAction(Future<void> Function() authAction) async {
+    _state = AuthState(
+      isLoading: true,
+      isAuthenticated: _state.isAuthenticated,
+      errorMessage: null,
+      successMessage: null,
+    );
+    notifyListeners();
 
     try {
       await authAction();
       _state = _state.copyWith(isLoading: false, isAuthenticated: true);
+      notifyListeners();
+      return true;
     } on InvalidCredentialsException {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
         errorMessage: "Invalid credentials. Please try again.",
       );
+      notifyListeners();
+      return false;
     } on UserNotFoundException {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
         errorMessage: "User not found. Please check the email or sign up.",
       );
+      notifyListeners();
+      return false;
+    } on EmailAlreadyInUseException {
+      // NEW: Add this block
+      _state = _state.copyWith(
+        isLoading: false,
+        isAuthenticated: false,
+        errorMessage: 'This email is already in use by another account.',
+      );
+      notifyListeners();
+      return false;
+    } on WeakPasswordException {
+      // NEW: Add this block too
+      _state = _state.copyWith(
+        isLoading: false,
+        isAuthenticated: false,
+        errorMessage: 'The password is too weak. Please choose a stronger one.',
+      );
+      notifyListeners();
+      return false;
     } catch (e) {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
         errorMessage: 'An unknown error occurred.',
       );
+      notifyListeners();
+      return false;
     }
-
-    notifyListeners();
   }
 
   Future<void> sendPasswordResetEmail({required String email}) async {
-    _state = _state.copyWith(
+    _state = AuthState(
       isLoading: true,
-      successMessage: null,
+      isAuthenticated: _state.isAuthenticated,
       errorMessage: null,
+      successMessage: null,
     );
     notifyListeners();
 
@@ -148,6 +182,24 @@ class AuthNotifier extends ChangeNotifier {
       );
     }
 
+    notifyListeners();
+  }
+
+  void clearMessages() {
+    // Using the constructor directly to ensure messages are cleared,
+    // as copyWith doesn't handle null overrides correctly.
+    _state = AuthState(
+      isLoading: _state.isLoading,
+      isAuthenticated: _state.isAuthenticated,
+      errorMessage: null,
+      successMessage: null,
+    );
+    notifyListeners();
+  }
+
+  // Only for Unit Test at the moment
+  void updateState(AuthState newState) {
+    _state = newState;
     notifyListeners();
   }
 }
