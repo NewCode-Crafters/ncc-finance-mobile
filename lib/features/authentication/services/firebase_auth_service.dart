@@ -51,10 +51,18 @@ class FirebaseAuthService implements AuthService {
         throw Exception('User creation failed, please try again later.');
       }
 
-      await _firestore.collection("users").doc(user.uid).set({
+      final userDocRef = _firestore.collection("users").doc(user.uid);
+
+      await userDocRef.set({
         "name": name,
         "email": email,
         "createdAt": FieldValue.serverTimestamp(),
+      });
+
+      await userDocRef.collection("balances").add({
+        "accountType": "CHECKING_ACCOUNT",
+        "amount": 0.0,
+        "currency": "BRL",
       });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
