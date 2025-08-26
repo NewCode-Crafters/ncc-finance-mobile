@@ -21,6 +21,7 @@ class BalanceService {
     required String userId,
     required String balanceId,
     required double transactionAmount,
+    WriteBatch? batch,
   }) async {
     final balanceDocRef = _firestore
         .collection('users')
@@ -28,11 +29,18 @@ class BalanceService {
         .collection('balances')
         .doc(balanceId);
 
-    // FieldValue.increment is an atomic operation.
-    // It safely adds the given value to the field.
-    // Since our expenses are negative, this correctly subtracts.
-    await balanceDocRef.update({
+    final writeBatch = batch ?? _firestore.batch();
+
+    writeBatch.update(balanceDocRef, {
+      // FieldValue.increment is an atomic operation.
+      // It safely adds the given value to the field.
+      // Since our expenses are negative, this correctly subtracts.
       'amount': FieldValue.increment(transactionAmount),
     });
+
+    // Only commit the write if we created the batch inside this method.
+    if (batch == null) {
+      await writeBatch.commit();
+    }
   }
 }
