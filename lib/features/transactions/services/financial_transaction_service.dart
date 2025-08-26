@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/features/dashboard/services/balance_service.dart';
 import 'package:flutter_application_1/features/transactions/models/financial_transaction.dart';
+import 'package:flutter_application_1/features/transactions/services/financial_transaction_exceptions.dart';
 
 class FinancialTransactionService {
   final FirebaseFirestore _firestore;
@@ -16,52 +17,101 @@ class FinancialTransactionService {
     required String userId,
     required Map<String, dynamic> data,
   }) async {
-    final batch = _firestore.batch();
+    try {
+      final batch = _firestore.batch();
 
-    final transactionRef = _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('transactions')
-        .doc();
+      final transactionRef = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('transactions')
+          .doc();
 
-    final transactionData = Map<String, dynamic>.from(data);
-    transactionData['date'] = Timestamp.fromDate(data['date']);
-    batch.set(transactionRef, transactionData);
+      final transactionData = Map<String, dynamic>.from(data);
+      transactionData['date'] = Timestamp.fromDate(data['date']);
+      batch.set(transactionRef, transactionData);
 
-    await _balanceService.updateBalanceOnTransaction(
-      userId: userId,
-      balanceId: data['balanceId'],
-      transactionAmount: data['amount'],
-      batch: batch,
-    );
+      await _balanceService.updateBalanceOnTransaction(
+        userId: userId,
+        balanceId: data['balanceId'],
+        transactionAmount: data['amount'],
+        batch: batch,
+      );
 
-    await batch.commit();
+      await batch.commit();
+    } catch (e) {
+      throw TransactionException('Failed to create transaction.');
+    }
   }
 
   Future<List<FinancialTransaction>> getTransactions({
     required String userId,
   }) async {
-    final snapshot = await _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('transactions')
-        .orderBy('date', descending: true)
-        .get();
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('transactions')
+          .orderBy('date', descending: true)
+          .get();
 
-    return snapshot.docs
-        .map((doc) => FinancialTransaction.fromFirestore(doc))
-        .toList();
+      return snapshot.docs
+          .map((doc) => FinancialTransaction.fromFirestore(doc))
+          .toList();
+    } catch (e) {
+      throw TransactionException('Failed to fetch transactions.');
+    }
   }
 
   Future<void> deleteTransaction({
     required String userId,
     required String transactionId,
   }) async {
-    await _firestore
-        .collection('users')
-        .doc(userId)
-        .collection('transactions')
-        .doc(transactionId)
-        .delete();
+    try {
+      final transactionRef = _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('transactions')
+          .doc(transactionId);
+
+      final transactionDoc = await transactionRef.get();
+      final transactionData = transactionDoc.data();
+
+      if (transactionData != null) {
+        final batch = _firestore.batch();
+
+        batch.delete(transactionRef);
+
+        final amountToRevert = transactionData['amount'] as double;
+        final balanceId = transactionData['balanceId'] as String;
+
+        await _balanceService.updateBalanceOnTransaction(
+          userId: userId,
+          balanceId: balanceId,
+          transactionAmount: -amountToRevert,
+          batch: batch,
+        );
+
+        await batch.commit();
+      }
+    } catch (e) {
+      throw TransactionException('Failed to delete transaction.');
+    }
+  }
+
+  Future<void> editTransaction({
+    required String userId,
+    required String transactionId,
+    required Map<String, dynamic> updateData,
+  }) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('transactions')
+          .doc(transactionId)
+          .update(updateData);
+    } catch (e) {
+      throw TransactionException('Failed to update transaction.');
+    }
   }
 }

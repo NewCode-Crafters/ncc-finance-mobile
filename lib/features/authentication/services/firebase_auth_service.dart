@@ -78,9 +78,14 @@ class FirebaseAuthService implements AuthService {
   }
 
   @override
-  Future<void> sendPasswordResetEmail({required String email}) {
-    // TODO: implement sendPasswordResetEmail
-    throw UnimplementedError();
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw Exception('An unknown Firebase error occurred: ${e.code}');
+    } catch (e) {
+      throw Exception('An unknown error occurred.');
+    }
   }
 
   @override

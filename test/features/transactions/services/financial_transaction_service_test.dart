@@ -100,7 +100,11 @@ void main() {
           .collection('users')
           .doc(userId)
           .collection('transactions')
-          .add({'amount': -50.0, 'date': Timestamp.now()});
+          .add({
+            'amount': -50.0,
+            'date': Timestamp.now(),
+            'balanceId': 'test_balance_id',
+          });
 
       await transactionService.deleteTransaction(
         userId: userId,
@@ -144,6 +148,113 @@ void main() {
           batch: anyNamed('batch'),
         ),
       ).called(1);
+    },
+  );
+
+  test(
+    'createTransaction should call balanceService with a POSITIVE amount for income',
+    () async {
+      final mockBalanceService = MockBalanceService();
+      transactionService = FinancialTransactionService(
+        firestore: fakeFirestore,
+        balanceService: mockBalanceService,
+      );
+
+      final balanceDoc = await fakeFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('balances')
+          .add({'amount': 1000.0});
+      final balanceId = balanceDoc.id;
+
+      final transactionData = {
+        'amount': 500.0,
+        'balanceId': balanceId,
+        'category': 'SALARY',
+        'date': DateTime.now(),
+      };
+
+      await transactionService.createTransaction(
+        userId: userId,
+        data: transactionData,
+      );
+
+      verify(
+        mockBalanceService.updateBalanceOnTransaction(
+          userId: userId,
+          balanceId: balanceId,
+          transactionAmount: 500.0,
+          batch: anyNamed('batch'),
+        ),
+      ).called(1);
+    },
+  );
+
+  test(
+    'deleteTransaction should call balanceService to revert the balance',
+    () async {
+      final mockBalanceService = MockBalanceService();
+      transactionService = FinancialTransactionService(
+        firestore: fakeFirestore,
+        balanceService: mockBalanceService,
+      );
+
+      final transactionAmount = -50.0;
+      final transactionDocRef = await fakeFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('transactions')
+          .add({
+            'amount': transactionAmount,
+            'balanceId': balanceId,
+            'date': Timestamp.now(),
+          });
+
+      await transactionService.deleteTransaction(
+        userId: userId,
+        transactionId: transactionDocRef.id,
+      );
+
+      verify(
+        mockBalanceService.updateBalanceOnTransaction(
+          userId: userId,
+          balanceId: balanceId,
+          transactionAmount: -transactionAmount,
+          batch: anyNamed('batch'),
+        ),
+      ).called(1);
+    },
+  );
+
+  test(
+    'editTransaction should update the fields of an existing document',
+    () async {
+      final docRef = await fakeFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('transactions')
+          .add({
+            'description': 'Old description',
+            'category': 'OLD_CATEGORY',
+            'amount': -50.0,
+            'date': Timestamp.now(),
+          });
+
+      final updateData = {
+        'description': 'New shiny description',
+        'category': 'NEW_CATEGORY',
+      };
+
+      await transactionService.editTransaction(
+        userId: userId,
+        transactionId: docRef.id,
+        updateData: updateData,
+      );
+
+      final updatedDoc = await docRef.get();
+      expect(updatedDoc.data()?['description'], 'New shiny description');
+      expect(updatedDoc.data()?['category'], 'NEW_CATEGORY');
+      expect(updatedDoc.data()?['amount'], -50.0);
     },
   );
 }
