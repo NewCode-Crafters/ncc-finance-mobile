@@ -96,4 +96,21 @@ class FirebaseAuthService implements AuthService {
       throw Exception('An error occurred during logout.');
     }
   }
+
+  @override
+  Future<void> updateUserPhotoUrl({required String url}) async {
+    try {
+      final user = _firebaseAuth.currentUser;
+
+      if (user == null) {
+        throw Exception("No authenticated user found.");
+      }
+
+      await _firestore.collection('users').doc(user.uid).update({
+        'photoUrl': url,
+      });
+    } catch (e) {
+      throw Exception('Failed to update photo URL.');
+    }
+  }
 }

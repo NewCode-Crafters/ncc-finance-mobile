@@ -8,5 +8,8 @@ abstract class AuthService {
   });
 
   Future<void> sendPasswordResetEmail({required String email});
+
   Future<void> logout();
+
+  Future<void> updateUserPhotoUrl({required String url});
 }

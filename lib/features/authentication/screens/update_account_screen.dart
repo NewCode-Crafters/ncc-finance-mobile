@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/widgets/custom_text_field.dart';
 import 'package:flutter_application_1/core/widgets/primary_button.dart';
 
-/*
-- The screen displays a "Name" input field.
-- The screen displays an "Email" input field.
-- The screen displays a "Save Changes" button.
-*/
 class UpdateAccountScreen extends StatelessWidget {
+  static const String routeName = '/update-account';
   const UpdateAccountScreen({super.key});
 
   @override
