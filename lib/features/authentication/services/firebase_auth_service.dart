@@ -113,4 +113,10 @@ class FirebaseAuthService implements AuthService {
       throw Exception('Failed to update photo URL.');
     }
   }
+
+  @override
+  Future<void> updateUserName({required String newName}) {
+    // TODO: implement updateUserName
+    throw UnimplementedError();
+  }
 }

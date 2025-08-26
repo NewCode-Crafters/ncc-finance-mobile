@@ -12,4 +12,6 @@ abstract class AuthService {
   Future<void> logout();
 
   Future<void> updateUserPhotoUrl({required String url});
+
+  Future<void> updateUserName({required String newName});
 }
