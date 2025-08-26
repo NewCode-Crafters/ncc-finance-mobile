@@ -251,7 +251,7 @@ _Focuses on migrating the application's entire data structure and business logic
 - **When** the update profile logic is called with new information (e.g., a new name),
 - **Then** the corresponding user document in Firestore must be updated.
 
-### [US5] Implement Authentication Business Logic
+### ✅ [US5] Implement Authentication Business Logic | [Joelton]
 
 - **As a** developer,
 - **I want to** implement the core authentication functions,
@@ -269,7 +269,22 @@ _Focuses on migrating the application's entire data structure and business logic
 - **When** the password reset function is called,
 - **Then** it should correctly trigger Firebase Authentication's password reset email flow.
 
-### [US6] Implement Business Logic for Account Balances
+### ✅ [US5.1] Create Default Balance on User Sign Up
+
+- **As a** new user,
+- **I want to** have a default checking account created automatically when I register,
+- **so that** I can start adding transactions immediately without any extra setup.
+
+**Acceptance Criteria:**
+
+- **Given** a new user is signing up through the application,
+- **When** the sign-up logic in the FirebaseAuthService is successfully executed,
+- **Then** a new document must be created within that user's `balances` sub-collection (e.g., `/users/{userId}/balances/{newBalanceId}`).
+- **And** this new balance document must contain an `accountType` field with the default value of `"CHECKING_ACCOUNT"`.
+- **And** the `amount` field must be initialized to `0.0`.
+- **And** the creation of the user's profile document and this default balance document must be performed as a single atomic operation (using a Firestore batched write) to ensure data consistency.
+
+### ✅ [US6] Implement Business Logic for Account Balances | [Joelton]
 
 - **As a** developer,
 - **I want to** create functions to reliably read and modify a user's account balance,
@@ -285,7 +300,7 @@ _Focuses on migrating the application's entire data structure and business logic
 - **Then** the user's balance must be reverted accordingly.
 - **And** this logic should be encapsulated in reusable functions that can be tested independently.
 
-### [US7] Implement CRUD Logic for Transactions
+### ✅ [US7] Implement CRUD Logic for Transactions
 
 - **As a** developer,
 - **I want to** build the core functions to create, read, update, and delete transaction documents,
@@ -651,3 +666,52 @@ _Focuses on fulfilling all the non-code deliverables required for the project su
 - Updating an Email: You don't just change the email in the database. For security, you call a special Firebase function (currentUser.verifyBeforeUpdateEmail()). This sends a verification link to the new email address to confirm the user actually owns it. The email is only updated after they click that link.
 
 - Updating a Password: This is also a special, secure function (currentUser.updatePassword()). To prevent someone from picking up an unlocked phone and changing the password, Firebase requires the user to have logged in recently. If they haven't, the app must ask them to re-enter their old password before they can set a new one.
+
+# Quest List
+
+Quest Log: Business Logic for Transactions (Revised)
+
+## Phase 1: Core Logic & Robustness
+
+✅ 1. Create a New Transaction Document
+✅ 2. Debit/Credit Balance on New Transaction
+✅ 3. Fetch All Transactions for a User
+✅ 4. Delete a Transaction Document
+✅ 5. Revert Balance on Transaction Deletion
+✅ 6. Add Robust Error Handling to Service Methods
+✅ 7. Edit a Transaction's Details: The service can update the non-financial details (description, category, date) of an existing transaction.
+
+## Phase 2: Advanced Features
+
+◻️ 8. Upload a Receipt to Storage & Link to Transaction
+◻️ 9. Filter Transactions by Date and Category
+◻️ 10. Paginate Transactions for Infinite Scroll
+
+## Phase 3: Notifier Logic
+
+◻️ 11. Fetch and Display Transactions in Notifier
+◻️ 12. Add a New Transaction via Notifier
+
+# Quest Log: The Complete User Profile Feature
+
+## Phase 1: Backend & Data Model
+
+✅ 1. Add Avatar URL to User Model & Service: Enhance our Firestore users model to include a photoUrl field and create the service method to update it.
+
+## Phase 2: UI Scaffolding (TDD)
+
+✅ 2. Build Reusable AppBar with Profile Avatar: Create a global AppBar that displays the user's avatar and can be used on all authenticated screens.
+
+✅ 3. Build Static 'My Profile' Screen: Create the main profile screen that displays the avatar, name, email, and the list of options ("Meu cadastro", "Encerrar sessão").
+
+✅ 4. Build Static 'Update Profile Details' Screen: This is our original UpdateAccountScreen for editing the user's name.
+
+## Phase 3: Integration & Functionality
+
+✅ 5. Implement Navigation Flows: Connect the AppBar avatar to the 'My Profile' screen, and the "Meu cadastro" link to the 'Update Profile Details' screen.
+
+✅ 6. Populate Profile Screens with Live Data: Fetch and display the real user name, email, and avatar from Firestore.
+
+7. Connect 'Update Profile Details' Logic: Make the "Save Changes" button functional to update the user's name.
+
+8. Implement Avatar Upload Flow: Implement the full flow of picking an image, uploading it to Firebase Storage, and updating the user's photoUrl.

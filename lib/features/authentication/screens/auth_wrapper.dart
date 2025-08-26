@@ -67,6 +67,7 @@ class _AuthGateState extends State<AuthGate> {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         // While waiting for the first auth state, show a loading indicator.
+        print("✅[auth_state] Connection State: ${snapshot.connectionState}");
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),

@@ -6,10 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 Future<void> pumpMainAppBar(WidgetTester tester) async {
   await tester.pumpWidget(
     MaterialApp(
-      routes: {
-        '/profile': (context) =>
-            const MyProfileScreen(userName: 'test', userEmail: 'test@test.com'),
-      },
+      routes: {'/profile': (context) => const MyProfileScreen()},
       home: const Scaffold(appBar: MainAppBar()),
     ),
   );

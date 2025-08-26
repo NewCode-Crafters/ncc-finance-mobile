@@ -1,24 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/authentication/screens/update_account_screen.dart';
+import 'package:flutter_application_1/features/profile/models/user_profile.dart';
+import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
 import 'package:flutter_application_1/features/profile/screens/my_profile_screen.dart';
+import 'package:flutter_application_1/features/profile/services/profile_service.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
+import 'package:provider/provider.dart';
 
+import '../notifiers/profile_notifier_test.mocks.dart';
+
+@GenerateMocks([ProfileService])
 void main() {
-  group("MyProfileScreen", () {
-    Future<void> pumpMyProfileScreen(WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: MyProfileScreen(
-            userName: 'matosJoe',
-            userEmail: 'joeltonmatos@ncc.com',
-          ),
+  late MockProfileService mockProfileService;
+  late ProfileNotifier profileNotifier;
+
+  Future<void> pumpMyProfileScreen(WidgetTester tester) async {
+    mockProfileService = MockProfileService();
+    profileNotifier = ProfileNotifier(mockProfileService);
+
+    final fakeProfile = UserProfile(
+      uid: '1',
+      name: 'matosJoe',
+      email: 'joeltonmatos@ncc.com',
+    );
+
+    profileNotifier.setStateForTest(ProfileState(userProfile: fakeProfile));
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<ProfileNotifier>.value(
+        value: profileNotifier,
+        child: MaterialApp(
+          home: const MyProfileScreen(), // The screen now takes no arguments.
           routes: {
             UpdateAccountScreen.routeName: (context) =>
                 const UpdateAccountScreen(),
           },
         ),
-      );
-    }
+      ),
+    );
+  }
+
+  group("MyProfileScreen", () {
+    testWidgets('should display user name from notifier', (
+      WidgetTester tester,
+    ) async {
+      // ARRANGE: Build the screen using our new helper.
+      await pumpMyProfileScreen(tester);
+
+      // ASSERT: The test now looks for the data from the notifier's state.
+      expect(find.text('matosJoe'), findsOneWidget);
+    });
+
+    testWidgets('should display user email from notifier', (
+      WidgetTester tester,
+    ) async {
+      await pumpMyProfileScreen(tester);
+      expect(find.text('joeltonmatos@ncc.com'), findsOneWidget);
+    });
 
     testWidgets('MyProfileScreen should display a large CircleAvatar', (
       WidgetTester tester,
@@ -32,22 +71,6 @@ void main() {
       );
 
       expect(largeAvatarFinder, findsOneWidget);
-    });
-
-    testWidgets('MyProfileScreen should display user name', (
-      WidgetTester tester,
-    ) async {
-      await pumpMyProfileScreen(tester);
-
-      expect(find.text('matosJoe'), findsOneWidget);
-    });
-
-    testWidgets('MyProfileScreen should display user email', (
-      WidgetTester tester,
-    ) async {
-      await pumpMyProfileScreen(tester);
-
-      expect(find.text('joeltonmatos@ncc.com'), findsOneWidget);
     });
 
     testWidgets('MyProfileScreen should display a "Meu cadastro" option', (
@@ -68,14 +91,11 @@ void main() {
       expect(find.byIcon(Icons.logout), findsOneWidget);
     });
     testWidgets(
-      'MyProfileScreen tapping "Meu cadastro" should navigate to UpdateAccountScreen',
+      'tapping "Meu cadastro" should navigate to UpdateAccountScreen',
       (WidgetTester tester) async {
         await pumpMyProfileScreen(tester);
-
-        final myAccountLink = find.text('Meu cadastro');
-        await tester.tap(myAccountLink);
+        await tester.tap(find.text('Meu cadastro'));
         await tester.pumpAndSettle();
-
         expect(find.byType(UpdateAccountScreen), findsOneWidget);
       },
     );

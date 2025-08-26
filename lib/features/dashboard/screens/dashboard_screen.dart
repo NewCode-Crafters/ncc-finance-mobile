@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/features/authentication/notifiers/auth_notifier.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_application_1/core/widgets/main_app_bar.dart';
 
 class DashboardScreen extends StatelessWidget {
   static const String routeName = '/dashboard';
@@ -10,17 +9,7 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              context.read<AuthNotifier>().logout();
-            },
-          ),
-        ],
-      ),
+      appBar: MainAppBar(),
       body: const Center(child: Text('Welcome to your Dashboard!')),
     );
   }

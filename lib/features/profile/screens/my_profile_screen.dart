@@ -1,66 +1,102 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/widgets/editable_avatar.dart';
+import 'package:flutter_application_1/features/authentication/notifiers/auth_notifier.dart';
 import 'package:flutter_application_1/features/authentication/screens/update_account_screen.dart';
+import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
+import 'package:provider/provider.dart';
 
-class MyProfileScreen extends StatelessWidget {
+class MyProfileScreen extends StatefulWidget {
   static const String routeName = '/profile';
-  final String userName;
-  final String userEmail;
+  const MyProfileScreen({super.key});
 
-  const MyProfileScreen({
-    super.key,
-    required this.userName,
-    required this.userEmail,
-  });
+  @override
+  State<MyProfileScreen> createState() => _MyProfileScreenState();
+}
+
+class _MyProfileScreenState extends State<MyProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchUserProfile();
+    });
+  }
+
+  void _fetchUserProfile() {
+    // Get the current user's UID directly from FirebaseAuth
+    final user = FirebaseAuth.instance.currentUser;
+    // print user
+    print('[✅_fetchUserProfile] User: ${user?.email}');
+    if (user != null) {
+      // Use context.read inside a method, not initState directly
+      context.read<ProfileNotifier>().fetchUserProfile(userId: user.uid);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final profileState = context.watch<ProfileNotifier>().state;
+    final userProfile = profileState.userProfile;
+    final isLoading = profileState.isLoading;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Meu perfil')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 2,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const EditableAvatar(radius: 50),
-                  const SizedBox(height: 16),
-                  Text(
-                    userName,
-                    style: Theme.of(context).textTheme.headlineSmall,
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const EditableAvatar(radius: 50),
+                        const SizedBox(height: 16),
+                        Text(
+                          userProfile?.name ?? 'Usuário...',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          userProfile?.email ?? '',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(userEmail, style: Theme.of(context).textTheme.bodyLarge),
+                  Expanded(
+                    flex: 3,
+                    child: ListView(
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.person_outline),
+                          title: const Text('Meu cadastro'),
+                          onTap: () {
+                            Navigator.of(
+                              context,
+                            ).pushNamed(UpdateAccountScreen.routeName);
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.logout),
+                          title: const Text('Encerrar sessão'),
+                          onTap: () {
+                            context.read<AuthNotifier>().logout();
+
+                            Navigator.of(
+                              context,
+                            ).popUntil((route) => route.isFirst);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-            Expanded(
-              flex: 3,
-              child: ListView(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.person_outline),
-                    title: const Text('Meu cadastro'),
-                    onTap: () {
-                      Navigator.of(
-                        context,
-                      ).pushNamed(UpdateAccountScreen.routeName);
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.logout),
-                    title: const Text('Encerrar sessão'),
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

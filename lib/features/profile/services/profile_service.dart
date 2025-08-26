@@ -9,6 +9,7 @@ class ProfileService {
 
   Future<UserProfile?> getUserProfile({required String userId}) async {
     final doc = await _firestore.collection('users').doc(userId).get();
+
     if (doc.exists) {
       return UserProfile.fromFirestore(doc);
     }
