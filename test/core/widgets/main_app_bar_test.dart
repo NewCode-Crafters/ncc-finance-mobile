@@ -1,18 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/widgets/main_app_bar.dart';
+import 'package:flutter_application_1/features/profile/models/user_profile.dart';
+import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
 import 'package:flutter_application_1/features/profile/screens/my_profile_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 
-Future<void> pumpMainAppBar(WidgetTester tester) async {
-  await tester.pumpWidget(
-    MaterialApp(
-      routes: {'/profile': (context) => const MyProfileScreen()},
-      home: const Scaffold(appBar: MainAppBar()),
-    ),
-  );
-}
+import '../../features/profile/screens/my_profile_screen_test.mocks.dart';
 
 void main() {
+  late MockProfileService mockProfileService;
+  late ProfileNotifier profileNotifier;
+
+  setUp(() {
+    mockProfileService = MockProfileService();
+    profileNotifier = ProfileNotifier(mockProfileService);
+
+    final fakeProfile = UserProfile(
+      uid: '1',
+      name: 'matosJoe',
+      email: 'joeltonmatos@ncc.com',
+    );
+
+    profileNotifier.setStateForTest(ProfileState(userProfile: fakeProfile));
+  });
+
+  Future<void> pumpMainAppBar(WidgetTester tester) async {
+    await tester.pumpWidget(
+      ChangeNotifierProvider<ProfileNotifier>.value(
+        value: profileNotifier,
+        child: MaterialApp(
+          routes: {'/profile': (context) => const MyProfileScreen()},
+          home: const Scaffold(appBar: MainAppBar()),
+        ),
+      ),
+    );
+  }
+
   testWidgets('MainAppBar should display a CircleAvatar', (
     WidgetTester tester,
   ) async {
