@@ -13,12 +13,13 @@ class FinancialTransactionService {
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
        _balanceService = balanceService ?? BalanceService();
 
-  Future<void> createTransaction({
+  Future<DocumentReference> createTransaction({
     required String userId,
     required Map<String, dynamic> data,
+    WriteBatch? batch,
   }) async {
     try {
-      final batch = _firestore.batch();
+      final writeBatch = batch ?? _firestore.batch();
 
       final transactionRef = _firestore
           .collection('users')
@@ -28,7 +29,7 @@ class FinancialTransactionService {
 
       final transactionData = Map<String, dynamic>.from(data);
       transactionData['date'] = Timestamp.fromDate(data['date']);
-      batch.set(transactionRef, transactionData);
+      writeBatch.set(transactionRef, transactionData);
 
       await _balanceService.updateBalanceOnTransaction(
         userId: userId,
@@ -37,7 +38,11 @@ class FinancialTransactionService {
         batch: batch,
       );
 
-      await batch.commit();
+      if (batch == null) {
+        await writeBatch.commit();
+      }
+
+      return transactionRef;
     } catch (e) {
       throw TransactionException('Failed to create transaction.');
     }

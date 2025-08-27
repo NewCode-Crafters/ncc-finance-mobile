@@ -5,6 +5,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
 
+import 'package:flutter_application_1/core/services/image_picker_service.dart'
+    as _i5;
 import 'package:flutter_application_1/features/profile/models/user_profile.dart'
     as _i4;
 import 'package:flutter_application_1/features/profile/services/profile_service.dart'
@@ -40,4 +42,14 @@ class MockProfileService extends _i1.Mock implements _i2.ProfileService {
             returnValue: _i3.Future<_i4.UserProfile?>.value(),
           )
           as _i3.Future<_i4.UserProfile?>);
+
+  @override
+  _i3.Future<String?> pickAndUploadAvatar({
+    required _i5.ImageSourceType? source,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#pickAndUploadAvatar, [], {#source: source}),
+            returnValue: _i3.Future<String?>.value(),
+          )
+          as _i3.Future<String?>);
 }
