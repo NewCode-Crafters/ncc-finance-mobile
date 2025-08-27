@@ -17,15 +17,28 @@ class ProfileNotifier extends ChangeNotifier {
 
   ProfileNotifier(this._profileService);
 
-  Future<void> fetchUserProfile({required String userId}) async {
-    _state = ProfileState(isLoading: true);
-    notifyListeners();
+  Future<void> fetchUserProfile({
+    required String userId,
+    bool forceRefresh = false,
+  }) async {
+    if (_state.isLoading ||
+        (!forceRefresh &&
+            _state.userProfile != null &&
+            _state.userProfile!.uid == userId)) {
+      return;
+    }
+
+    // Use Future.microtask to avoid "setState called during build" errors.
+    Future.microtask(() {
+      _state = ProfileState(isLoading: true, userProfile: _state.userProfile);
+      notifyListeners();
+    });
 
     try {
       final profile = await _profileService.getUserProfile(userId: userId);
       _state = ProfileState(userProfile: profile, isLoading: false);
     } catch (e) {
-      _state = ProfileState(isLoading: false);
+      _state = ProfileState(isLoading: false, userProfile: _state.userProfile);
     }
 
     notifyListeners();

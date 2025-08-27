@@ -4,12 +4,14 @@ class CustomTextField extends StatelessWidget {
   final String label;
   final bool obscureText;
   final TextEditingController? controller;
+  final bool? readOnly;
 
   const CustomTextField({
     super.key,
     required this.label,
     this.obscureText = false,
     this.controller,
+    this.readOnly = false,
   });
 
   @override
@@ -21,6 +23,7 @@ class CustomTextField extends StatelessWidget {
         border: const OutlineInputBorder(),
         labelText: label,
       ),
+      readOnly: readOnly ?? false,
     );
   }
 }

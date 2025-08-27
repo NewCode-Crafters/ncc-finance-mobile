@@ -4,6 +4,7 @@ import 'package:flutter_application_1/features/authentication/notifiers/auth_not
 import 'package:flutter_application_1/features/authentication/screens/auth_wrapper.dart';
 import 'package:flutter_application_1/features/authentication/screens/login_screen.dart';
 import 'package:flutter_application_1/features/authentication/screens/register_screen.dart';
+import 'package:flutter_application_1/features/authentication/screens/update_account_screen.dart';
 import 'package:flutter_application_1/features/authentication/services/auth_service.dart';
 import 'package:flutter_application_1/features/authentication/services/firebase_auth_service.dart';
 import 'package:flutter_application_1/features/dashboard/screens/dashboard_screen.dart';
@@ -52,6 +53,8 @@ class MyApp extends StatelessWidget {
           RegisterScreen.routeName: (context) => const RegisterScreen(),
           DashboardScreen.routeName: (context) => const DashboardScreen(),
           MyProfileScreen.routeName: (context) => const MyProfileScreen(),
+          UpdateAccountScreen.routeName: (context) =>
+              const UpdateAccountScreen(),
         },
       ),
     );

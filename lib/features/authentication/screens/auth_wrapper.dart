@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/authentication/notifiers/auth_notifier.dart';
 import 'package:flutter_application_1/features/authentication/screens/login_screen.dart';
+import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
 import 'package:flutter_application_1/features/dashboard/screens/dashboard_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -67,7 +68,6 @@ class _AuthGateState extends State<AuthGate> {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         // While waiting for the first auth state, show a loading indicator.
-        print("✅[auth_state] Connection State: ${snapshot.connectionState}");
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
@@ -76,6 +76,9 @@ class _AuthGateState extends State<AuthGate> {
 
         // Once the stream is active, check if we have a user.
         if (snapshot.hasData) {
+          final user = snapshot.data!;
+          context.read<ProfileNotifier>().fetchUserProfile(userId: user.uid);
+
           return const DashboardScreen();
         }
 

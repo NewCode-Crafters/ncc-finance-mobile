@@ -115,8 +115,17 @@ class FirebaseAuthService implements AuthService {
   }
 
   @override
-  Future<void> updateUserName({required String newName}) {
-    // TODO: implement updateUserName
-    throw UnimplementedError();
+  Future<void> updateUserName({required String newName}) async {
+    try {
+      final user = _firebaseAuth.currentUser;
+      if (user == null) {
+        throw Exception("Cannot update name for a non-authenticated user.");
+      }
+      await _firestore.collection('users').doc(user.uid).update({
+        'name': newName,
+      });
+    } catch (e) {
+      throw Exception('Failed to update user name.');
+    }
   }
 }

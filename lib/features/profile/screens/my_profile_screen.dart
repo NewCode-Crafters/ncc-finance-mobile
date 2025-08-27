@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/widgets/editable_avatar.dart';
 import 'package:flutter_application_1/features/authentication/notifiers/auth_notifier.dart';
@@ -15,25 +14,6 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchUserProfile();
-    });
-  }
-
-  void _fetchUserProfile() {
-    // Get the current user's UID directly from FirebaseAuth
-    final user = FirebaseAuth.instance.currentUser;
-    // print user
-    print('[✅_fetchUserProfile] User: ${user?.email}');
-    if (user != null) {
-      // Use context.read inside a method, not initState directly
-      context.read<ProfileNotifier>().fetchUserProfile(userId: user.uid);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final profileState = context.watch<ProfileNotifier>().state;

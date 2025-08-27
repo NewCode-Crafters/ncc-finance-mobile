@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/authentication/screens/update_account_screen.dart';
+import 'package:flutter_application_1/features/authentication/services/auth_service.dart';
 import 'package:flutter_application_1/features/profile/models/user_profile.dart';
 import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
 import 'package:flutter_application_1/features/profile/screens/my_profile_screen.dart';
@@ -8,16 +9,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:provider/provider.dart';
 
+import '../../authentication/screens/login_screen_test.mocks.dart';
 import '../notifiers/profile_notifier_test.mocks.dart';
 
 @GenerateMocks([ProfileService])
 void main() {
   late MockProfileService mockProfileService;
   late ProfileNotifier profileNotifier;
+  late MockAuthService mockAuthService;
 
-  Future<void> pumpMyProfileScreen(WidgetTester tester) async {
+  setUp(() {
     mockProfileService = MockProfileService();
     profileNotifier = ProfileNotifier(mockProfileService);
+    mockAuthService = MockAuthService();
 
     final fakeProfile = UserProfile(
       uid: '1',
@@ -26,10 +30,15 @@ void main() {
     );
 
     profileNotifier.setStateForTest(ProfileState(userProfile: fakeProfile));
+  });
 
+  Future<void> pumpMyProfileScreen(WidgetTester tester) async {
     await tester.pumpWidget(
-      ChangeNotifierProvider<ProfileNotifier>.value(
-        value: profileNotifier,
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ProfileNotifier>.value(value: profileNotifier),
+          Provider<AuthService>.value(value: mockAuthService),
+        ],
         child: MaterialApp(
           home: const MyProfileScreen(), // The screen now takes no arguments.
           routes: {
@@ -59,7 +68,7 @@ void main() {
       expect(find.text('joeltonmatos@ncc.com'), findsOneWidget);
     });
 
-    testWidgets('MyProfileScreen should display a large CircleAvatar', (
+    testWidgets('should display a large CircleAvatar', (
       WidgetTester tester,
     ) async {
       await pumpMyProfileScreen(tester);
@@ -73,7 +82,7 @@ void main() {
       expect(largeAvatarFinder, findsOneWidget);
     });
 
-    testWidgets('MyProfileScreen should display a "Meu cadastro" option', (
+    testWidgets('should display a "Meu cadastro" option', (
       WidgetTester tester,
     ) async {
       await pumpMyProfileScreen(tester);
@@ -82,7 +91,7 @@ void main() {
       expect(find.byIcon(Icons.person_outline), findsOneWidget);
     });
 
-    testWidgets('MyProfileScreen should display an "Encerrar sessão" option', (
+    testWidgets('should display an "Encerrar sessão" option', (
       WidgetTester tester,
     ) async {
       await pumpMyProfileScreen(tester);
