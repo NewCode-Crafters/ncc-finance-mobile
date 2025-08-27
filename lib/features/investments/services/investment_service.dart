@@ -18,6 +18,29 @@ class InvestmentService {
     required String userId,
     required Map<String, dynamic> data,
   }) async {
+    final investmentAmount = data['amount'] as double;
+    final balanceId = data['balanceId'] as String;
+
+    final balanceDocRef = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('balances')
+        .doc(balanceId);
+
+    final balanceSnapshot = await balanceDocRef.get();
+    if (!balanceSnapshot.exists) {
+      throw Exception('Balance account not found.');
+    }
+
+    final currentBalance = (balanceSnapshot.data()!['amount'] as num)
+        .toDouble();
+
+    if (currentBalance < investmentAmount) {
+      throw InsufficientFundsException(
+        'Saldo insuficiente para realizar o investimento.',
+      );
+    }
+
     try {
       final batch = _firestore.batch();
 
@@ -46,7 +69,10 @@ class InvestmentService {
 
       await batch.commit();
     } catch (e) {
-      throw InvestmentException('Failed to create investment.');
+      if (e is! InsufficientFundsException) {
+        throw InvestmentException('Failed to create investment.');
+      }
+      rethrow;
     }
   }
 

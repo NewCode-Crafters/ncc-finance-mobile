@@ -4,6 +4,7 @@ import 'package:flutter_application_1/core/widgets/custom_text_field.dart';
 import 'package:flutter_application_1/core/widgets/primary_button.dart';
 import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:flutter_application_1/features/investments/notifiers/investment_notifier.dart';
+import 'package:flutter_application_1/features/investments/services/investment_exceptions.dart';
 import 'package:flutter_application_1/features/investments/services/investment_service.dart';
 import 'package:provider/provider.dart';
 
@@ -91,9 +92,14 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
         );
         Navigator.of(context).pop();
       }
+    } on InsufficientFundsException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
+      }
     } catch (e) {
       if (mounted) {
-        print('Erro: ${e.toString()}');
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Erro: ${e.toString()}')));
