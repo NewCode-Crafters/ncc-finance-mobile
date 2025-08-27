@@ -17,13 +17,17 @@ class AuthGate extends StatefulWidget {
 
 class _AuthGateState extends State<AuthGate> {
   late AuthNotifier _authNotifier;
+  late ProfileNotifier _profileNotifier;
 
   @override
   void initState() {
     super.initState();
     _authNotifier = context.read<AuthNotifier>();
+    _profileNotifier = context.read<ProfileNotifier>();
+
     // Listen for changes in AuthNotifier's state to display messages
     _authNotifier.addListener(_onAuthMessageChanged);
+    _profileNotifier.addListener(_onProfileMessageChanged);
   }
 
   @override
@@ -62,6 +66,19 @@ class _AuthGateState extends State<AuthGate> {
     }
   }
 
+  void _onProfileMessageChanged() {
+    final errorMessage = _profileNotifier.state.errorMessage;
+    if (errorMessage != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(errorMessage)));
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
@@ -78,6 +95,8 @@ class _AuthGateState extends State<AuthGate> {
         if (snapshot.hasData) {
           final user = snapshot.data!;
           context.read<ProfileNotifier>().fetchUserProfile(userId: user.uid);
+
+          // TODO: Fetch the initial balance data here.
 
           return const DashboardScreen();
         }

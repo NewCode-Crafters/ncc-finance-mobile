@@ -1,12 +1,26 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_application_1/core/services/image_picker_service.dart';
 import 'package:flutter_application_1/features/profile/models/user_profile.dart';
 import 'package:flutter_application_1/features/profile/services/profile_service.dart';
 
 class ProfileState {
   final UserProfile? userProfile;
   final bool isLoading;
+  final String? errorMessage;
 
-  ProfileState({this.userProfile, this.isLoading = false});
+  ProfileState({this.userProfile, this.isLoading = false, this.errorMessage});
+
+  ProfileState copyWith({
+    UserProfile? userProfile,
+    bool? isLoading,
+    String? errorMessage,
+  }) {
+    return ProfileState(
+      userProfile: userProfile ?? this.userProfile,
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage ?? this.errorMessage,
+    );
+  }
 }
 
 class ProfileNotifier extends ChangeNotifier {
@@ -46,5 +60,35 @@ class ProfileNotifier extends ChangeNotifier {
 
   setStateForTest(ProfileState newState) {
     _state = newState;
+  }
+
+  Future<void> updateUserAvatar({
+    required String userId,
+    required ImageSourceType source,
+  }) async {
+    _state = ProfileState(isLoading: true, userProfile: _state.userProfile);
+    notifyListeners();
+
+    try {
+      final newPhotoUrl = await _profileService.pickAndUploadAvatar(
+        source: source,
+      );
+
+      if (newPhotoUrl != null) {
+        final updatedProfile = _state.userProfile?.copyWith(
+          photoUrl: newPhotoUrl,
+        );
+        _state = _state.copyWith(isLoading: false, userProfile: updatedProfile);
+      } else {
+        _state = _state.copyWith(isLoading: false);
+      }
+    } catch (e) {
+      _state = ProfileState(
+        isLoading: false,
+        userProfile: _state.userProfile,
+        errorMessage: 'Failed to upload avatar. Please try again.',
+      );
+    }
+    notifyListeners();
   }
 }

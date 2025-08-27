@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/core/services/image_picker_service.dart';
 import 'package:flutter_application_1/core/widgets/editable_avatar.dart';
 import 'package:flutter_application_1/features/authentication/notifiers/auth_notifier.dart';
 import 'package:flutter_application_1/features/authentication/screens/update_account_screen.dart';
@@ -14,6 +16,46 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
+  void _showImageSourceActionSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Tirar Foto'),
+                onTap: () {
+                  Navigator.of(context).pop(); // Close the modal
+                  _updateAvatar(ImageSourceType.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Galeria'),
+                onTap: () {
+                  Navigator.of(context).pop(); // Close the modal
+                  _updateAvatar(ImageSourceType.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _updateAvatar(ImageSourceType source) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      context.read<ProfileNotifier>().updateUserAvatar(
+        userId: user.uid,
+        source: source,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileState = context.watch<ProfileNotifier>().state;
@@ -33,7 +75,13 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const EditableAvatar(radius: 50),
+                        EditableAvatar(
+                          radius: 50,
+                          photoUrl: userProfile?.photoUrl,
+                          userId: userProfile?.uid,
+                          onEditPressed: () =>
+                              _showImageSourceActionSheet(context),
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           userProfile?.name ?? 'Usuário...',

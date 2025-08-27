@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/core/utils/color_helper.dart';
+import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
 import 'package:flutter_application_1/features/profile/screens/my_profile_screen.dart';
+import 'package:provider/provider.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final userProfile = context.watch<ProfileNotifier>().state.userProfile;
+
     return AppBar(
       title: const Text('Bytebank'),
       actions: [
@@ -15,7 +20,27 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             onTap: () {
               Navigator.of(context).pushNamed(MyProfileScreen.routeName);
             },
-            child: const CircleAvatar(),
+            child: CircleAvatar(
+              backgroundImage: userProfile?.photoUrl != null
+                  ? NetworkImage(userProfile!.photoUrl!)
+                  : null,
+              backgroundColor:
+                  userProfile != null && userProfile.photoUrl == null
+                  ? ColorHelper.getColorFromString(userProfile.uid)
+                  : Colors.grey.shade400,
+              child: userProfile?.photoUrl == null
+                  ? Text(
+                      userProfile?.name.isNotEmpty == true
+                          ? userProfile!.name[0].toUpperCase()
+                          : '?',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : null,
+            ),
           ),
         ),
       ],

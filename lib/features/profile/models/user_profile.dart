@@ -13,6 +13,20 @@ class UserProfile {
     this.photoUrl,
   });
 
+  UserProfile copyWith({
+    String? uid,
+    String? name,
+    String? email,
+    String? photoUrl,
+  }) {
+    return UserProfile(
+      uid: uid ?? this.uid,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      photoUrl: photoUrl ?? this.photoUrl,
+    );
+  }
+
   factory UserProfile.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return UserProfile(

@@ -1,16 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/core/utils/color_helper.dart';
 
 class EditableAvatar extends StatelessWidget {
   final double radius;
+  final String? photoUrl;
   final VoidCallback? onEditPressed;
+  final String? userId;
 
-  const EditableAvatar({super.key, required this.radius, this.onEditPressed});
+  const EditableAvatar({
+    super.key,
+    required this.radius,
+    this.photoUrl,
+    this.onEditPressed,
+    this.userId,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        CircleAvatar(radius: radius, child: const Icon(Icons.person, size: 50)),
+        CircleAvatar(
+          radius: radius,
+          backgroundImage: photoUrl != null ? NetworkImage(photoUrl!) : null,
+          backgroundColor: photoUrl == null
+              ? ColorHelper.getColorFromString(userId ?? "")
+              : null,
+          child: photoUrl == null
+              ? const Icon(Icons.person, size: 50, color: Colors.white)
+              : null,
+        ),
         Positioned(
           bottom: 0,
           right: 0,
