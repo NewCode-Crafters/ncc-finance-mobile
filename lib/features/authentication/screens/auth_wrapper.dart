@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/authentication/notifiers/auth_notifier.dart';
 import 'package:flutter_application_1/features/authentication/screens/login_screen.dart';
+import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
 import 'package:flutter_application_1/features/dashboard/screens/dashboard_screen.dart';
 import 'package:provider/provider.dart';
@@ -96,7 +97,7 @@ class _AuthGateState extends State<AuthGate> {
           final user = snapshot.data!;
           context.read<ProfileNotifier>().fetchUserProfile(userId: user.uid);
 
-          // TODO: Fetch the initial balance data here.
+          context.read<BalanceNotifier>().fetchBalances(userId: user.uid);
 
           return const DashboardScreen();
         }

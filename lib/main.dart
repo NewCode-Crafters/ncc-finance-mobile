@@ -7,7 +7,13 @@ import 'package:flutter_application_1/features/authentication/screens/register_s
 import 'package:flutter_application_1/features/authentication/screens/update_account_screen.dart';
 import 'package:flutter_application_1/features/authentication/services/auth_service.dart';
 import 'package:flutter_application_1/features/authentication/services/firebase_auth_service.dart';
+import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:flutter_application_1/features/dashboard/screens/dashboard_screen.dart';
+import 'package:flutter_application_1/features/dashboard/services/balance_service.dart';
+import 'package:flutter_application_1/features/investments/notifiers/investment_notifier.dart';
+import 'package:flutter_application_1/features/investments/screens/create_investment_screen.dart';
+import 'package:flutter_application_1/features/investments/screens/investments_screen.dart';
+import 'package:flutter_application_1/features/investments/services/investment_service.dart';
 import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
 import 'package:flutter_application_1/features/profile/screens/my_profile_screen.dart';
 import 'package:flutter_application_1/features/profile/services/profile_service.dart';
@@ -39,6 +45,17 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<ProfileNotifier>(
           create: (context) => ProfileNotifier(context.read<ProfileService>()),
         ),
+        // --- Balance ---
+        Provider<BalanceService>(create: (_) => BalanceService()),
+        ChangeNotifierProvider<BalanceNotifier>(
+          create: (context) => BalanceNotifier(context.read<BalanceService>()),
+        ),
+        // --- Investments ---
+        Provider<InvestmentService>(create: (_) => InvestmentService()),
+        ChangeNotifierProvider<InvestmentNotifier>(
+          create: (context) =>
+              InvestmentNotifier(context.read<InvestmentService>()),
+        ),
       ],
       child: MaterialApp(
         title: 'Bytebank',
@@ -55,6 +72,9 @@ class MyApp extends StatelessWidget {
           MyProfileScreen.routeName: (context) => const MyProfileScreen(),
           UpdateAccountScreen.routeName: (context) =>
               const UpdateAccountScreen(),
+          InvestmentsScreen.routeName: (context) => const InvestmentsScreen(),
+          CreateInvestmentScreen.routeName: (context) =>
+              const CreateInvestmentScreen(),
         },
       ),
     );

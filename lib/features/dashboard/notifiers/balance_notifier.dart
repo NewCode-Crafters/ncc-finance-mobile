@@ -23,8 +23,10 @@ class BalanceNotifier extends ChangeNotifier {
   BalanceNotifier(this._balanceService);
 
   Future<void> fetchBalances({required String userId}) async {
-    _state = BalanceState(isLoading: true);
-    notifyListeners();
+    Future.microtask(() {
+      _state = BalanceState(isLoading: true);
+      notifyListeners();
+    });
 
     try {
       final balances = await _balanceService.getBalances(userId: userId);
