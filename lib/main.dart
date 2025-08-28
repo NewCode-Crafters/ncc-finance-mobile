@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/dashboard_page.dart';
-import 'package:flutter_application_1/pages/transaction_list_page.dart';
+import 'package:flutter_application_1/features/dashboard/screens/dashboard_page.dart';
+import 'package:flutter_application_1/features/transaction/screens/transaction_list_page.dart';
 import 'package:flutter_application_1/theme/theme.dart';
 
 void main() {

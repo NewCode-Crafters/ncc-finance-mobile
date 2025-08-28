@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/components/nav_bar.dart';
+import 'package:flutter_application_1/core/widgets/nav_bar.dart';
 import 'package:flutter_application_1/models/nav_model.dart';
-import 'package:flutter_application_1/services/transaction_list_service.dart';
+import 'package:flutter_application_1/features/transaction/services/transaction_list_service.dart';
 import 'package:flutter_application_1/theme/theme.dart';
 
 class TransactionListPage extends StatefulWidget {
