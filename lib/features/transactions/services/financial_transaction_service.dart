@@ -50,14 +50,40 @@ class FinancialTransactionService {
 
   Future<List<FinancialTransaction>> getTransactions({
     required String userId,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     try {
-      final snapshot = await _firestore
+      Query query = _firestore
           .collection('users')
           .doc(userId)
           .collection('transactions')
-          .orderBy('date', descending: true)
-          .get();
+          .orderBy('date', descending: true);
+
+      if (startDate != null) {
+        query = query.where(
+          'date',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+        );
+      }
+
+      if (endDate != null) {
+        final inclusiveEndDate = DateTime(
+          endDate.year,
+          endDate.month,
+          endDate.day,
+          23,
+          59,
+          59,
+        );
+
+        query = query.where(
+          'date',
+          isLessThanOrEqualTo: Timestamp.fromDate(inclusiveEndDate),
+        );
+      }
+
+      final snapshot = await query.get();
 
       return snapshot.docs
           .map((doc) => FinancialTransaction.fromFirestore(doc))

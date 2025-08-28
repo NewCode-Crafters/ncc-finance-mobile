@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_application_1/core/services/metadata_service.dart';
+import 'package:flutter_application_1/features/transactions/notifiers/transaction_notifier.dart';
+import 'package:flutter_application_1/features/transactions/screens/transactions_screen.dart';
+import 'package:flutter_application_1/features/transactions/services/financial_transaction_service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -60,6 +64,17 @@ class MyApp extends StatelessWidget {
           create: (context) =>
               InvestmentNotifier(context.read<InvestmentService>()),
         ),
+        // --- Transactions ---
+        Provider<MetadataService>(create: (_) => MetadataService()),
+        Provider<FinancialTransactionService>(
+          create: (_) => FinancialTransactionService(),
+        ),
+        ChangeNotifierProvider<TransactionNotifier>(
+          create: (context) => TransactionNotifier(
+            context.read<FinancialTransactionService>(),
+            context.read<MetadataService>(),
+          ),
+        ),
       ],
       child: MaterialApp(
         title: 'Bytebank',
@@ -85,6 +100,7 @@ class MyApp extends StatelessWidget {
           InvestmentsScreen.routeName: (context) => const InvestmentsScreen(),
           CreateInvestmentScreen.routeName: (context) =>
               const CreateInvestmentScreen(),
+          TransactionsScreen.routeName: (context) => const TransactionsScreen(),
         },
       ),
     );

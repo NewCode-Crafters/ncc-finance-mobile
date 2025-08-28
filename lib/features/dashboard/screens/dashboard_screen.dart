@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/dashboard/widgets/action_card.dart';
+import 'package:flutter_application_1/features/transactions/screens/transactions_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_application_1/core/widgets/main_app_bar.dart';
 import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
@@ -114,7 +115,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ActionCard(
                   icon: Icons.swap_horiz,
                   label: 'Fazer uma\ntransação',
-                  onTap: () {}, // Void for now
+                  onTap: () {
+                    Navigator.of(
+                      context,
+                    ).pushNamed(TransactionsScreen.routeName);
+                  },
                 ),
                 ActionCard(
                   icon: Icons.bar_chart,
