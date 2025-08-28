@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/transactions/notifiers/transaction_notifier.dart';
+import 'package:flutter_application_1/features/transactions/screens/create_transaction_screen.dart';
 import 'package:flutter_application_1/features/transactions/widgets/transaction_list_item.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -111,21 +112,39 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.calendar_today),
+                      ActionChip(
+                        avatar: const Icon(Icons.calendar_today, size: 16),
+                        label: Text(
+                          '${DateFormat('dd/MM/yy').format(state.startDate)} - ${DateFormat('dd/MM/yy').format(state.endDate)}',
+                        ),
                         onPressed: () =>
                             notifier.updateDateRange(context, userId),
                       ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(DateFormat('dd/MM/yy').format(state.startDate)),
-                          const Text('  -  '),
-                          Text(DateFormat('dd/MM/yy').format(state.endDate)),
-                        ],
+                      const Spacer(),
+                      Card(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.of(
+                              context,
+                            ).pushNamed(CreateTransactionScreen.routeName);
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12.0,
+                              vertical: 8.0,
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.add),
+                                SizedBox(width: 8),
+                                Text('Nova Transação'),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),

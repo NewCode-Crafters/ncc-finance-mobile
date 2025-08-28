@@ -71,6 +71,16 @@ class TransactionNotifier extends ChangeNotifier {
     }).toList();
   }
 
+  List<TransactionCategory> get userSelectableCategories {
+    final filtered = _state.categories
+        .where((c) => c.id != 'INVESTMENT' && c.id != 'INVESTMENT_REDEMPTION')
+        .toList();
+
+    filtered.sort((a, b) => a.label.compareTo(b.label));
+
+    return filtered;
+  }
+
   Future<void> fetchTransactions(String userId) async {
     _state = _state.copyWith(isLoading: true);
     notifyListeners();
