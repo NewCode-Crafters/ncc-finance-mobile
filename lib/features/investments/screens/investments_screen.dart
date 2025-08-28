@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:flutter_application_1/features/investments/notifiers/investment_notifier.dart';
 import 'package:flutter_application_1/features/investments/screens/create_investment_screen.dart';
+import 'package:flutter_application_1/features/investments/widgets/investment_list_item.dart';
 import 'package:provider/provider.dart';
 
 class InvestmentsScreen extends StatefulWidget {
@@ -15,6 +17,17 @@ class InvestmentsScreen extends StatefulWidget {
 }
 
 class _InvestmentsScreenState extends State<InvestmentsScreen> {
+  final List<Color> _colors = [
+    Colors.green,
+    Colors.blue,
+    Colors.purple,
+    Colors.orange,
+    Colors.red,
+    Colors.teal,
+    Colors.pink,
+    Colors.amber,
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -25,9 +38,44 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
 
   void _fetchData() {
     final userId = FirebaseAuth.instance.currentUser?.uid;
-    print('🎉 Current User ID: $userId');
     if (userId != null) {
       context.read<InvestmentNotifier>().fetchInvestments(userId: userId);
+    }
+  }
+
+  Future<bool?> _showDeleteConfirmationDialog() async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar Exclusão'),
+        content: const Text(
+          'Deseja realmente resgatar este investimento? A ação criará uma transação de entrada no seu saldo.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Confirmar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteInvestment(String investmentId) async {
+    if (mounted) {
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      final investmentNotifier = context.read<InvestmentNotifier>();
+      final balanceNotifier = context.read<BalanceNotifier>();
+
+      await investmentNotifier.deleteInvestment(
+        userId: userId,
+        investmentId: investmentId,
+      );
+      await balanceNotifier.fetchBalances(userId: userId);
     }
   }
 
@@ -49,7 +97,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                   const SizedBox(height: 24),
                   _buildSummaryCards(investmentState),
                   const SizedBox(height: 24),
-                  _buildInvestmentList(investmentState),
+                  _buildInvestmentList(investmentState, _colors),
                 ],
               ),
             ),
@@ -179,10 +227,15 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     );
   }
 
-  Widget _buildInvestmentList(InvestmentState state) {
+  Widget _buildInvestmentList(InvestmentState state, List<Color> colors) {
     if (state.investments.isEmpty) {
       return const Center(child: Text('Você ainda não possui investimentos.'));
     }
+
+    final typeToColor = {
+      for (var i = 0; i < state.chartData.keys.length; i++)
+        state.chartData.keys.elementAt(i): colors[i % colors.length],
+    };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,14 +252,17 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           itemCount: state.investments.length,
           itemBuilder: (context, index) {
             final investment = state.investments[index];
-            return Card(
-              child: ListTile(
-                title: Text(investment.name),
-                subtitle: Text(
-                  investment.investedAt.toLocal().toString().split(' ')[0],
-                ),
-                trailing: Text('R\$ ${investment.amount.toStringAsFixed(2)}'),
-              ),
+            return InvestmentListItem(
+              investment: investment,
+              indicatorColor: typeToColor[investment.type] ?? Colors.grey,
+              onConfirmDelete: () async {
+                final confirmed = await _showDeleteConfirmationDialog();
+                if (confirmed == true) {
+                  await _deleteInvestment(investment.id);
+                  return true; // This will dismiss the item
+                }
+                return false; // This will not dismiss the item
+              },
             );
           },
         ),

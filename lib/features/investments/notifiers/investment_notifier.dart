@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_application_1/features/investments/models/investment.dart';
+import 'package:flutter_application_1/features/investments/services/investment_exceptions.dart';
 import 'package:flutter_application_1/features/investments/services/investment_service.dart';
 
 class InvestmentState {
@@ -9,6 +10,7 @@ class InvestmentState {
   final double totalFixedIncome;
   final double totalVariableIncome;
   final Map<String, double> chartData;
+  final String? errorMessage;
 
   InvestmentState({
     this.investments = const [],
@@ -17,7 +19,28 @@ class InvestmentState {
     this.totalFixedIncome = 0.0,
     this.totalVariableIncome = 0.0,
     this.chartData = const {}, // Default to an empty map
+    this.errorMessage,
   });
+
+  InvestmentState copyWith({
+    List<Investment>? investments,
+    bool? isLoading,
+    double? totalInvestments,
+    double? totalFixedIncome,
+    double? totalVariableIncome,
+    Map<String, double>? chartData,
+    String? errorMessage,
+  }) {
+    return InvestmentState(
+      investments: investments ?? this.investments,
+      isLoading: isLoading ?? this.isLoading,
+      totalInvestments: totalInvestments ?? this.totalInvestments,
+      totalFixedIncome: totalFixedIncome ?? this.totalFixedIncome,
+      totalVariableIncome: totalVariableIncome ?? this.totalVariableIncome,
+      chartData: chartData ?? this.chartData,
+      errorMessage: errorMessage ?? this.errorMessage,
+    );
+  }
 }
 
 class InvestmentNotifier extends ChangeNotifier {
@@ -73,5 +96,30 @@ class InvestmentNotifier extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  Future<void> deleteInvestment({
+    required String userId,
+    required String investmentId,
+  }) async {
+    try {
+      await _investmentService.deleteInvestment(
+        userId: userId,
+        investmentId: investmentId,
+      );
+      await fetchInvestments(userId: userId);
+    } on InvestmentException catch (e) {
+      _state = _state.copyWith(errorMessage: e.message);
+      notifyListeners();
+    } catch (e) {
+      _state = _state.copyWith(errorMessage: 'Um erro inesperado ocorreu.');
+      notifyListeners();
+    }
+  }
+
+  void clearError() {
+    if (_state.errorMessage != null) {
+      _state = _state.copyWith(errorMessage: null);
+    }
   }
 }

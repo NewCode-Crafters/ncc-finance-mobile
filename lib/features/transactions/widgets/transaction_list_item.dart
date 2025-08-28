@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/transactions/models/financial_transaction.dart';
+import 'package:flutter_application_1/features/transactions/utils/transaction_helpers.dart';
 import 'package:intl/intl.dart';
 
 class TransactionListItem extends StatelessWidget {
@@ -15,33 +16,6 @@ class TransactionListItem extends StatelessWidget {
     required this.onDelete,
     required this.onEdit,
   });
-
-  IconData _getIconForCategory(String categoryId) {
-    switch (categoryId) {
-      case 'SALARY':
-        return Icons.monetization_on;
-      case 'FOOD':
-        return Icons.fastfood;
-      case 'HOUSING':
-        return Icons.house;
-      case 'TRANSPORT':
-        return Icons.directions_car;
-      case 'LEISURE':
-        return Icons.sports_esports;
-      case 'HEALTH':
-        return Icons.healing;
-      case 'EDUCATION':
-        return Icons.school;
-      case 'SHOPPING':
-        return Icons.shopping_cart;
-      case 'INVESTMENT':
-        return Icons.bar_chart;
-      case 'INVESTMENT_REDEMPTION':
-        return Icons.trending_up;
-      default:
-        return Icons.category;
-    }
-  }
 
   Widget _buildDismissibleBackground({
     required Color color,
@@ -115,7 +89,7 @@ class TransactionListItem extends StatelessWidget {
           },
           child: ListTile(
             leading: CircleAvatar(
-              child: Icon(_getIconForCategory(transaction.category)),
+              child: Icon(getIconForCategory(transaction.category)),
             ),
             title: Text(categoryLabel),
             subtitle: Column(

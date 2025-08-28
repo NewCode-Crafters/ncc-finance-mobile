@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/features/authentication/notifiers/auth_notifier.dart';
 import 'package:flutter_application_1/features/authentication/screens/login_screen.dart';
 import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:flutter_application_1/features/investments/notifiers/investment_notifier.dart';
 import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
 import 'package:flutter_application_1/features/dashboard/screens/dashboard_screen.dart';
 import 'package:provider/provider.dart';
@@ -19,16 +20,19 @@ class AuthGate extends StatefulWidget {
 class _AuthGateState extends State<AuthGate> {
   late AuthNotifier _authNotifier;
   late ProfileNotifier _profileNotifier;
+  late InvestmentNotifier _investmentNotifier;
 
   @override
   void initState() {
     super.initState();
     _authNotifier = context.read<AuthNotifier>();
     _profileNotifier = context.read<ProfileNotifier>();
+    _investmentNotifier = context.read<InvestmentNotifier>();
 
     // Listen for changes in AuthNotifier's state to display messages
     _authNotifier.addListener(_onAuthMessageChanged);
     _profileNotifier.addListener(_onProfileMessageChanged);
+    _investmentNotifier.addListener(_onInvestmentMessageChanged);
   }
 
   @override
@@ -75,6 +79,21 @@ class _AuthGateState extends State<AuthGate> {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(errorMessage)));
+        }
+      });
+    }
+  }
+
+  void _onInvestmentMessageChanged() {
+    final errorMessage = _investmentNotifier.state.errorMessage;
+    if (errorMessage != null) {
+      _investmentNotifier.clearError();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+          );
         }
       });
     }

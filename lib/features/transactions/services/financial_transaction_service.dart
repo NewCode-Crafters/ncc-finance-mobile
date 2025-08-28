@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/features/dashboard/services/balance_service.dart';
 import 'package:flutter_application_1/features/transactions/models/financial_transaction.dart';
@@ -43,7 +44,13 @@ class FinancialTransactionService {
       }
 
       return transactionRef;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      log(
+        'Error creating transaction',
+        error: e,
+        stackTrace: stackTrace,
+        name: 'FinancialTransactionService',
+      );
       throw TransactionException('Failed to create transaction.');
     }
   }

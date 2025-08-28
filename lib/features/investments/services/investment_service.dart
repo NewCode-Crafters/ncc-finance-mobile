@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/features/investments/models/investment.dart';
 import 'package:flutter_application_1/features/investments/services/investment_exceptions.dart';
@@ -104,7 +105,7 @@ class InvestmentService {
           'amount': investmentData['amount'],
           'balanceId': investmentData['balanceId'],
           'category': 'INVESTMENT_REDEMPTION',
-          'date': Timestamp.now(),
+          'date': DateTime.now(),
           'description': 'Redemption of ${investmentData['name']}',
           'investmentId': investmentId,
         },
@@ -112,8 +113,17 @@ class InvestmentService {
       );
 
       await batch.commit();
-    } catch (e) {
-      throw InvestmentException('Failed to delete investment.');
+    } catch (e, stackTrace) {
+      log(
+        'Error deleting investment and creating redemption transaction',
+        error: e,
+        stackTrace: stackTrace,
+        name: 'InvestmentService',
+      );
+
+      throw InvestmentException(
+        'Ocorreu um erro ao resgatar o investimento. Tente novamente.',
+      );
     }
   }
 
