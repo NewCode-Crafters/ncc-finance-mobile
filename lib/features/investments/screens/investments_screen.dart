@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:flutter_application_1/features/investments/notifiers/investment_notifier.dart';
-import 'package:flutter_application_1/features/investments/screens/create_investment_screen.dart';
-import 'package:flutter_application_1/features/investments/widgets/investment_list_item.dart';
+import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
+import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
+import 'package:bytebank/features/investments/widgets/investment_list_item.dart';
 import 'package:provider/provider.dart';
 
 class InvestmentsScreen extends StatefulWidget {

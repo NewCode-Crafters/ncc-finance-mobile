@@ -1,6 +1,6 @@
-import 'package:flutter_application_1/features/investments/models/investment.dart';
-import 'package:flutter_application_1/features/investments/notifiers/investment_notifier.dart';
-import 'package:flutter_application_1/features/investments/services/investment_service.dart';
+import 'package:bytebank/features/investments/models/investment.dart';
+import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
+import 'package:bytebank/features/investments/services/investment_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';

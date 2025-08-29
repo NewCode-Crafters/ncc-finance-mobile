@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/features/dashboard/widgets/action_card.dart';
-import 'package:flutter_application_1/features/transactions/screens/transactions_screen.dart';
+import 'package:bytebank/features/dashboard/widgets/action_card.dart';
+import 'package:bytebank/features/transactions/screens/transactions_screen.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_application_1/core/widgets/main_app_bar.dart';
-import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:flutter_application_1/features/investments/screens/investments_screen.dart';
-import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
+import 'package:bytebank/core/widgets/main_app_bar.dart';
+import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/features/investments/screens/investments_screen.dart';
+import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
 import 'package:provider/provider.dart';
 
 class DashboardScreen extends StatefulWidget {

@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/validators.dart';
-import 'package:flutter_application_1/features/authentication/services/auth_exceptions.dart';
-import 'package:flutter_application_1/features/authentication/services/auth_service.dart';
+import 'package:bytebank/core/validators.dart';
+import 'package:bytebank/features/authentication/services/auth_exceptions.dart';
+import 'package:bytebank/features/authentication/services/auth_service.dart';
 
 class AuthState extends Equatable {
   final bool isLoading;

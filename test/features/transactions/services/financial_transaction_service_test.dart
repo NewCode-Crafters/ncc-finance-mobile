@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:flutter_application_1/features/dashboard/services/balance_service.dart';
-import 'package:flutter_application_1/features/transactions/services/financial_transaction_service.dart';
+import 'package:bytebank/features/dashboard/services/balance_service.dart';
+import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';

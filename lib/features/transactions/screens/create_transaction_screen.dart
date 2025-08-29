@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/services/metadata_service.dart';
-import 'package:flutter_application_1/core/widgets/primary_button.dart';
-import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:flutter_application_1/features/transactions/notifiers/transaction_notifier.dart';
-import 'package:flutter_application_1/features/transactions/services/financial_transaction_service.dart';
-import 'package:flutter_application_1/features/transactions/utils/transaction_helpers.dart';
+import 'package:bytebank/core/services/metadata_service.dart';
+import 'package:bytebank/core/widgets/primary_button.dart';
+import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
+import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
+import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:provider/provider.dart';
 

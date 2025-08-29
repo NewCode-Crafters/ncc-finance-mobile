@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/constants/app_assets.dart';
-import 'package:flutter_application_1/features/authentication/screens/auth_wrapper.dart';
+import 'package:bytebank/core/constants/app_assets.dart';
+import 'package:bytebank/features/authentication/screens/auth_wrapper.dart';
 
 class SplashScreen extends StatefulWidget {
   static const String routeName = '/splash';

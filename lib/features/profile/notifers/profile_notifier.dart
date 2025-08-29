@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_application_1/core/services/image_picker_service.dart';
-import 'package:flutter_application_1/features/profile/models/user_profile.dart';
-import 'package:flutter_application_1/features/profile/services/profile_service.dart';
+import 'package:bytebank/core/services/image_picker_service.dart';
+import 'package:bytebank/features/profile/models/user_profile.dart';
+import 'package:bytebank/features/profile/services/profile_service.dart';
 
 class ProfileState {
   final UserProfile? userProfile;

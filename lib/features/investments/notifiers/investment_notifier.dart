@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_application_1/features/investments/models/investment.dart';
-import 'package:flutter_application_1/features/investments/services/investment_exceptions.dart';
-import 'package:flutter_application_1/features/investments/services/investment_service.dart';
+import 'package:bytebank/features/investments/models/investment.dart';
+import 'package:bytebank/features/investments/services/investment_exceptions.dart';
+import 'package:bytebank/features/investments/services/investment_service.dart';
 
 class InvestmentState {
   final List<Investment> investments;

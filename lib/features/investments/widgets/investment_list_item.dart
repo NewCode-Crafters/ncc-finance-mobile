@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/features/investments/models/investment.dart';
+import 'package:bytebank/features/investments/models/investment.dart';
 import 'package:intl/intl.dart';
 
 class InvestmentListItem extends StatelessWidget {

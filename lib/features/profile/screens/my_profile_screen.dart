@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/services/image_picker_service.dart';
-import 'package:flutter_application_1/core/widgets/editable_avatar.dart';
-import 'package:flutter_application_1/features/authentication/notifiers/auth_notifier.dart';
-import 'package:flutter_application_1/features/authentication/screens/update_account_screen.dart';
-import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
+import 'package:bytebank/core/services/image_picker_service.dart';
+import 'package:bytebank/core/widgets/editable_avatar.dart';
+import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
+import 'package:bytebank/features/authentication/screens/update_account_screen.dart';
+import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
 import 'package:provider/provider.dart';
 
 class MyProfileScreen extends StatefulWidget {

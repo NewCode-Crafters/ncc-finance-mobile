@@ -1,6 +1,6 @@
-import 'package:flutter_application_1/features/authentication/notifiers/auth_notifier.dart';
-import 'package:flutter_application_1/features/authentication/services/auth_exceptions.dart';
-import 'package:flutter_application_1/features/authentication/services/auth_service.dart';
+import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
+import 'package:bytebank/features/authentication/services/auth_exceptions.dart';
+import 'package:bytebank/features/authentication/services/auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';

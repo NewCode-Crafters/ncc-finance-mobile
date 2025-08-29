@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/widgets/main_app_bar.dart';
-import 'package:flutter_application_1/features/profile/models/user_profile.dart';
-import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
-import 'package:flutter_application_1/features/profile/screens/my_profile_screen.dart';
+import 'package:bytebank/core/widgets/main_app_bar.dart';
+import 'package:bytebank/features/profile/models/user_profile.dart';
+import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
+import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 

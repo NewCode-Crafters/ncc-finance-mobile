@@ -1,6 +1,6 @@
-import 'package:flutter_application_1/features/dashboard/models/balance.dart';
-import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:flutter_application_1/features/dashboard/services/balance_service.dart';
+import 'package:bytebank/features/dashboard/models/balance.dart';
+import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/features/dashboard/services/balance_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';

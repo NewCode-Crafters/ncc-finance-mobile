@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/widgets/primary_button.dart';
-import 'package:flutter_application_1/features/authentication/notifiers/auth_notifier.dart';
-import 'package:flutter_application_1/features/authentication/screens/register_screen.dart';
-import 'package:flutter_application_1/features/authentication/services/auth_service.dart';
-import 'package:flutter_application_1/features/dashboard/screens/dashboard_screen.dart';
+import 'package:bytebank/core/widgets/primary_button.dart';
+import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
+import 'package:bytebank/features/authentication/screens/register_screen.dart';
+import 'package:bytebank/features/authentication/services/auth_service.dart';
+import 'package:bytebank/features/dashboard/screens/dashboard_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:provider/provider.dart';

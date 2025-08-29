@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/features/authentication/notifiers/auth_notifier.dart';
-import 'package:flutter_application_1/features/authentication/screens/login_screen.dart';
-import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:flutter_application_1/features/investments/notifiers/investment_notifier.dart';
-import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
-import 'package:flutter_application_1/features/dashboard/screens/dashboard_screen.dart';
-import 'package:flutter_application_1/features/transactions/notifiers/transaction_notifier.dart';
+import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
+import 'package:bytebank/features/authentication/screens/login_screen.dart';
+import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
+import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
+import 'package:bytebank/features/dashboard/screens/dashboard_screen.dart';
+import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:provider/provider.dart';
 
 /// AuthGate is responsible for routing based on the user's authentication state

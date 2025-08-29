@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/widgets/custom_text_field.dart';
-import 'package:flutter_application_1/core/widgets/primary_button.dart';
-import 'package:flutter_application_1/features/authentication/notifiers/auth_notifier.dart';
+import 'package:bytebank/core/widgets/custom_text_field.dart';
+import 'package:bytebank/core/widgets/primary_button.dart';
+import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
 import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_application_1/features/dashboard/models/balance.dart';
+import 'package:bytebank/features/dashboard/models/balance.dart';
 
 class BalanceService {
   final FirebaseFirestore _firestore;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/services/metadata_service.dart';
-import 'package:flutter_application_1/features/transactions/models/financial_transaction.dart';
-import 'package:flutter_application_1/features/transactions/services/financial_transaction_service.dart';
+import 'package:bytebank/core/services/metadata_service.dart';
+import 'package:bytebank/features/transactions/models/financial_transaction.dart';
+import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
 
 DateTime _startOfMonth(DateTime date) => DateTime(date.year, date.month, 1);
 

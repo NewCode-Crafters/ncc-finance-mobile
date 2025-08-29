@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter_application_1/core/services/image_picker_service.dart';
-import 'package:flutter_application_1/features/profile/models/user_profile.dart';
+import 'package:bytebank/core/services/image_picker_service.dart';
+import 'package:bytebank/features/profile/models/user_profile.dart';
 
 class ProfileService {
   final FirebaseFirestore _firestore;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/features/dashboard/models/balance.dart';
-import 'package:flutter_application_1/features/dashboard/services/balance_service.dart';
+import 'package:bytebank/features/dashboard/models/balance.dart';
+import 'package:bytebank/features/dashboard/services/balance_service.dart';
 
 class BalanceState {
   final List<Balance> balances;

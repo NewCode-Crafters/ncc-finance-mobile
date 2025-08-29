@@ -1,6 +1,6 @@
-import 'package:flutter_application_1/features/profile/models/user_profile.dart';
-import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
-import 'package:flutter_application_1/features/profile/services/profile_service.dart';
+import 'package:bytebank/features/profile/models/user_profile.dart';
+import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
+import 'package:bytebank/features/profile/services/profile_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';

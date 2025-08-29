@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/widgets/custom_text_field.dart';
-import 'package:flutter_application_1/core/widgets/primary_button.dart';
-import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:flutter_application_1/features/investments/notifiers/investment_notifier.dart';
-import 'package:flutter_application_1/features/investments/services/investment_exceptions.dart';
-import 'package:flutter_application_1/features/investments/services/investment_service.dart';
+import 'package:bytebank/core/widgets/custom_text_field.dart';
+import 'package:bytebank/core/widgets/primary_button.dart';
+import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
+import 'package:bytebank/features/investments/services/investment_exceptions.dart';
+import 'package:bytebank/features/investments/services/investment_service.dart';
 import 'package:provider/provider.dart';
 
 class CreateInvestmentScreen extends StatefulWidget {
