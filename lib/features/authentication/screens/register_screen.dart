@@ -1,3 +1,6 @@
+import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/custom_text_field.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
@@ -38,6 +41,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Capture the navigator before the async call to avoid using BuildContext
     // across an async gap.
     final navigator = Navigator.of(context);
+    final balanceNotifier = context.read<BalanceNotifier>();
+    final profileNotifier = context.read<ProfileNotifier>();
 
     final bool success = await _authNotifier.signUp(
       name: _nameController.text,
@@ -46,6 +51,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
 
     if (success && mounted) {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId != null) {
+        // Fetch both profile and balance to ensure the notifiers are populated
+        // before the user lands on the dashboard.
+        await profileNotifier.fetchUserProfile(userId: userId);
+        await balanceNotifier.fetchBalances(userId: userId);
+      }
       navigator.pop();
     }
   }
