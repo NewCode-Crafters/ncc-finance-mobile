@@ -300,7 +300,7 @@ _Focuses on migrating the application's entire data structure and business logic
 - **Then** the user's balance must be reverted accordingly.
 - **And** this logic should be encapsulated in reusable functions that can be tested independently.
 
-### ✅ [US7] Implement CRUD Logic for Transactions
+### ✅ [US7] Implement CRUD Logic for Transactions | [Joelton]
 
 - **As a** developer,
 - **I want to** build the core functions to create, read, update, and delete transaction documents,
@@ -313,7 +313,7 @@ _Focuses on migrating the application's entire data structure and business logic
 - **Then** a new document must be added to that user's `transactions` sub-collection in Firestore.
 - **And** functions to read a single transaction, read all transactions, update a transaction, and delete a transaction must be implemented and tested.
 
-### [US8] Implement CRUD Logic for Investments
+### ✅ [US8] Implement CRUD Logic for Investments | [Joelton]
 
 - **As a** developer,
 - **I want to** build the core functions to create, read, update, and delete investment documents,
@@ -341,7 +341,7 @@ _Focuses on migrating the application's entire data structure and business logic
 - **When** the "investment chart" logic is called,
 - **Then** it must query Firestore and return an aggregated summary of investments by category.
 
-### [US10] Implement Unit and Integration Tests for Business Logic
+### ✅ [US10] Implement Unit and Integration Tests for Business Logic | [Joelton]
 
 - **As a** developer,
 - **I want to** write comprehensive tests for all backend functions,
@@ -361,7 +361,7 @@ _Focuses on migrating the application's entire data structure and business logic
 
 _Focuses on connecting the static UI screens built in Epic 1 with the Firebase backend logic defined in Epic 2. This epic will make the application fully interactive and data-driven._
 
-### [US1] Connect Login & Registration to Firebase Authentication
+### ✅ [US1] Connect Login & Registration to Firebase Authentication | [Joelton]
 
 - **As a** user,
 - **I want to** have my inputs on the Login and Registration screens actually create a session or a new account,
@@ -376,7 +376,7 @@ _Focuses on connecting the static UI screens built in Epic 1 with the Firebase b
 - **Then** the "Authentication Business Logic" for login from Epic 2 must be called.
 - **And** upon successful authentication, the user must be navigated to the main application dashboard.
 
-### [US2] Connect 'Update Account' Screen to Firestore
+### ✅ [US2] Connect 'Update Account' Screen to Firestore | [Joelton]
 
 - **As a** user,
 - **I want to** be able to save the changes I make to my profile,
@@ -389,7 +389,7 @@ _Focuses on connecting the static UI screens built in Epic 1 with the Firebase b
 - **Then** the "Update User Profile Information" logic from Epic 2 must be called.
 - **And** the UI should display a success message and reflect the updated name in the header.
 
-### [US3] Populate Dashboard with Live Data from Firestore
+### ✅ [US3] Populate Dashboard with Live Data from Firestore | [Joelton]
 
 - **As a** user,
 - **I want to** see my real, up-to-date financial information on the dashboard,
@@ -416,7 +416,7 @@ _Focuses on connecting the static UI screens built in Epic 1 with the Firebase b
 - **And** the static donut chart placeholder must be replaced with a live chart displaying the expense data.
 - **And** the list below the chart must be populated with my real expense data.
 
-### [US5] Populate 'Investments' Screen with Live Data
+### ✅ [US5] Populate 'Investments' Screen with Live Data [Joelton]
 
 - **As a** user,
 - **I want to** see a chart and summary of my real investments,
@@ -429,7 +429,7 @@ _Focuses on connecting the static UI screens built in Epic 1 with the Firebase b
 - **Then** the backend logic to aggregate investment data (from Epic 2) must be called.
 - **And** the static summary and chart components must be populated with my live investment data.
 
-### [US6] Connect 'Create Transaction' & 'Create Investment' Forms to Firestore
+### ✅ [US6] Connect 'Create Transaction' & 'Create Investment' Forms to Firestore | [Joelton]
 
 - **As a** user,
 - **I want to** be able to save new transactions and investments,
@@ -445,7 +445,7 @@ _Focuses on connecting the static UI screens built in Epic 1 with the Firebase b
 - **Then** the "CRUD Logic for Investments" from Epic 2 must be called to create a new investment document in Firestore.
 - **And** upon success, the user should be navigated away from the form, and the relevant data lists should update.
 
-### [US7] Enable Transaction and Investment Deletion from the UI
+### ✅ [US7] Enable Transaction and Investment Deletion from the UI | [Joelton]
 
 - **As a** user,
 - **I want to** be able to delete transactions or investments I no longer need,
@@ -666,52 +666,3 @@ _Focuses on fulfilling all the non-code deliverables required for the project su
 - Updating an Email: You don't just change the email in the database. For security, you call a special Firebase function (currentUser.verifyBeforeUpdateEmail()). This sends a verification link to the new email address to confirm the user actually owns it. The email is only updated after they click that link.
 
 - Updating a Password: This is also a special, secure function (currentUser.updatePassword()). To prevent someone from picking up an unlocked phone and changing the password, Firebase requires the user to have logged in recently. If they haven't, the app must ask them to re-enter their old password before they can set a new one.
-
-# Quest List
-
-Quest Log: Business Logic for Transactions (Revised)
-
-## Phase 1: Core Logic & Robustness
-
-✅ 1. Create a New Transaction Document
-✅ 2. Debit/Credit Balance on New Transaction
-✅ 3. Fetch All Transactions for a User
-✅ 4. Delete a Transaction Document
-✅ 5. Revert Balance on Transaction Deletion
-✅ 6. Add Robust Error Handling to Service Methods
-✅ 7. Edit a Transaction's Details: The service can update the non-financial details (description, category, date) of an existing transaction.
-
-## Phase 2: Advanced Features
-
-◻️ 8. Upload a Receipt to Storage & Link to Transaction
-◻️ 9. Filter Transactions by Date and Category
-◻️ 10. Paginate Transactions for Infinite Scroll
-
-## Phase 3: Notifier Logic
-
-◻️ 11. Fetch and Display Transactions in Notifier
-◻️ 12. Add a New Transaction via Notifier
-
-# Quest Log: The Complete User Profile Feature
-
-## Phase 1: Backend & Data Model
-
-✅ 1. Add Avatar URL to User Model & Service: Enhance our Firestore users model to include a photoUrl field and create the service method to update it.
-
-## Phase 2: UI Scaffolding (TDD)
-
-✅ 2. Build Reusable AppBar with Profile Avatar: Create a global AppBar that displays the user's avatar and can be used on all authenticated screens.
-
-✅ 3. Build Static 'My Profile' Screen: Create the main profile screen that displays the avatar, name, email, and the list of options ("Meu cadastro", "Encerrar sessão").
-
-✅ 4. Build Static 'Update Profile Details' Screen: This is our original UpdateAccountScreen for editing the user's name.
-
-## Phase 3: Integration & Functionality
-
-✅ 5. Implement Navigation Flows: Connect the AppBar avatar to the 'My Profile' screen, and the "Meu cadastro" link to the 'Update Profile Details' screen.
-
-✅ 6. Populate Profile Screens with Live Data: Fetch and display the real user name, email, and avatar from Firestore.
-
-7. Connect 'Update Profile Details' Logic: Make the "Save Changes" button functional to update the user's name.
-
-8. Implement Avatar Upload Flow: Implement the full flow of picking an image, uploading it to Firebase Storage, and updating the user's photoUrl.

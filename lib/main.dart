@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_application_1/core/services/metadata_service.dart';
+import 'package:flutter_application_1/features/splash/screens/splash_screen.dart';
 import 'package:flutter_application_1/features/transactions/models/financial_transaction.dart';
 import 'package:flutter_application_1/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:flutter_application_1/features/transactions/screens/create_transaction_screen.dart';
@@ -92,7 +93,7 @@ class MyApp extends StatelessWidget {
         ],
         supportedLocales: const [Locale('pt', 'BR')],
         // The AuthGate will decide which screen to show.
-        home: const AuthGate(),
+        home: const SplashScreen(),
         routes: {
           LoginScreen.routeName: (context) => const LoginScreen(),
           RegisterScreen.routeName: (context) => const RegisterScreen(),

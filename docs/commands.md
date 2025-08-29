@@ -25,5 +25,29 @@ flutter test               # Runs all unit and widget tests
 flutter test test/features/authentication/notifiers/auth_notifier_test.dart
 ```
 
+### Test Mocks
+
 - dart run build_runner build # Generate the mocks
-- dart run build_runner build --delete-conflicting-outputs # Regenerate the mocks
+
+# Regenerate the mocks
+
+- dart run build_runner build --delete-conflicting-outputs
+
+### Splash Screen
+
+- dart run flutter_native_splash:create
+
+### Icon
+
+- dart run flutter_launcher_icons:generate
+- dart run flutter_launcher_icons:generate --override
+
+# Quest List Temp
+
+Quest Log: Business Logic for Transactions (Revised)
+
+## Phase 2: Advanced Features
+
+◻️ 8. Upload a Receipt to Storage & Link to Transaction
+◻️ 9. Filter Transactions by Date and Category
+◻️ 10. Paginate Transactions for Infinite Scroll

@@ -61,6 +61,8 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   fake_cloud_firestore: ^4.0.0
   firebase_auth_mocks: ^0.15.0
+  flutter_native_splash: ^2.4.6
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -102,3 +104,22 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_native_splash:
+  # The background color of the splash screen
+  color: "#C6E0AE" # A green color
+
+  # The image to show on the splash screen
+  image: assets/images/bytebank_1152.png
+
+  # Android 12 has special theming. This ensures it looks good there too.
+  android_12:
+    color: "#C6E0AE"
+    image: assets/images/bytebank_1152.png
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/bytebank_logo_1024.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#C6E0AE"
