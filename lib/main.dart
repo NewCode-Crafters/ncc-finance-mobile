@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_application_1/core/services/metadata_service.dart';
+import 'package:flutter_application_1/features/transactions/models/financial_transaction.dart';
 import 'package:flutter_application_1/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:flutter_application_1/features/transactions/screens/create_transaction_screen.dart';
+import 'package:flutter_application_1/features/transactions/screens/edit_transaction_screen.dart';
 import 'package:flutter_application_1/features/transactions/screens/transactions_screen.dart';
 import 'package:flutter_application_1/features/transactions/services/financial_transaction_service.dart';
 import 'package:provider/provider.dart';
@@ -104,6 +106,18 @@ class MyApp extends StatelessWidget {
           TransactionsScreen.routeName: (context) => const TransactionsScreen(),
           CreateTransactionScreen.routeName: (context) =>
               const CreateTransactionScreen(),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == EditTransactionScreen.routeName) {
+            final transaction = settings.arguments as FinancialTransaction;
+            return MaterialPageRoute(
+              builder: (context) =>
+                  EditTransactionScreen(transaction: transaction),
+            );
+          }
+          return MaterialPageRoute(
+            builder: (_) => const AuthGate(),
+          ); // Fallback
         },
       ),
     );

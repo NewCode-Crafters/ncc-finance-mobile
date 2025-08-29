@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:flutter_application_1/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:flutter_application_1/features/transactions/screens/create_transaction_screen.dart';
+import 'package:flutter_application_1/features/transactions/screens/edit_transaction_screen.dart';
 import 'package:flutter_application_1/features/transactions/widgets/transaction_list_item.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +54,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     String transactionId,
   ) async {
     final notifier = context.read<TransactionNotifier>();
+    final balanceNotifier = context.read<BalanceNotifier>();
     final userId = FirebaseAuth.instance.currentUser!.uid;
 
     final confirmed = await showDialog<bool>(
@@ -79,6 +82,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         userId: userId,
         transactionId: transactionId,
       );
+      await balanceNotifier.fetchBalances(userId: userId);
     }
   }
 
@@ -180,6 +184,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       itemCount: notifier.visibleTransactions.length,
                       itemBuilder: (context, index) {
                         final transaction = notifier.visibleTransactions[index];
+
+                        final bool isInvestmentTransaction =
+                            transaction.category == 'INVESTMENT' ||
+                            transaction.category == 'INVESTMENT_REDEMPTION';
+
                         return TransactionListItem(
                           transaction: transaction,
                           categoryLabel: notifier.getCategoryLabel(
@@ -188,8 +197,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           onDelete: () =>
                               _showDeleteConfirmation(context, transaction.id),
                           onEdit: () {
-                            /* TODO: Implement Edit */
+                            Navigator.of(context).pushNamed(
+                              EditTransactionScreen.routeName,
+                              arguments: transaction,
+                            );
                           },
+                          isReadOnly: isInvestmentTransaction,
                         );
                       },
                     ),

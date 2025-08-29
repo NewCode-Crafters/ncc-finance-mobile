@@ -6,6 +6,7 @@ import 'package:flutter_application_1/features/dashboard/notifiers/balance_notif
 import 'package:flutter_application_1/features/investments/notifiers/investment_notifier.dart';
 import 'package:flutter_application_1/features/profile/notifers/profile_notifier.dart';
 import 'package:flutter_application_1/features/dashboard/screens/dashboard_screen.dart';
+import 'package:flutter_application_1/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:provider/provider.dart';
 
 /// AuthGate is responsible for routing based on the user's authentication state
@@ -21,6 +22,7 @@ class _AuthGateState extends State<AuthGate> {
   late AuthNotifier _authNotifier;
   late ProfileNotifier _profileNotifier;
   late InvestmentNotifier _investmentNotifier;
+  late TransactionNotifier _transactionNotifier;
 
   @override
   void initState() {
@@ -28,16 +30,21 @@ class _AuthGateState extends State<AuthGate> {
     _authNotifier = context.read<AuthNotifier>();
     _profileNotifier = context.read<ProfileNotifier>();
     _investmentNotifier = context.read<InvestmentNotifier>();
+    _transactionNotifier = context.read<TransactionNotifier>();
 
     // Listen for changes in AuthNotifier's state to display messages
     _authNotifier.addListener(_onAuthMessageChanged);
     _profileNotifier.addListener(_onProfileMessageChanged);
     _investmentNotifier.addListener(_onInvestmentMessageChanged);
+    _transactionNotifier.addListener(_onTransactionMessageChanged);
   }
 
   @override
   void dispose() {
     _authNotifier.removeListener(_onAuthMessageChanged);
+    _profileNotifier.removeListener(_onProfileMessageChanged);
+    _investmentNotifier.removeListener(_onInvestmentMessageChanged);
+    _transactionNotifier.removeListener(_onTransactionMessageChanged);
     super.dispose();
   }
 
@@ -97,6 +104,33 @@ class _AuthGateState extends State<AuthGate> {
         }
       });
     }
+  }
+
+  void _onTransactionMessageChanged() {
+    final successMessage = _transactionNotifier.state.successMessage;
+    final errorMessage = _transactionNotifier.state.error;
+
+    if (successMessage != null) {
+      _transactionNotifier.clearSuccessMessage();
+      _showSnackBar(successMessage, isError: false);
+    } else if (errorMessage != null) {
+      // TODO: move your error handling for transactions here if you like
+      // _transactionNotifier.clearError();
+      // _showSnackBar(errorMessage, isError: true);
+    }
+  }
+
+  void _showSnackBar(String message, {bool isError = false}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: isError ? Colors.red : Colors.green[600],
+          ),
+        );
+      }
+    });
   }
 
   @override

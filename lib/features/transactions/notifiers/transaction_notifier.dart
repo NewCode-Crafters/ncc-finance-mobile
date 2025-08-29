@@ -10,6 +10,7 @@ class TransactionState {
   final List<TransactionCategory> categories;
   final bool isLoading;
   final String? error;
+  final String? successMessage;
   final String searchText;
   final DateTime startDate;
   final DateTime endDate;
@@ -19,6 +20,7 @@ class TransactionState {
     this.categories = const [],
     this.isLoading = false,
     this.error,
+    this.successMessage,
     DateTime? startDate, // Make nullable for default
     DateTime? endDate,
     this.searchText = '',
@@ -30,6 +32,7 @@ class TransactionState {
     List<TransactionCategory>? categories,
     bool? isLoading,
     String? error,
+    String? successMessage,
     String? searchText,
     DateTime? startDate,
     DateTime? endDate,
@@ -39,6 +42,7 @@ class TransactionState {
       categories: categories ?? this.categories,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      successMessage: successMessage,
       searchText: searchText ?? this.searchText,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
@@ -71,15 +75,22 @@ class TransactionNotifier extends ChangeNotifier {
     }).toList();
   }
 
-  List<TransactionCategory> get userSelectableCategories {
+  List<TransactionCategory> _filterAndSort(String type) {
     final filtered = _state.categories
-        .where((c) => c.id != 'INVESTMENT' && c.id != 'INVESTMENT_REDEMPTION')
+        .where(
+          (c) =>
+              c.type == type &&
+              c.id != 'INVESTMENT' &&
+              c.id != 'INVESTMENT_REDEMPTION',
+        )
         .toList();
-
     filtered.sort((a, b) => a.label.compareTo(b.label));
-
     return filtered;
   }
+
+  List<TransactionCategory> get incomeCategories => _filterAndSort('income');
+
+  List<TransactionCategory> get expenseCategories => _filterAndSort('expense');
 
   Future<void> fetchTransactions(String userId) async {
     _state = _state.copyWith(isLoading: true);
@@ -115,6 +126,12 @@ class TransactionNotifier extends ChangeNotifier {
         userId: userId,
         transactionId: transactionId,
       );
+
+      _state = _state.copyWith(
+        successMessage: 'Transação excluída com sucesso!',
+      );
+      notifyListeners();
+
       // Refresh the list after deletion
       await fetchTransactions(userId);
     } catch (e) {
@@ -157,8 +174,32 @@ class TransactionNotifier extends ChangeNotifier {
     }
   }
 
+  Future<void> editTransaction({
+    required String userId,
+    required String transactionId,
+    required Map<String, dynamic> data,
+  }) async {
+    try {
+      await _transactionService.editTransaction(
+        userId: userId,
+        transactionId: transactionId,
+        updateData: data,
+      );
+      await fetchTransactions(userId);
+    } catch (e) {
+      _state = _state.copyWith(error: "Falha ao editar a transação.");
+      notifyListeners();
+    }
+  }
+
   void resetFilters() {
     // Create a new default state
     _state = TransactionState();
+  }
+
+  void clearSuccessMessage() {
+    if (_state.successMessage != null) {
+      _state = _state.copyWith(successMessage: null);
+    }
   }
 }

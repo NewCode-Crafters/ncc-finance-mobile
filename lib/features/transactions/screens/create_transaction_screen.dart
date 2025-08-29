@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/services/metadata_service.dart';
 import 'package:flutter_application_1/core/widgets/primary_button.dart';
@@ -18,6 +19,8 @@ class CreateTransactionScreen extends StatefulWidget {
       _CreateTransactionScreenState();
 }
 
+enum TransactionType { expense, income }
+
 class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
   final _descriptionController = TextEditingController();
   final _amountController = MoneyMaskedTextController(
@@ -28,6 +31,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
 
   TransactionCategory? _selectedCategory;
   bool _isLoading = false;
+  TransactionType _selectedType = TransactionType.expense;
 
   Future<void> _handleCreateTransaction() async {
     if (_selectedCategory == null || _amountController.numberValue <= 0) {
@@ -48,7 +52,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
       final userId = FirebaseAuth.instance.currentUser!.uid;
       final balanceId = context.read<BalanceNotifier>().state.balances.first.id;
 
-      final amount = _selectedCategory!.type == 'income'
+      final amount = _selectedType == TransactionType.income
           ? _amountController.numberValue
           : -_amountController.numberValue;
 
@@ -66,6 +70,19 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
       if (mounted) {
         await context.read<TransactionNotifier>().fetchTransactions(userId);
         await context.read<BalanceNotifier>().fetchBalances(userId: userId);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.check_circle, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Transação realizada com sucesso!'),
+              ],
+            ),
+            backgroundColor: Colors.green[600],
+          ),
+        );
 
         Navigator.of(context).pop();
       }
@@ -86,9 +103,11 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final categories = context
-        .watch<TransactionNotifier>()
-        .userSelectableCategories;
+    final notifier = context.watch<TransactionNotifier>();
+
+    final categories = _selectedType == TransactionType.income
+        ? notifier.incomeCategories
+        : notifier.expenseCategories;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Criar Transação')),
@@ -96,6 +115,28 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            CupertinoSlidingSegmentedControl<TransactionType>(
+              groupValue: _selectedType,
+              children: const {
+                TransactionType.expense: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text('Despesa'),
+                ),
+                TransactionType.income: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text('Receita'),
+                ),
+              },
+              onValueChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedType = value;
+                    _selectedCategory = null;
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 24),
             DropdownButtonFormField<TransactionCategory>(
               value: _selectedCategory,
               hint: const Text('Selecione uma categoria'),
