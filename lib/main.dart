@@ -29,6 +29,7 @@ import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
 import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
 import 'package:bytebank/features/profile/services/profile_service.dart';
 import 'package:bytebank/firebase_options.dart';
+import 'package:bytebank/theme/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,10 +83,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Bytebank',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-          useMaterial3: true,
-        ),
+        theme: appTheme,
         localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,

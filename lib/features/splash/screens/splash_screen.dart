@@ -1,3 +1,4 @@
+import 'package:bytebank/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/constants/app_assets.dart';
 import 'package:bytebank/features/authentication/screens/auth_wrapper.dart';
@@ -82,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      color: appTheme.colorScheme.primary,
                     ),
                   ),
                 ],
@@ -97,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 'by NCC Finance',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  color: appTheme.colorScheme.surface,
                 ),
               ),
             ),
