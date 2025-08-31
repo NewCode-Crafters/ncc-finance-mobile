@@ -25,7 +25,7 @@ import 'package:bytebank/features/investments/notifiers/investment_notifier.dart
 import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
 import 'package:bytebank/features/investments/screens/investments_screen.dart';
 import 'package:bytebank/features/investments/services/investment_service.dart';
-import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
+import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
 import 'package:bytebank/features/profile/services/profile_service.dart';
 import 'package:bytebank/firebase_options.dart';

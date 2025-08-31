@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/custom_text_field.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
 import 'package:bytebank/features/authentication/services/auth_service.dart';
-import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
+import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:provider/provider.dart';
 
 class UpdateAccountScreen extends StatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:bytebank/features/profile/models/user_profile.dart';
-import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
+import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/profile/services/profile_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';

@@ -1,32 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/models/nav_model.dart';
-import 'package:bytebank/features/transaction/services/transaction_list_service.dart';
+import 'package:bytebank/features/pokemons/services/pokemons_service.dart';
 
-class TransactionListPage extends StatefulWidget {
-  const TransactionListPage({super.key});
+class PokemonListScreen extends StatefulWidget {
+  const PokemonListScreen({super.key});
 
   @override
-  State<TransactionListPage> createState() => _TransactionListPageState();
+  State<PokemonListScreen> createState() => _PokemonListScreenState();
 }
 
-class _TransactionListPageState extends State<TransactionListPage> {
-  dynamic? _transaction;
+class _PokemonListScreenState extends State<PokemonListScreen> {
+  dynamic? _pokemon;
   bool _loading = false;
   String? _error;
   int selectedTab = 0;
   List<NavModel> items = [];
 
-  Future<void> _getRandomTransaction() async {
+  Future<void> _getRandomPokemon() async {
     setState(() {
       _loading = true;
       _error = null;
     });
 
     try {
-      final dynamic transaction =
-          await TransactionListService.fetchRandomTransaction();
+      final dynamic pokemon = await PokemonListService.fetchRandomPokemon();
       setState(() {
-        _transaction = transaction;
+        _pokemon = pokemon;
       });
     } catch (e) {
       setState(() {
@@ -42,7 +41,7 @@ class _TransactionListPageState extends State<TransactionListPage> {
   @override
   void initState() {
     super.initState();
-    _getRandomTransaction();
+    _getRandomPokemon();
   }
 
   @override
@@ -53,29 +52,29 @@ class _TransactionListPageState extends State<TransactionListPage> {
             ? const CircularProgressIndicator()
             : _error != null
             ? Text('Error: $_error')
-            : _transaction == null
-            ? const Text('No Transaction found')
+            : _pokemon == null
+            ? const Text('No Pokemon found')
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.network(_transaction!.spriteUrl),
+                  Image.network(_pokemon!.spriteUrl),
                   Text(
-                    _transaction!.name.toUpperCase(),
+                    _pokemon!.name.toUpperCase(),
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    "Weight: ${_transaction!.weight}",
+                    "Weight: ${_pokemon!.weight}",
                     style: const TextStyle(color: Colors.white),
                   ),
                   Text(
-                    "Types: ${_transaction!.types.join(', ')}",
+                    "Types: ${_pokemon!.types.join(', ')}",
                     style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 10),
-                  ..._transaction!.stats.entries.map(
+                  ..._pokemon!.stats.entries.map(
                     (e) => Text(
                       '${e.key}: ${e.value}',
                       style: const TextStyle(color: Colors.white),
@@ -83,8 +82,8 @@ class _TransactionListPageState extends State<TransactionListPage> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: _getRandomTransaction,
-                    child: const Text('Get Another Transaction'),
+                    onPressed: _getRandomPokemon,
+                    child: const Text('Get Another Pokemon'),
                   ),
                 ],
               ),

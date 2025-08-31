@@ -1,3 +1,4 @@
+import 'package:bytebank/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class ActionCard extends StatelessWidget {
@@ -15,6 +16,7 @@ class ActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: AppColors.brandSecondary,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
@@ -24,9 +26,15 @@ class ActionCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 32),
+              Icon(icon, size: 32, color: AppColors.brandPrimary),
               const SizedBox(height: 8),
-              Text(label, textAlign: TextAlign.center),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: const Color.fromARGB(255, 228, 234, 227),
+                ),
+              ),
             ],
           ),
         ),

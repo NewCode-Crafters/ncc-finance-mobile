@@ -3,7 +3,7 @@ import 'package:bytebank/core/widgets/primary_button.dart';
 import 'package:bytebank/features/authentication/screens/update_account_screen.dart';
 import 'package:bytebank/features/authentication/services/auth_service.dart';
 import 'package:bytebank/features/profile/models/user_profile.dart';
-import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
+import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/profile/services/profile_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';

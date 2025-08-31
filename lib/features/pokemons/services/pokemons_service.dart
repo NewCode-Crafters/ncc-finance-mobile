@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class TransactionListService {
+class PokemonListService {
   static const String baseUrl = 'https://pokeapi.co/api/v2/pokemon';
 
   static Future<dynamic> fetchPokemonByName(String name) async {
@@ -15,12 +15,12 @@ class TransactionListService {
     }
   }
 
-  static Future<dynamic> fetchRandomTransaction() async {
+  static Future<dynamic> fetchRandomPokemon() async {
     final randomId = Random().nextInt(898) + 1; // Pokémon up to Gen 8
     final response = await http.get(Uri.parse('$baseUrl/$randomId'));
 
     if (response.statusCode == 200) {
-      return fromJson(json.decode(response.body)); 
+      return fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to load Pokémon');
     }

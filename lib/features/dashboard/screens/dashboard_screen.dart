@@ -1,5 +1,5 @@
 import 'package:bytebank/core/widgets/nav_bar.dart';
-import 'package:bytebank/features/transaction/screens/transaction_list_page.dart';
+import 'package:bytebank/features/pokemons/screens/pokemons_screen.dart';
 import 'package:bytebank/core/models/nav_model.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:bytebank/core/widgets/main_app_bar.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/investments/screens/investments_screen.dart';
-import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
+import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:provider/provider.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -64,7 +64,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       'pt_BR',
     );
 
+    final currentNavigator = items.isNotEmpty
+        ? items[selectedTab].navKey.currentState
+        : null;
+    final canPopNested = currentNavigator?.canPop() ?? false;
+
     return Scaffold(
+      backgroundColor: AppColors.surfaceDefault,
       appBar: const MainAppBar(),
       body: RefreshIndicator(
         onRefresh: _refreshData,
@@ -72,7 +78,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           padding: const EdgeInsets.all(16.0),
           children: [
             Text(
-              'Ben-vindo de volta',
+              'Bem-vindo de volta',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             Text(
@@ -84,8 +90,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 24),
-
-            // --- Balance Card ---
             Card(
               color: Colors.green.shade100,
               child: Padding(
@@ -128,8 +132,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // --- Action Buttons ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -158,18 +160,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ],
             ),
-            WillPopScope(
-              onWillPop: () {
-                if (items[selectedTab].navKey.currentState?.canPop() ?? false) {
-                  items[selectedTab].navKey.currentState?.pop();
-                  return Future.value(false);
-                } else {
-                  return Future.value(true);
-                }
+            PopScope(
+              canPop: !canPopNested,
+              onPopInvokedWithResult: (bool didPop, _) {
+                // If the pop was vetoed (didPop: false), it means our nested navigator can pop.
+                // We handle it manually here. If the pop was allowed (didPop: true), we do nothing.
+                if (didPop) return;
+                currentNavigator?.pop();
               },
-              child: Scaffold(
-                backgroundColor: AppColors.surfaceDefault,
-                body: IndexedStack(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.5,
+                child: IndexedStack(
                   index: selectedTab,
                   children: items
                       .map(
@@ -186,24 +187,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       )
                       .toList(),
                 ),
-                bottomNavigationBar: NavBar(
-                  pageIndex: selectedTab,
-                  onTap: (index) {
-                    if (index == selectedTab) {
-                      items[index].navKey.currentState?.popUntil(
-                        (route) => route.isFirst,
-                      );
-                    } else {
-                      setState(() {
-                        selectedTab = index;
-                      });
-                    }
-                  },
-                ),
               ),
             ),
           ],
         ),
+      ),
+      bottomNavigationBar: NavBar(
+        pageIndex: selectedTab,
+        onTap: (index) {
+          if (index == selectedTab) {
+            items[index].navKey.currentState?.popUntil(
+              (route) => route.isFirst,
+            );
+          } else {
+            setState(() {
+              selectedTab = index;
+            });
+          }
+        },
       ),
     );
   }
@@ -247,7 +248,7 @@ class Page extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Page Tab $tab')),
-      body: Center(child: tab != 1 ? Text('Tab $tab') : TransactionListPage()),
+      body: Center(child: tab != 1 ? Text('Tab $tab') : PokemonListScreen()),
     );
   }
 }

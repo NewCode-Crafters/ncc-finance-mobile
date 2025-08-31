@@ -4,7 +4,7 @@ import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
 import 'package:bytebank/features/authentication/screens/login_screen.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
-import 'package:bytebank/features/profile/notifers/profile_notifier.dart';
+import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/dashboard/screens/dashboard_screen.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:provider/provider.dart';
