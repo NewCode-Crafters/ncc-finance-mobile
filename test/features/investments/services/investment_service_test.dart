@@ -27,41 +27,48 @@ void main() {
     );
   });
 
-  // test(
-  //   'createInvestment should add a new document to the investments sub-collection',
-  //   () async {
-  //     when(
-  //       mockTransactionService.createTransaction(
-  //         userId: anyNamed('userId'),
-  //         data: anyNamed('data'),
-  //         batch: anyNamed('batch'),
-  //       ),
-  //     ).thenAnswer((_) async => MockDocumentReference());
+  test(
+    'createInvestment should add a new document to the investments sub-collection',
+    () async {
+      when(
+        mockTransactionService.createTransaction(
+          userId: anyNamed('userId'),
+          data: anyNamed('data'),
+          batch: anyNamed('batch'),
+        ),
+      ).thenAnswer((_) async => MockDocumentReference());
 
-  //     final investmentData = {
-  //       'name': 'Tesouro Selic 2029',
-  //       'amount': 5000.0,
-  //       'category': 'FIXED_INCOME',
-  //       'type': 'GOVERNMENT_BOND',
-  //       'investedAt': DateTime.now(),
-  //       'balanceId': 'test_balance_id',
-  //     };
+      final investmentData = {
+        'name': 'Tesouro Selic 2029',
+        'amount': 5000.0,
+        'category': 'FIXED_INCOME',
+        'type': 'GOVERNMENT_BOND',
+        'investedAt': DateTime.now(),
+        'balanceId': 'test_balance_id',
+      };
 
-  //     await investmentService.createInvestment(
-  //       userId: userId,
-  //       data: investmentData,
-  //     );
+      await fakeFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('balances')
+          .doc('test_balance_id')
+          .set({'amount': 10000.0});
 
-  //     final snapshot = await fakeFirestore
-  //         .collection('users')
-  //         .doc(userId)
-  //         .collection('investments')
-  //         .get();
+      await investmentService.createInvestment(
+        userId: userId,
+        data: investmentData,
+      );
 
-  //     expect(snapshot.docs.length, 1);
-  //     expect(snapshot.docs.first.data()['name'], 'Tesouro Selic 2029');
-  //   },
-  // );
+      final snapshot = await fakeFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('investments')
+          .get();
+
+      expect(snapshot.docs.length, 1);
+      expect(snapshot.docs.first.data()['name'], 'Tesouro Selic 2029');
+    },
+  );
 
   test(
     'deleteInvestment should remove the document from the sub-collection',
@@ -132,47 +139,54 @@ void main() {
     },
   );
 
-  // test(
-  //   'createInvestment should create a corresponding expense transaction',
-  //   () async {
-  //     when(
-  //       mockTransactionService.createTransaction(
-  //         userId: anyNamed('userId'),
-  //         data: anyNamed('data'),
-  //         batch: anyNamed('batch'),
-  //       ),
-  //     ).thenAnswer((_) async => MockDocumentReference());
+  test(
+    'createInvestment should create a corresponding expense transaction',
+    () async {
+      when(
+        mockTransactionService.createTransaction(
+          userId: anyNamed('userId'),
+          data: anyNamed('data'),
+          batch: anyNamed('batch'),
+        ),
+      ).thenAnswer((_) async => MockDocumentReference());
 
-  //     final investmentData = {
-  //       'name': 'Tesouro Selic 2029',
-  //       'amount': 5000.0,
-  //       'balanceId': 'test_balance_id',
-  //       'investedAt': DateTime.now(),
-  //       'category': 'FIXED_INCOME',
-  //       'type': 'GOVERNMENT_BOND',
-  //     };
+      final investmentData = {
+        'name': 'Tesouro Selic 2029',
+        'amount': 5000.0,
+        'balanceId': 'test_balance_id',
+        'investedAt': DateTime.now(),
+        'category': 'FIXED_INCOME',
+        'type': 'GOVERNMENT_BOND',
+      };
 
-  //     await investmentService.createInvestment(
-  //       userId: userId,
-  //       data: investmentData,
-  //     );
+      await fakeFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('balances')
+          .doc('test_balance_id')
+          .set({'amount': 10000.0});
 
-  //     final captured = verify(
-  //       mockTransactionService.createTransaction(
-  //         userId: userId,
-  //         data: captureAnyNamed('data'),
-  //         batch: anyNamed('batch'),
-  //       ),
-  //     ).captured;
+      await investmentService.createInvestment(
+        userId: userId,
+        data: investmentData,
+      );
 
-  //     expect(
-  //       captured.first['amount'],
-  //       -5000.0,
-  //     ); // It must be a negative amount.
-  //     expect(captured.first['category'], 'INVESTMENT');
-  //     expect(captured.first['description'], 'Tesouro Selic 2029');
-  //   },
-  // );
+      final captured = verify(
+        mockTransactionService.createTransaction(
+          userId: userId,
+          data: captureAnyNamed('data'),
+          batch: anyNamed('batch'),
+        ),
+      ).captured;
+
+      expect(
+        captured.first['amount'],
+        -5000.0,
+      ); // It must be a negative amount.
+      expect(captured.first['category'], 'INVESTMENT');
+      expect(captured.first['description'], 'Tesouro Selic 2029');
+    },
+  );
 
   test(
     'deleteInvestment should create a corresponding income transaction',
