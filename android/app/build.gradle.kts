@@ -22,6 +22,20 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
+    // Calculate a monotonic Android versionCode from versionName (major.minor.patch)
+    // and the flutter versionCode (build number). Result: MMMmmppbb
+    // where MMM=major, mm=minor, pp=patch, bb=buildNumber component.
+    val flutterVersionNameStr = (flutter.versionName ?: "").toString()
+    val flutterBuildNumber = (flutter.versionCode as? Int) ?: 0
+
+    val versionParts = flutterVersionNameStr.split('.')
+    val major = versionParts.getOrNull(0)?.toIntOrNull() ?: 0
+    val minor = versionParts.getOrNull(1)?.toIntOrNull() ?: 0
+    val patch = versionParts.getOrNull(2)?.toIntOrNull() ?: 0
+
+    val calculatedBuildVersion = major * 100_000 + minor * 10_000 + patch * 100 + flutterBuildNumber
+
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -38,7 +52,7 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 23
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
+        versionCode = calculatedBuildVersion
         versionName = flutter.versionName
     }
 
