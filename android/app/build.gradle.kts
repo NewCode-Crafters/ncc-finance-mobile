@@ -61,7 +61,10 @@ android {
         // CI environment variables when present (useful for Codemagic) or fall
         // back to the local key.properties file when running locally.
         create("release") {
-          if (System.getenv()["CI"].toBoolean()) {
+            val isCi = System.getenv("CI")?.toBoolean() == true
+            val ciHasKeystore = !System.getenv("CM_KEYSTORE_PATH").isNullOrBlank()
+
+            if (isCi && ciHasKeystore) {
                 storeFile = file(System.getenv()["CM_KEYSTORE_PATH"])
                 storePassword = System.getenv()["CM_KEYSTORE_PASSWORD"]
                 keyAlias = System.getenv()["CM_KEY_ALIAS"]
@@ -77,8 +80,15 @@ android {
     } 
 
     buildTypes {
-        release {            
-            signingConfig = signingConfigs.getByName("release")
+        release {  
+            val isCi = System.getenv("CI")?.toBoolean() == true
+            val ciHasKeystore = !System.getenv("CM_KEYSTORE_PATH").isNullOrBlank()
+
+            if (isCi && ciHasKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            } else {
+                signingConfig = signingConfigs.getByName("debug")
+            }
         }
     }
 }
