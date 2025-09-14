@@ -47,6 +47,13 @@ void main() {
         'balanceId': 'test_balance_id',
       };
 
+      await fakeFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('balances')
+          .doc('test_balance_id')
+          .set({'amount': 10000.0});
+
       await investmentService.createInvestment(
         userId: userId,
         data: investmentData,
@@ -151,6 +158,13 @@ void main() {
         'category': 'FIXED_INCOME',
         'type': 'GOVERNMENT_BOND',
       };
+
+      await fakeFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('balances')
+          .doc('test_balance_id')
+          .set({'amount': 10000.0});
 
       await investmentService.createInvestment(
         userId: userId,
