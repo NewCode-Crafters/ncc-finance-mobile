@@ -149,7 +149,9 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     Icons.circle,
                     color: colors[index % colors.length],
                   ),
-                  title: Text(entry.key.replaceAll('_', ' ').toLowerCase()),
+                  title: Text(entry.key.replaceAll('_', ' ').toLowerCase(), textHeightBehavior: TextHeightBehavior(applyHeightToFirstAscent: false)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+                  minVerticalPadding: 0.0,
                 );
               },
             ),

@@ -29,6 +29,16 @@ class AppColors {
 
   static const textSubtle = Color(0xFFC8C8C8);
 
+  static const darkPurpleColor = Color(0xFFBFA1E9);
+  static const lightPurpleColor = Color.fromRGBO(227, 207, 255, 1);
+  static const darkGreenColor = Color(0xFF22441E);
+  static const lightGreenColor = Color.fromRGBO(198, 224, 174, 1);
+
+  static const cardSaldoGradient = LinearGradient(
+    colors: [Color.fromRGBO(34, 68, 30, 1), Color.fromRGBO(116, 146, 102, 1), Color.fromRGBO(198, 224, 174, 1)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
   // Chart Colors
   static const chartBlue = Color(0xFF2567F9);
   static const chartPurple = Color(0xFF8F3CFF);

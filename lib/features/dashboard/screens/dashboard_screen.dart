@@ -91,43 +91,57 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 24),
             Card(
-              color: Colors.green.shade100,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Text('Saldo'),
-                        const Spacer(),
-                        IconButton(
-                          icon: Icon(
-                            _isBalanceVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: AppColors.cardSaldoGradient,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Text('Saldo', style: TextStyle(fontWeight: FontWeight.w500, color: AppColors.neutral100)),
+                          //const Spacer(),
+                          IconButton(
+                            icon: Icon(
+                              _isBalanceVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isBalanceVisible = !_isBalanceVisible;
+                              });
+                            },
+                            style: IconButton.styleFrom(
+                              foregroundColor: AppColors.darkPurpleColor,
+                            ),
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _isBalanceVisible = !_isBalanceVisible;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    if (balanceState.isLoading)
-                      const CircularProgressIndicator()
-                    else
-                      Text(
-                        _isBalanceVisible
-                            ? currencyFormatter.format(
-                                balanceState.totalBalance,
-                              )
-                            : 'R\$ --,--',
-                        style: Theme.of(context).textTheme.headlineLarge,
+                        ],
                       ),
-                  ],
+                      const Divider(color: AppColors.darkPurpleColor, thickness: 1),
+                      const SizedBox(height: 8),
+                      
+                      if (balanceState.isLoading)
+                        const CircularProgressIndicator()
+                      else
+                        Text(
+                          _isBalanceVisible
+                              ? currencyFormatter.format(
+                                  balanceState.totalBalance,
+                                )
+                              : 'R\$ --,--',
+                          style: Theme.of(context).textTheme.headlineLarge!.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral100),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -246,9 +260,9 @@ class Page extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return tab == 1 ? InvestmentsScreen() : Scaffold(
       appBar: AppBar(title: Text('Page Tab $tab')),
-      body: Center(child: tab != 1 ? Text('Tab $tab') : PokemonListScreen()),
+      body: Center(child: tab != 1 ? Text('Tab $tab') : InvestmentsScreen()),
     );
   }
 }
