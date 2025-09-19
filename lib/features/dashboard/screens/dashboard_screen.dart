@@ -1,6 +1,7 @@
 import 'package:bytebank/core/widgets/nav_bar.dart';
 import 'package:bytebank/features/pokemons/screens/pokemons_screen.dart';
 import 'package:bytebank/core/models/nav_model.dart';
+import 'package:bytebank/features/transactions/screens/create_transaction_screen.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -35,10 +36,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     items = [
-      NavModel(page: const TabPage(tab: 1), navKey: homeNavKey),
-      NavModel(page: const TabPage(tab: 2), navKey: searchNavKey),
-      NavModel(page: const TabPage(tab: 3), navKey: notificationNavKey),
-      NavModel(page: const TabPage(tab: 4), navKey: profileNavKey),
+      NavModel(page: const DashboardScreen(), navKey: homeNavKey),
+      NavModel(page: const InvestmentsScreen(), navKey: searchNavKey),
+      // NavModel(page: const TabPage(tab: 3), navKey: notificationNavKey),
+      // NavModel(page: const TabPage(tab: 4), navKey: profileNavKey),
     ];
   }
 
@@ -155,7 +156,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onTap: () {
                     Navigator.of(
                       context,
-                    ).pushNamed(TransactionsScreen.routeName);
+                    ).pushNamed(CreateTransactionScreen.routeName);
                   },
                 ),
                 ActionCard(
@@ -174,35 +175,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ],
             ),
-            PopScope(
-              canPop: !canPopNested,
-              onPopInvokedWithResult: (bool didPop, _) {
-                // If the pop was vetoed (didPop: false), it means our nested navigator can pop.
-                // We handle it manually here. If the pop was allowed (didPop: true), we do nothing.
-                if (didPop) return;
-                currentNavigator?.pop();
-              },
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.5,
-                child: IndexedStack(
-                  index: selectedTab,
-                  children: items
-                      .map(
-                        (page) => Navigator(
-                          key: page.navKey,
-                          onGenerateInitialRoutes: (navigator, initialRoute) {
-                            return [
-                              MaterialPageRoute(
-                                builder: (context) => page.page,
-                              ),
-                            ];
-                          },
-                        ),
-                      )
-                      .toList(),
-                ),
-              ),
+            const SizedBox(height: 24), // Add some spacing
+            SizedBox(
+              height: 400, // Defina uma altura fixa ou use MediaQuery para torná-lo responsivo
+              child: TransactionsScreen(),
             ),
+            // PopScope(
+            //   canPop: !canPopNested,
+            //   onPopInvokedWithResult: (bool didPop, _) {
+            //     // If the pop was vetoed (didPop: false), it means our nested navigator can pop.
+            //     // We handle it manually here. If the pop was allowed (didPop: true), we do nothing.
+            //     if (didPop) return;
+            //     currentNavigator?.pop();
+            //   },
+            //   child: SizedBox(
+            //     height: MediaQuery.of(context).size.height * 0.5,
+            //     child: IndexedStack(
+            //       index: selectedTab,
+            //       children: items
+            //           .map(
+            //             (page) => Navigator(
+            //               key: page.navKey,
+            //               onGenerateInitialRoutes: (navigator, initialRoute) {
+            //                 return [
+            //                   MaterialPageRoute(
+            //                     builder: (context) => page.page,
+            //                   ),
+            //                 ];
+            //               },
+            //             ),
+            //           )
+            //           .toList(),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -210,9 +216,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         pageIndex: selectedTab,
         onTap: (index) {
           if (index == selectedTab) {
-            items[index].navKey.currentState?.popUntil(
-              (route) => route.isFirst,
-            );
+            Navigator.of(
+              context,
+            ).pushNamed(InvestmentsScreen.routeName);
+            // items[index].navKey.currentState?.popUntil(
+            //   (route) => route.isFirst,
+            // );
           } else {
             setState(() {
               selectedTab = index;
@@ -224,45 +233,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-class TabPage extends StatelessWidget {
-  final int tab;
+// class TabPage extends StatelessWidget {
+//   final int tab;
 
-  const TabPage({Key? key, required this.tab}) : super(key: key);
+//   const TabPage({Key? key, required this.tab}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      //appBar: AppBar(title: Text('Tab $tab')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Tab $tab'),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (context) => Page(tab: tab)));
-              },
-              child: const Text('Go to page'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       //appBar: AppBar(title: Text('Tab $tab')),
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             Text('Tab $tab'),
+//             ElevatedButton(
+//               onPressed: () {
+//                 Navigator.of(
+//                   context,
+//                 ).push(MaterialPageRoute(builder: (context) => NavBar(pageIndex: tab)));
+//               },
+//               child: const Text('Go to page'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
-class Page extends StatelessWidget {
-  final int tab;
+// class Page extends StatelessWidget {
+//   final int tab;
 
-  const Page({super.key, required this.tab});
+//   const Page({super.key, required this.tab});
 
-  @override
-  Widget build(BuildContext context) {
-    return tab == 1 ? InvestmentsScreen() : Scaffold(
-      appBar: AppBar(title: Text('Page Tab $tab')),
-      body: Center(child: tab != 1 ? Text('Tab $tab') : InvestmentsScreen()),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return tab == 1 ? InvestmentsScreen() : Scaffold(
+//       appBar: AppBar(title: Text('Page Tab $tab')),
+//       body: Center(child: tab != 1 ? Text('Tab $tab') : InvestmentsScreen()),
+//     );
+//   }
+// }

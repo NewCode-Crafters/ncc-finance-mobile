@@ -1,3 +1,4 @@
+import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -111,31 +112,58 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Criar Transação')),
+      backgroundColor: AppColors.surfaceDefault,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            CupertinoSlidingSegmentedControl<TransactionType>(
-              groupValue: _selectedType,
-              children: const {
-                TransactionType.expense: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text('Despesa'),
-                ),
-                TransactionType.income: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text('Receita'),
-                ),
+            ToggleButtons(
+              isSelected: [
+                _selectedType == TransactionType.expense,
+                _selectedType == TransactionType.income,
+              ],
+              onPressed: (index) {
+                setState(() {
+                  _selectedType = TransactionType.values[index];
+                  _selectedCategory = null;
+                });
               },
-              onValueChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _selectedType = value;
-                    _selectedCategory = null;
-                  });
-                }
-              },
+              borderRadius: BorderRadius.circular(8),
+              selectedColor: Colors.white,
+              fillColor: AppColors.brandTertiary,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
+              children: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text('Saída'),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text('Entrada'),
+                ),
+              ],
             ),
+            // CupertinoSlidingSegmentedControl<TransactionType>(
+            //   groupValue: _selectedType,
+            //   children: const {
+            //     TransactionType.expense: Padding(
+            //       padding: EdgeInsets.all(8),
+            //       child: Text('Despesa'),
+            //     ),
+            //     TransactionType.income: Padding(
+            //       padding: EdgeInsets.all(8),
+            //       child: Text('Receita'),
+            //     ),
+            //   },
+            //   onValueChanged: (value) {
+            //     if (value != null) {
+            //       setState(() {
+            //         _selectedType = value;
+            //         _selectedCategory = null;
+            //       });
+            //     }
+            //   },
+            // ),
             const SizedBox(height: 24),
             DropdownButtonFormField<TransactionCategory>(
               value: _selectedCategory,
