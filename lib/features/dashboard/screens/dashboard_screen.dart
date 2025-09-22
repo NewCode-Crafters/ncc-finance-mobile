@@ -38,8 +38,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     items = [
       NavModel(page: const DashboardScreen(), navKey: homeNavKey),
       NavModel(page: const InvestmentsScreen(), navKey: searchNavKey),
-      // NavModel(page: const TabPage(tab: 3), navKey: notificationNavKey),
-      // NavModel(page: const TabPage(tab: 4), navKey: profileNavKey),
+      NavModel(page: const TabPage(tab: 3), navKey: notificationNavKey),
+      NavModel(page: const TabPage(tab: 4), navKey: profileNavKey),
     ];
   }
 
@@ -65,15 +65,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       'pt_BR',
     );
 
-    final currentNavigator = items.isNotEmpty
-        ? items[selectedTab].navKey.currentState
-        : null;
-    final canPopNested = currentNavigator?.canPop() ?? false;
-
-    return Scaffold(
-      backgroundColor: AppColors.surfaceDefault,
-      appBar: const MainAppBar(),
-      body: RefreshIndicator(
+    final List<Widget> tabBodies = [
+      // Tab 0: Dashboard principal
+      RefreshIndicator(
         onRefresh: _refreshData,
         child: ListView(
           padding: const EdgeInsets.all(16.0),
@@ -109,7 +103,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Row(
                         children: [
                           const Text('Saldo', style: TextStyle(fontWeight: FontWeight.w500, color: AppColors.neutral100)),
-                          //const Spacer(),
                           IconButton(
                             icon: Icon(
                               _isBalanceVisible
@@ -129,7 +122,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       const Divider(color: AppColors.darkPurpleColor, thickness: 1),
                       const SizedBox(height: 8),
-                      
                       if (balanceState.isLoading)
                         const CircularProgressIndicator()
                       else
@@ -171,107 +163,84 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ActionCard(
                   icon: Icons.receipt_long,
                   label: 'Consultar\ngastos',
-                  onTap: () {}, // Void for now
+                  onTap: () {},
                 ),
               ],
             ),
-            const SizedBox(height: 24), // Add some spacing
+            const SizedBox(height: 24),
             SizedBox(
-              height: 400, // Defina uma altura fixa ou use MediaQuery para torná-lo responsivo
+              height: 400,
               child: TransactionsScreen(),
             ),
-            // PopScope(
-            //   canPop: !canPopNested,
-            //   onPopInvokedWithResult: (bool didPop, _) {
-            //     // If the pop was vetoed (didPop: false), it means our nested navigator can pop.
-            //     // We handle it manually here. If the pop was allowed (didPop: true), we do nothing.
-            //     if (didPop) return;
-            //     currentNavigator?.pop();
-            //   },
-            //   child: SizedBox(
-            //     height: MediaQuery.of(context).size.height * 0.5,
-            //     child: IndexedStack(
-            //       index: selectedTab,
-            //       children: items
-            //           .map(
-            //             (page) => Navigator(
-            //               key: page.navKey,
-            //               onGenerateInitialRoutes: (navigator, initialRoute) {
-            //                 return [
-            //                   MaterialPageRoute(
-            //                     builder: (context) => page.page,
-            //                   ),
-            //                 ];
-            //               },
-            //             ),
-            //           )
-            //           .toList(),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
+      ),
+      // Tab 1: Investimentos
+      const InvestmentsScreen(),
+      // Tab 2: Notificações (exemplo)
+      const TabPage(tab: 3),
+      // Tab 3: Perfil (exemplo)
+      const TabPage(tab: 4),
+    ];
+
+    return Scaffold(
+      backgroundColor: AppColors.surfaceDefault,
+      appBar: const MainAppBar(),
+      body: IndexedStack(
+        index: selectedTab,
+        children: tabBodies,
       ),
       bottomNavigationBar: NavBar(
         pageIndex: selectedTab,
         onTap: (index) {
-          if (index == selectedTab) {
-            Navigator.of(
-              context,
-            ).pushNamed(InvestmentsScreen.routeName);
-            // items[index].navKey.currentState?.popUntil(
-            //   (route) => route.isFirst,
-            // );
-          } else {
-            setState(() {
-              selectedTab = index;
-            });
-          }
+          setState(() {
+            selectedTab = index;
+          });
         },
       ),
     );
   }
 }
 
-// class TabPage extends StatelessWidget {
-//   final int tab;
+ class TabPage extends StatelessWidget {
+   final int tab;
 
-//   const TabPage({Key? key, required this.tab}) : super(key: key);
+   const TabPage({Key? key, required this.tab}) : super(key: key);
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       //appBar: AppBar(title: Text('Tab $tab')),
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             Text('Tab $tab'),
-//             ElevatedButton(
-//               onPressed: () {
-//                 Navigator.of(
-//                   context,
-//                 ).push(MaterialPageRoute(builder: (context) => NavBar(pageIndex: tab)));
-//               },
-//               child: const Text('Go to page'),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+   @override
+   Widget build(BuildContext context) {
+     return Scaffold(
+       //appBar: AppBar(title: Text('Tab $tab')),
+       body: Center(
+         child: Column(
+           mainAxisAlignment: MainAxisAlignment.center,
+           children: [
+             Text('Tab $tab'),
+             ElevatedButton(
+               onPressed: () {
+                 Navigator.of(
+                   context,
+                 ).push(MaterialPageRoute(builder: (context) => NavBar(pageIndex: tab, onTap: (int p1) {  },)));
+               },
+               child: const Text('Go to page'),
+             ),
+           ],
+         ),
+       ),
+     );
+   }
+ }
 
-// class Page extends StatelessWidget {
-//   final int tab;
+ class Page extends StatelessWidget {
+   final int tab;
 
-//   const Page({super.key, required this.tab});
+   const Page({super.key, required this.tab});
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return tab == 1 ? InvestmentsScreen() : Scaffold(
-//       appBar: AppBar(title: Text('Page Tab $tab')),
-//       body: Center(child: tab != 1 ? Text('Tab $tab') : InvestmentsScreen()),
-//     );
-//   }
-// }
+  @override
+   Widget build(BuildContext context) {
+     return tab == 1 ? InvestmentsScreen() : Scaffold(
+       appBar: AppBar(title: Text('Page Tab $tab')),
+       body: Center(child: tab != 1 ? Text('Tab $tab') : InvestmentsScreen()),
+     );
+   }
+ }
