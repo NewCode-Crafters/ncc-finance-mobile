@@ -1,12 +1,7 @@
-import 'package:bytebank/core/models/nav_model.dart';
-import 'package:bytebank/core/widgets/nav_bar.dart';
-import 'package:bytebank/features/dashboard/screens/dashboard_screen.dart';
-import 'package:bytebank/features/investments/screens/investments_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
-import 'package:bytebank/features/transactions/screens/create_transaction_screen.dart';
 import 'package:bytebank/features/transactions/screens/edit_transaction_screen.dart';
 import 'package:bytebank/features/transactions/widgets/transaction_list_item.dart';
 import 'package:intl/intl.dart';
@@ -24,21 +19,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   final _searchController = TextEditingController();
   late final TransactionNotifier _transactionNotifier;
   int selectedTab = 0;
-  List<NavModel> items = [];
-  final homeNavKey = GlobalKey<NavigatorState>();
-  final searchNavKey = GlobalKey<NavigatorState>();
-  final notificationNavKey = GlobalKey<NavigatorState>();
-  final profileNavKey = GlobalKey<NavigatorState>();
+
 
   @override
   void initState() {
     super.initState();
-    items = [
-      NavModel(page: const DashboardScreen(), navKey: homeNavKey),
-      NavModel(page: const TransactionsScreen(), navKey: searchNavKey),
-      // NavModel(page: const TabPage(tab: 3), navKey: notificationNavKey),
-      // NavModel(page: const TabPage(tab: 4), navKey: profileNavKey),
-    ];
+
     _transactionNotifier = context.read<TransactionNotifier>();
 
     _searchController.addListener(() {

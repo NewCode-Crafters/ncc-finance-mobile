@@ -1,3 +1,4 @@
+import 'package:bytebank/core/widgets/main_app_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -85,7 +86,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     final investmentState = context.watch<InvestmentNotifier>().state;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Investimentos')),
+      appBar: MainAppBar(title: 'Investimentos'),
       body: investmentState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(

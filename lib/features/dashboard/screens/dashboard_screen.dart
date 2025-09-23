@@ -1,6 +1,8 @@
 import 'package:bytebank/core/widgets/nav_bar.dart';
-import 'package:bytebank/features/pokemons/screens/pokemons_screen.dart';
+import 'package:bytebank/features/transactions/screens/expense_control_screen.dart';
 import 'package:bytebank/core/models/nav_model.dart';
+import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
+import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
 import 'package:bytebank/features/transactions/screens/create_transaction_screen.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,8 +28,8 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _isBalanceVisible = true;
   final homeNavKey = GlobalKey<NavigatorState>();
-  final searchNavKey = GlobalKey<NavigatorState>();
-  final notificationNavKey = GlobalKey<NavigatorState>();
+  final investmentsNavKey = GlobalKey<NavigatorState>();
+  final expenseNavKey = GlobalKey<NavigatorState>();
   final profileNavKey = GlobalKey<NavigatorState>();
   int selectedTab = 0;
   List<NavModel> items = [];
@@ -37,9 +39,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.initState();
     items = [
       NavModel(page: const DashboardScreen(), navKey: homeNavKey),
-      NavModel(page: const InvestmentsScreen(), navKey: searchNavKey),
-      NavModel(page: const TabPage(tab: 3), navKey: notificationNavKey),
-      NavModel(page: const TabPage(tab: 4), navKey: profileNavKey),
+      NavModel(page: const ExpenseControlScreen(), navKey: expenseNavKey),
+      NavModel(page: const InvestmentsScreen(), navKey: investmentsNavKey),
+      NavModel(page: const MyProfileScreen(), navKey: profileNavKey),
     ];
   }
 
@@ -157,7 +159,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onTap: () {
                     Navigator.of(
                       context,
-                    ).pushNamed(InvestmentsScreen.routeName);
+                    ).pushNamed(CreateInvestmentScreen.routeName);
                   },
                 ),
                 ActionCard(
@@ -175,17 +177,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
-      // Tab 1: Investimentos
+      // Tab 1: Controle de Gastos
+      const ExpenseControlScreen(),
+      // Tab 2: Investimentos
       const InvestmentsScreen(),
-      // Tab 2: Notificações (exemplo)
-      const TabPage(tab: 3),
       // Tab 3: Perfil (exemplo)
-      const TabPage(tab: 4),
+      const MyProfileScreen()
     ];
 
     return Scaffold(
       backgroundColor: AppColors.surfaceDefault,
-      appBar: const MainAppBar(),
+      appBar: selectedTab == 0 ? const MainAppBar() : null,
       body: IndexedStack(
         index: selectedTab,
         children: tabBodies,
@@ -202,45 +204,3 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
- class TabPage extends StatelessWidget {
-   final int tab;
-
-   const TabPage({Key? key, required this.tab}) : super(key: key);
-
-   @override
-   Widget build(BuildContext context) {
-     return Scaffold(
-       //appBar: AppBar(title: Text('Tab $tab')),
-       body: Center(
-         child: Column(
-           mainAxisAlignment: MainAxisAlignment.center,
-           children: [
-             Text('Tab $tab'),
-             ElevatedButton(
-               onPressed: () {
-                 Navigator.of(
-                   context,
-                 ).push(MaterialPageRoute(builder: (context) => NavBar(pageIndex: tab, onTap: (int p1) {  },)));
-               },
-               child: const Text('Go to page'),
-             ),
-           ],
-         ),
-       ),
-     );
-   }
- }
-
- class Page extends StatelessWidget {
-   final int tab;
-
-   const Page({super.key, required this.tab});
-
-  @override
-   Widget build(BuildContext context) {
-     return tab == 1 ? InvestmentsScreen() : Scaffold(
-       appBar: AppBar(title: Text('Page Tab $tab')),
-       body: Center(child: tab != 1 ? Text('Tab $tab') : InvestmentsScreen()),
-     );
-   }
- }
