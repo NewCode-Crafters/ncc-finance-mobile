@@ -24,9 +24,7 @@ A Flutter mobile application for personal finance management. Bytebank (package 
 
 - [Project structure](#project-structure)
 - [Getting started](#getting-started)
-- [Configuration](#configuration)
-- [CI/CI](#ci-ci)
-- [Important files to review](#important-files-to-review)
+- [CI/CD](#ci-cd)
 - [Available commands](#available-commands)
 - [Development notes](#development-notes)
 - [Key packages](#key-packages)
@@ -112,17 +110,19 @@ flutter run -d <device-id>
 - Localization: The app registers `pt_BR`. To add more locales, update `supportedLocales` in `lib/main.dart` and provide localized strings/resources.
 - Firebase: Authentication, Firestore and Storage are used across features. Verify your Firebase project rules (for dev use, you can relax rules; for production tighten them).
 
-## CI/CI
+<a id="ci-cd"></a>
+
+## CI/CD
 
 The project uses Codemagic (https://codemagic.io) for CI/CD. Pipelines are defined to validate PRs, build homologation (staging) artifacts, and produce production builds for release.
 
 Pipeline overview
 
-| Workflow           | Trigger                                                                   | Purpose                                                                                                                                                       |
-| ------------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DEV-WORKFLOW`     | Pull requests from branches with prefixes `task/`, `fix/`, `enhancement/` | Run build/test steps to validate PRs before review.                                                                                                           |
-| `HOMOLOG-WORKFLOW` | Pull requests from the `dev` branch                                       | Build staging artifacts for QA/Homolog. The workflow creates artifacts(like .apk ) and distributes in the Firebase App Distribution to the team test features |
-| `PROD-WORKFLOW`    | Pushes to `main` or release tags                                          | Build production artifacts and trigger distribution.                                                                                                          |
+| Workflow           | Trigger                                                                   | Purpose                                                                                                                                                        |
+| ------------------ | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DEV-WORKFLOW`     | Pull requests from branches with prefixes `task/`, `fix/`, `enhancement/` | Run build/test steps to validate PRs before review.                                                                                                            |
+| `HOMOLOG-WORKFLOW` | Pull requests from the `dev` branch                                       | Build staging artifacts for QA/Homolog. The workflow creates artifacts (like .apk ) and distributes in the Firebase App Distribution to the team test features |
+| `PROD-WORKFLOW`    | Pushes to `main` or release tags                                          | Build production artifacts and trigger distribution.                                                                                                           |
 
 ## Available commands
 
@@ -220,18 +220,3 @@ TDD note:
 - **Figma prototype:** https://www.figma.com/design/gB5nE8V4Le026J3y4FJxDQ/NCC-TC-3-prototipo?node-id=12085-1622&t=649czXOSHu6ZTlJI-1
 
 TODO: Make the Figma prototype public before delivering the project.
-
-**Troubleshooting**
-
-- Firebase initialization errors: Ensure `google-services.json` / `GoogleService-Info.plist` match the `firebase_options.dart` or re-run `flutterfire configure`.
-- Plugin compatibility: Confirm plugin versions in `pubspec.yaml` match your Flutter SDK. If you see build errors, run `flutter pub upgrade` or pin versions known to work with your SDK.
-
-**Authors**
-
-| Name              | GitHub Profile                                       | Profile Picture                                                                                                       |
-| ----------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Carlos Ferreira   | [@carlosrfjrdev](https://github.com/carlosrfjrdev)   | <img src="https://avatars.githubusercontent.com/u/107284563?v=4" width="40" height="40" style="border-radius:50%;" /> |
-| Joelton Matos     | [@joeltonmatos](https://github.com/joeltonmats)      | <img src="https://avatars.githubusercontent.com/u/4190757?v=4" width="40" height="40" style="border-radius:50%;" />   |
-| Larissa Rocha     | [@larisr](https://github.com/larisr)                 | <img src="https://avatars.githubusercontent.com/u/64704731?v=4" width="40" height="40" style="border-radius:50%;" />  |
-| Leonardo Medeiros | [@leomartinsm](https://github.com/leomartinsm)       | <img src="https://avatars.githubusercontent.com/u/20979905?v=4" width="40" height="40" style="border-radius:50%;" />  |
-| Ricardo Momberg   | [@ricardomomberg](https://github.com/RicardoMomberg) | <img src="https://avatars.githubusercontent.com/u/65039145?v=4" width="40" height="40" style="border-radius:50%;" />  |
