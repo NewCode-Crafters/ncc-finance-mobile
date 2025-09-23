@@ -54,7 +54,7 @@ Repository top-level (visualized):
 │   │   └── splash/
 │   ├── firebase_options.dart# generated Firebase config
 │   ├── main.dart            # app entrypoint + Provider registration
-+│   └── theme/
+│   └── theme/
 ├── assets/
 │   └── images/              # logos and splash screens
 ├── pubspec.yaml
@@ -82,7 +82,7 @@ Clone and install dependencies
 
 ```bash
 git clone <repo-url>
-cd flutter_application_1
+cd bytebank
 flutter pub get
 ```
 
@@ -209,7 +209,7 @@ TDD note:
 | Name              | GitHub Profile                                       | Profile Picture                                                                                                       |
 | ----------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Carlos Ferreira   | [@carlosrfjrdev](https://github.com/carlosrfjrdev)   | <img src="https://avatars.githubusercontent.com/u/107284563?v=4" width="40" height="40" style="border-radius:50%;" /> |
-| Joelton Matos     | [@joeltonmatos](https://github.com/joeltonmats)      | <img src="https://avatars.githubusercontent.com/u/4190757?v=4" width="40" height="40" style="border-radius:50%;" />   |
+| Joelton Matos     | [@joeltonmats](https://github.com/joeltonmats)       | <img src="https://avatars.githubusercontent.com/u/4190757?v=4" width="40" height="40" style="border-radius:50%;" />   |
 | Larissa Rocha     | [@larisr](https://github.com/larisr)                 | <img src="https://avatars.githubusercontent.com/u/64704731?v=4" width="40" height="40" style="border-radius:50%;" />  |
 | Leonardo Medeiros | [@leomartinsm](https://github.com/leomartinsm)       | <img src="https://avatars.githubusercontent.com/u/20979905?v=4" width="40" height="40" style="border-radius:50%;" />  |
 | Ricardo Momberg   | [@ricardomomberg](https://github.com/RicardoMomberg) | <img src="https://avatars.githubusercontent.com/u/65039145?v=4" width="40" height="40" style="border-radius:50%;" />  |
