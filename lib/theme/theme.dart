@@ -165,5 +165,5 @@ ThemeData appTheme = ThemeData(
       fontWeight: AppTypography.fontWeightBold,
     ),
   ),
-  // Adicione outros temas conforme necessário
+  useMaterial3: true,
 );

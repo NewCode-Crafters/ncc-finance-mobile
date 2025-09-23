@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "767296020733",
+    "project_id": "ncc-finance-mobile",
+    "storage_bucket": "ncc-finance-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767296020733:android:50187e1044e61e390fde94",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnr9MjLxHQ3TL1WsPuE19rqkRthbhd8bk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767296020733:android:6409b5177aade0600fde94",
+        "android_client_info": {
+          "package_name": "com.nccfinance.bytebank"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnr9MjLxHQ3TL1WsPuE19rqkRthbhd8bk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
