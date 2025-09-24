@@ -1,4 +1,5 @@
 import 'package:bytebank/features/onboarding/models/onboarding_item.dart';
+import 'package:bytebank/theme/theme.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:bytebank/features/authentication/screens/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,7 @@ class _OnboardingCarouselScreenState extends State<OnboardingCarouselScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: cs.surface,
+      backgroundColor: const Color(0xFFC6E0AE),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
@@ -128,7 +129,7 @@ class _OnboardingCarouselScreenState extends State<OnboardingCarouselScreen> {
                       Navigator.of(context).pushNamed(LoginScreen.routeName),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: cs.primary,
+                    backgroundColor: appTheme.colorScheme.primary,
                     foregroundColor: cs.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -158,12 +159,12 @@ class _OnboardingCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: cs.outlineVariant),
+        border: Border.all(color: cs.primary.withOpacity(0.18)),
         boxShadow: [
           BoxShadow(
-            color: cs.primary.withOpacity(0.10),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -184,7 +185,8 @@ class _OnboardingCard extends StatelessWidget {
               ),
             ),
 
-            // Gradient overlay to keep text readable
+            // Subtle overlay to keep image vivid while ensuring
+            // the bottom panel remains readable. Avoid heavy dark tints.
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
@@ -192,8 +194,8 @@ class _OnboardingCard extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      cs.surfaceContainerHighest.withOpacity(0.55),
-                      cs.surface.withOpacity(0.55),
+                      Colors.transparent,
+                      Colors.white.withOpacity(0.28),
                     ],
                   ),
                 ),
@@ -207,8 +209,13 @@ class _OnboardingCard extends StatelessWidget {
               right: 0,
               bottom: 0,
               child: Container(
-                padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
-                color: cs.surface.withOpacity(0.45),
+                padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.86),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(12),
+                  ),
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -216,7 +223,7 @@ class _OnboardingCard extends StatelessWidget {
                       item.title,
                       textAlign: TextAlign.center,
                       style: textTheme.titleLarge?.copyWith(
-                        color: cs.onSurface,
+                        color: cs.primary,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -225,7 +232,7 @@ class _OnboardingCard extends StatelessWidget {
                       item.subtitle,
                       textAlign: TextAlign.center,
                       style: textTheme.bodyMedium?.copyWith(
-                        color: cs.onSurfaceVariant,
+                        color: appTheme.colorScheme.surface,
                         height: 1.35,
                       ),
                     ),
