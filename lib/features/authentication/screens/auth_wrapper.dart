@@ -1,7 +1,7 @@
+import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
-import 'package:bytebank/features/authentication/screens/login_screen.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
@@ -155,7 +155,7 @@ class _AuthGateState extends State<AuthGate> {
           return const DashboardScreen();
         }
 
-        return const LoginScreen();
+        return const OnboardingCarouselScreen();
       },
     );
   }

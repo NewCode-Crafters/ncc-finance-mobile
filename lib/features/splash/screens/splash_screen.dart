@@ -75,6 +75,8 @@ class _SplashScreenState extends State<SplashScreen> {
                       AppAssets.byteBankSplashScreenImage,
                       width: 300,
                       height: 300,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.broken_image, size: 120),
                     ),
                   ),
                   const SizedBox(height: 16),

@@ -28,8 +28,10 @@ import 'package:bytebank/features/investments/services/investment_service.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
 import 'package:bytebank/features/profile/services/profile_service.dart';
+import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.dart';
 import 'package:bytebank/firebase_options.dart';
 import 'package:bytebank/theme/theme.dart';
+import 'package:bytebank/core/navigation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -105,6 +107,8 @@ class MyApp extends StatelessWidget {
           TransactionsScreen.routeName: (context) => const TransactionsScreen(),
           CreateTransactionScreen.routeName: (context) =>
               const CreateTransactionScreen(),
+          OnboardingCarouselScreen.routeName: (context) =>
+              const OnboardingCarouselScreen(),
         },
         onGenerateRoute: (settings) {
           if (settings.name == EditTransactionScreen.routeName) {
