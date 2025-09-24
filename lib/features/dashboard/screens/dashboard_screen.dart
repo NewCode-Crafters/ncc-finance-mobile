@@ -165,7 +165,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ActionCard(
                   icon: Icons.receipt_long,
                   label: 'Consultar\ngastos',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(
+                      context,
+                    ).pushNamed(ExpenseControlScreen.routeName);
+                  },
                 ),
               ],
             ),
@@ -174,6 +178,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               height: 400,
               child: TransactionsScreen(),
             ),
+            const SizedBox(height: 60),
           ],
         ),
       ),
