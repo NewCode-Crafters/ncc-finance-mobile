@@ -31,7 +31,6 @@ import 'package:bytebank/features/profile/services/profile_service.dart';
 import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.dart';
 import 'package:bytebank/firebase_options.dart';
 import 'package:bytebank/theme/theme.dart';
-import 'package:bytebank/core/navigation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
