@@ -23,6 +23,7 @@ class _AuthGateState extends State<AuthGate> {
   late ProfileNotifier _profileNotifier;
   late InvestmentNotifier _investmentNotifier;
   late TransactionNotifier _transactionNotifier;
+  String? _lastUserId;
 
   @override
   void initState() {
@@ -145,16 +146,27 @@ class _AuthGateState extends State<AuthGate> {
           );
         }
 
-        // Once the stream is active, check if we have a user.
+        // If user is authenticated, return the Dashboard widget directly.
         if (snapshot.hasData) {
           final user = snapshot.data!;
-          context.read<ProfileNotifier>().fetchUserProfile(userId: user.uid);
 
-          context.read<BalanceNotifier>().fetchBalances(userId: user.uid);
+          // Fetch profile and balances only when the logged user changes.
+          if (_lastUserId != user.uid) {
+            _lastUserId = user.uid;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                context.read<ProfileNotifier>().fetchUserProfile(
+                  userId: user.uid,
+                );
+                context.read<BalanceNotifier>().fetchBalances(userId: user.uid);
+              }
+            });
+          }
 
           return const DashboardScreen();
         }
 
+        _lastUserId = null;
         return const OnboardingCarouselScreen();
       },
     );

@@ -1,5 +1,6 @@
 import 'package:bytebank/features/onboarding/models/onboarding_item.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:bytebank/features/authentication/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingCarouselScreen extends StatefulWidget {
@@ -124,7 +125,7 @@ class _OnboardingCarouselScreenState extends State<OnboardingCarouselScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () =>
-                      Navigator.of(context).pushReplacementNamed('/login'),
+                      Navigator.of(context).pushNamed(LoginScreen.routeName),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     backgroundColor: cs.primary,
