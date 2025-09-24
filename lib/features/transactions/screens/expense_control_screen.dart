@@ -1,6 +1,7 @@
 import 'package:bytebank/core/widgets/main_app_bar.dart';
 import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
 import 'package:bytebank/features/transactions/screens/create_transaction_screen.dart';
+import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -76,21 +77,24 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
   Widget _buildChart(TransactionState state) {
     // Create a list of colors for the chart sections
     final colors = [
-      Colors.green,
-      Colors.blue,
-      Colors.purple,
-      Colors.orange,
-      Colors.red,
+      AppColors.chartDarkGreen,
+      AppColors.chartGreen,
+      AppColors.chartDarkPurple,
+      AppColors.chartPurple,
+      AppColors.chartBeige,
+      AppColors.chartBlue,
+      AppColors.chartYellow,
+      AppColors.chartOrange,
     ];
 
     final chartData = state.chartData.entries.toList();
 
     return SizedBox(
-      height: 200,
+      height: 150,
       child: Row(
         children: [
           Expanded(
-            flex: 2,
+            flex: 3,
             child: PieChart(
               PieChartData(
                 sections: List.generate(chartData.length, (index) {
@@ -99,11 +103,12 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
                     color: colors[index % colors.length],
                     value: entry.value,
                     title: '', // We use the legend instead
-                    radius: 50,
+                    radius: 30,
+                    showTitle: false,
                   );
                 }),
-                sectionsSpace: 2,
-                centerSpaceRadius: 40,
+                sectionsSpace: 1,
+                centerSpaceRadius: 50,
               ),
             ),
           ),

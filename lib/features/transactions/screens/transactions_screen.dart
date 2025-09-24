@@ -1,3 +1,4 @@
+import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
@@ -103,53 +104,44 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               child: Column(
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
+                        flex: 4,
                         child: TextField(
                           controller: _searchController,
+                          cursorColor: AppColors.textSubtle,
                           decoration: const InputDecoration(
-                            hintText: 'Pesquisar por descrição ou categoria...',
+                            hintText: 'Pesquise uma transação',
                             prefixIcon: Icon(Icons.search),
-                            border: OutlineInputBorder(),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                              borderSide: BorderSide(
+                                color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                                width: 2.0,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                                width: 2.0,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      ActionChip(
-                        avatar: const Icon(Icons.calendar_today, size: 16),
-                        label: Text(
-                          '${DateFormat('dd/MM/yy').format(state.startDate)} - ${DateFormat('dd/MM/yy').format(state.endDate)}',
-                        ),
-                        onPressed: () =>
+                      Expanded (
+                        flex: 1,
+                        child: IconButton (
+                          icon: const Icon(
+                            Icons.calendar_today, 
+                            size: 30, 
+                            color: AppColors.lightGreenColor,
+                          ),
+                          onPressed: () =>
                             notifier.updateDateRange(context, userId),
+                        ),
                       ),
-                      const Spacer(),
-                      // Card(
-                      //   child: InkWell(
-                      //     onTap: () {
-                      //       Navigator.of(
-                      //         context,
-                      //       ).pushNamed(CreateTransactionScreen.routeName);
-                      //     },
-                      //     child: const Padding(
-                      //       padding: EdgeInsets.symmetric(
-                      //         horizontal: 12.0,
-                      //         vertical: 8.0,
-                      //       ),
-                      //       child: Row(
-                      //         children: [
-                      //           Icon(Icons.add),
-                      //           SizedBox(width: 8),
-                      //           Text('Nova Transação'),
-                      //         ],
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
                     ],
                   ),
                 ],
@@ -206,11 +198,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         );
                       },
                     ),
+
             ),
           ],
         ),
       ),
-
     );
   }
 }

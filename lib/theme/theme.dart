@@ -40,10 +40,14 @@ class AppColors {
     end: Alignment.bottomRight,
   );
   // Chart Colors
-  static const chartBlue = Color(0xFF2567F9);
-  static const chartPurple = Color(0xFF8F3CFF);
-  static const chartOrange = Color(0xFFF1823D);
-  static const chartMagenta = Color(0xFFFF3C82);
+  static const chartDarkGreen = Color(0xFF22441E);
+  static const chartGreen = Color(0xFF57A64E);
+  static const chartDarkPurple = Color(0xFF8F3CFF);
+  static const chartPurple = Color(0xFFBFA1E9);
+  static const chartBeige = Color(0xFFDEE0AE);
+  static const chartBlue = Color(0xFF4B9CF2);
+  static const chartYellow = Color(0xFFFFDF4D);
+  static const chartOrange = Color(0xFFF29C4B);
 }
 
 class AppTypography {

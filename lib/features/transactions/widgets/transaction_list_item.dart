@@ -1,3 +1,4 @@
+import 'package:bytebank/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/features/transactions/models/financial_transaction.dart';
 import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
@@ -83,6 +84,7 @@ class TransactionListItem extends StatelessWidget {
         },
         child: ListTile(
           leading: CircleAvatar(
+            backgroundColor: AppColors.neutral500,
             child: Icon(getIconForCategory(transaction.category)),
           ),
           title: Row(

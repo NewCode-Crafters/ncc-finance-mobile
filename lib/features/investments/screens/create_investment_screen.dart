@@ -1,3 +1,4 @@
+import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/custom_text_field.dart';
@@ -6,6 +7,7 @@ import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
 import 'package:bytebank/features/investments/services/investment_exceptions.dart';
 import 'package:bytebank/features/investments/services/investment_service.dart';
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:provider/provider.dart';
 
 class CreateInvestmentScreen extends StatefulWidget {
@@ -17,7 +19,11 @@ class CreateInvestmentScreen extends StatefulWidget {
 }
 
 class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
-  final _amountController = TextEditingController();
+  final MoneyMaskedTextController _amountController = MoneyMaskedTextController(
+    leftSymbol: 'R\$ ', // Adiciona o símbolo "R$"
+    decimalSeparator: ',', // Define o separador decimal como vírgula
+    thousandSeparator: '.', // Define o separador de milhar como ponto
+  );
   String? _selectedType;
   bool _isLoading = false;
 
@@ -36,7 +42,7 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
   }
 
   Future<void> _handleCreateInvestment() async {
-    final amountText = _amountController.text.replaceAll(',', '.');
+    final amountText = _amountController.text.replaceAll('R\$ ', '').replaceAll(',', '.');
     final amount = double.tryParse(amountText);
 
     if (_selectedType == null || amount == null || amount <= 0) {
@@ -122,15 +128,29 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Criar um novo investimento',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
             const SizedBox(height: 32),
             DropdownButtonFormField<String>(
               value: _selectedType,
-              hint: const Text('Selecione o tipo de investimento'),
-              decoration: const InputDecoration(border: OutlineInputBorder()),
+              hint: const Text(
+                'Selecione o tipo de investimento',
+                style: TextStyle(color: AppColors.textSubtle),
+              ),
+              decoration: const InputDecoration(
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    width: 2.0,
+                  ),
+                ),
+              ),
               items: _investmentTypes
                   .map(
                     (type) => DropdownMenuItem(value: type, child: Text(type)),
@@ -143,9 +163,32 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
               },
             ),
             const SizedBox(height: 16),
-            CustomTextField(
+            TextField(
               controller: _amountController,
-              label: 'Valor a ser investido',
+              cursorColor: AppColors.textSubtle,
+              decoration: const InputDecoration(
+                labelText: 'Valor',
+                labelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando não está focado
+                ),
+                floatingLabelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando está focado
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    width: 2.0,
+                  ),
+                ),
+              ),
               keyboardType: TextInputType.number,
             ),
             const Spacer(),
