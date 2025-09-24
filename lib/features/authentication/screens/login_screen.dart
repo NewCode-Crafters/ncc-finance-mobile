@@ -28,7 +28,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     final authNotifier = context.read<AuthNotifier>();
-    await authNotifier.login(_emailController.text, _passwordController.text);
+    final success = await authNotifier.login(
+      _emailController.text,
+      _passwordController.text,
+    );
+
+    if (success) {
+      // Close this login screen so the AuthGate (root) can render the Dashboard.
+      if (mounted) Navigator.of(context).pop();
+    }
   }
 
   @override
