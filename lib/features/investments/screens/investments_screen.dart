@@ -21,14 +21,11 @@ class InvestmentsScreen extends StatefulWidget {
 
 class _InvestmentsScreenState extends State<InvestmentsScreen> {
   final List<Color> _colors = [
-    Colors.green,
-    Colors.blue,
-    Colors.purple,
-    Colors.orange,
-    Colors.red,
-    Colors.teal,
-    Colors.pink,
-    Colors.amber,
+    AppColors.chartDarkGreen,
+    AppColors.chartGreen,
+    AppColors.chartDarkPurple,
+    AppColors.chartPurple,
+    AppColors.chartBeige,
   ];
 
   @override
@@ -57,11 +54,11 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar'),
+            child: const Text('Cancelar', style: TextStyle(color: AppColors.brandSecondary),),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Confirmar'),
+            child: const Text('Confirmar', style: TextStyle(color: AppColors.brandSecondary),),
           ),
         ],
       ),
@@ -110,21 +107,21 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   Widget _buildChart(InvestmentState state) {
     // Create a list of colors for the chart sections
     final colors = [
-      Colors.green,
-      Colors.blue,
-      Colors.purple,
-      Colors.orange,
-      Colors.red,
+      AppColors.chartDarkGreen,
+      AppColors.chartGreen,
+      AppColors.chartDarkPurple,
+      AppColors.chartPurple,
+      AppColors.chartBeige,
     ];
 
     final chartData = state.chartData.entries.toList();
 
     return SizedBox(
-      height: 200,
+      height: 150,
       child: Row(
         children: [
           Expanded(
-            flex: 2,
+            flex: 3,
             child: PieChart(
               PieChartData(
                 sections: List.generate(chartData.length, (index) {
@@ -133,11 +130,11 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     color: colors[index % colors.length],
                     value: entry.value,
                     title: '', // We use the legend instead
-                    radius: 50,
+                    radius: 30,
                   );
                 }),
                 sectionsSpace: 2,
-                centerSpaceRadius: 40,
+                centerSpaceRadius: 50,
               ),
             ),
           ),
@@ -256,10 +253,6 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Meus Investimentos',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
         const SizedBox(height: 16),
         // Use shrinkWrap and physics for ListView inside another scrolling view.
         ListView.builder(

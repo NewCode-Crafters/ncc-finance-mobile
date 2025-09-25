@@ -79,6 +79,7 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     final colors = [
       AppColors.chartDarkGreen,
       AppColors.chartGreen,
+      AppColors.chartGrayGreen,
       AppColors.chartDarkPurple,
       AppColors.chartPurple,
       AppColors.chartBeige,
