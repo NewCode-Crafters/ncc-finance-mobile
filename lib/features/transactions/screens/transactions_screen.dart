@@ -18,8 +18,6 @@ class TransactionsScreen extends StatefulWidget {
 class _TransactionsScreenState extends State<TransactionsScreen> {
   final _searchController = TextEditingController();
   late final TransactionNotifier _transactionNotifier;
-  int selectedTab = 0;
-
 
   @override
   void initState() {
@@ -210,7 +208,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           ],
         ),
       ),
-
     );
   }
 }

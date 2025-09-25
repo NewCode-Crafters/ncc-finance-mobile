@@ -26,7 +26,7 @@ class ActionCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 32, color: AppColors.darkPurpleColor,),
+              Icon(icon, size: 32, color: AppColors.darkPurpleColor),
               const SizedBox(height: 8),
               Text(
                 label,

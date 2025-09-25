@@ -34,6 +34,15 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
   bool _isLoading = false;
   TransactionType _selectedType = TransactionType.expense;
 
+  void _onToggleTypePressed(int index) {
+    setState(() {
+      _selectedType = index == 0
+          ? TransactionType.expense
+          : TransactionType.income;
+      _selectedCategory = null;
+    });
+  }
+
   Future<void> _handleCreateTransaction() async {
     if (_selectedCategory == null || _amountController.numberValue <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -125,10 +134,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
                 _selectedType == TransactionType.income,
               ],
               onPressed: (index) {
-                setState(() {
-                  _selectedType = TransactionType.values[index];
-                  _selectedCategory = null;
-                });
+                _onToggleTypePressed(index);
               },
               borderRadius: BorderRadius.circular(8),
               selectedColor: Colors.white,
