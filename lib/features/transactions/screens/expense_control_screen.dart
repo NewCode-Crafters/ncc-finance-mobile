@@ -165,7 +165,28 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
 
   Widget _buildTransactionList(TransactionState transactionState) {
     if (transactionState.transactions.isEmpty) {
-      return const Center(child: Text('Você ainda não possui transações.'));
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.receipt_long,
+              size: 80,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Nenhuma despesa encontrada',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+            Text(
+              'Tente realizar uma nova transação do tipo saída para controlar suas despesas.',
+              style: TextStyle(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
     }
     // Agrupa valores por categoria, excluindo depósitos
     final Map<String, double> categoryTotals = {};

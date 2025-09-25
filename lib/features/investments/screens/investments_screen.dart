@@ -1,4 +1,5 @@
 import 'package:bytebank/core/widgets/main_app_bar.dart';
+import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
 import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
 import 'package:bytebank/features/investments/widgets/investment_list_item.dart';
+import 'package:bytebank/features/dashboard/widgets/action_card.dart';
 import 'package:provider/provider.dart';
 
 class InvestmentsScreen extends StatefulWidget {
@@ -165,65 +167,56 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   Widget _buildSummaryCards(InvestmentState state) {
     return Row(
       children: [
-        // This flexible contains the two original summary cards
-        Flexible(
+        Expanded(
           flex: 2,
-          child: Column(
-            children: [
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Text('Renda Fixa'),
-                      Text(
-                        'R\$ ${state.totalFixedIncome.toStringAsFixed(2)}',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ],
+          child: Card(
+            color: AppColors.lightGreenColor,
+            child: SizedBox(
+              height: 100,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.savings, size: 28, color: AppColors.darkPurpleColor),
+                        const SizedBox(height: 4),
+                        Text('Renda Fixa', style: TextStyle(color: AppColors.neutral500,fontWeight: AppTypography.fontWeightBold,fontSize: 14.0,),),
+                        Text('R\$ ${state.totalFixedIncome.toStringAsFixed(2)}', style: TextStyle(color: AppColors.neutral500,fontWeight: AppTypography.fontWeightBold,fontSize: 16.0,),),
+                      ],
+                    ),
                   ),
-                ),
-              ),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Text('Renda Variável'),
-                      Text(
-                        'R\$ ${state.totalVariableIncome.toStringAsFixed(2)}',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ],
+                  Container(
+                    width: 1,
+                    height: 60,
+                    color: AppColors.neutral500,
                   ),
-                ),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.show_chart, size: 28, color: AppColors.darkPurpleColor),
+                        const SizedBox(height: 4),
+                        Text('Renda Variável', style: TextStyle(color: AppColors.neutral500,fontWeight: AppTypography.fontWeightBold,fontSize: 14.0,),),
+                        Text('R\$ ${state.totalVariableIncome.toStringAsFixed(2)}', style: TextStyle(color: AppColors.neutral500,fontWeight: AppTypography.fontWeightBold,fontSize: 16.0,),),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
         const SizedBox(width: 16),
-        // This is the new card for creating an investment
+        // Novo ActionCard para criar investimento
         Flexible(
           flex: 1,
-          child: Card(
-            child: InkWell(
-              onTap: () {
-                Navigator.of(
-                  context,
-                ).pushNamed(CreateInvestmentScreen.routeName);
-              },
-              child: Container(
-                height: 150, // Adjust height to match cards
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.add_card, size: 32),
-                    SizedBox(height: 8),
-                    Text('Fazer um\ninvestimento', textAlign: TextAlign.center),
-                  ],
-                ),
-              ),
-            ),
+          child: ActionCard(
+            icon: Icons.add_card,
+            label: 'Fazer um\ninvestimento',
+            onTap: () {
+              Navigator.of(context).pushNamed(CreateInvestmentScreen.routeName);
+            },
           ),
         ),
       ],
@@ -232,7 +225,27 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
 
   Widget _buildInvestmentList(InvestmentState state, List<Color> colors) {
     if (state.investments.isEmpty) {
-      return const Center(child: Text('Você ainda não possui investimentos.'));
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.receipt_long,
+              size: 80,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Nenhum investimento encontrado',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+            Text(
+              'Tente realizar um novo investimento.',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      );
     }
 
     final typeToColor = {

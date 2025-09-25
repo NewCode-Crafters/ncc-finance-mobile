@@ -70,11 +70,11 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
       }
 
       final balanceId = balances.first.id;
-
+      final category = _selectedType! == 'Tesouro Direto' || _selectedType! == 'Previdência Privada' ? 'FIXED_INCOME' : 'VARIABLE_INCOME';
       final investmentData = {
         'name': _selectedType!,
         'amount': amount,
-        'category': 'FIXED_INCOME', // Placeholder category
+        'category': category,
         'type': _selectedType!.replaceAll(' ', '_').toUpperCase(),
         'investedAt': DateTime.now(),
         'balanceId': balanceId,
