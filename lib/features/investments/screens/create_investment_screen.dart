@@ -1,4 +1,5 @@
 import 'package:bytebank/core/widgets/app_snackbar.dart';
+import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/custom_text_field.dart';
@@ -56,6 +57,7 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
     final investmentService = context.read<InvestmentService>();
     final investmentNotifier = context.read<InvestmentNotifier>();
     final balanceNotifier = context.read<BalanceNotifier>();
+    final transactionNotifier = context.read<TransactionNotifier>();
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     final userId = FirebaseAuth.instance.currentUser?.uid;
@@ -90,6 +92,7 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
 
       await investmentNotifier.fetchInvestments(userId: userId);
       await balanceNotifier.fetchBalances(userId: userId);
+      await transactionNotifier.fetchTransactions(userId);
 
       scaffoldMessenger.showSnackBar(
         buildAppSnackBar(

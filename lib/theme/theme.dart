@@ -35,7 +35,11 @@ class AppColors {
   static const lightGreenColor = Color.fromRGBO(198, 224, 174, 1);
 
   static const cardSaldoGradient = LinearGradient(
-    colors: [Color.fromRGBO(34, 68, 30, 1), Color.fromRGBO(116, 146, 102, 1), Color.fromRGBO(198, 224, 174, 1)],
+    colors: [
+      Color.fromRGBO(34, 68, 30, 1),
+      Color.fromRGBO(116, 146, 102, 1),
+      Color.fromRGBO(198, 224, 174, 1),
+    ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -121,12 +125,10 @@ ThemeData appTheme = ThemeData(
     primary: AppColors.brandPrimary,
     secondary: AppColors.brandSecondary,
     surface: AppColors.surfaceDefault,
-    background: AppColors.surfaceDefault,
     error: AppColors.error,
     onPrimary: Colors.white,
     onSecondary: Colors.white,
     onSurface: AppColors.neutral900,
-    onBackground: AppColors.neutral900,
     onError: Colors.white,
     brightness: Brightness.light,
   ),
