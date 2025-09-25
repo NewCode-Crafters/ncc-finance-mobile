@@ -1,3 +1,4 @@
+import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/custom_text_field.dart';
@@ -40,8 +41,10 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
     final amount = double.tryParse(amountText);
 
     if (_selectedType == null || amount == null || amount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, preencha todos os campos.')),
+      showAppSnackBar(
+        context,
+        'Por favor, selecione um tipo de investimento e preencha o valor a ser investido.',
+        AppMessageType.warning,
       );
       return;
     }
@@ -50,11 +53,15 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
       _isLoading = true;
     });
 
-    try {
-      final investmentService = context.read<InvestmentService>();
-      final userId = FirebaseAuth.instance.currentUser?.uid;
-      final balances = await context.read<BalanceNotifier>().state.balances;
+    final investmentService = context.read<InvestmentService>();
+    final investmentNotifier = context.read<InvestmentNotifier>();
+    final balanceNotifier = context.read<BalanceNotifier>();
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    final balances = context.read<BalanceNotifier>().state.balances;
 
+    try {
       if (userId == null) {
         throw Exception("Usuário não encontrado.");
       }
@@ -79,30 +86,29 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
         data: investmentData,
       );
 
-      if (mounted) {
-        // Refresh the investments list
-        await context.read<InvestmentNotifier>().fetchInvestments(
-          userId: userId,
-        );
-        // Refresh the balances list
-        await context.read<BalanceNotifier>().fetchBalances(userId: userId);
+      if (!mounted) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Investimento criado com sucesso!')),
-        );
-        Navigator.of(context).pop();
-      }
+      await investmentNotifier.fetchInvestments(userId: userId);
+      await balanceNotifier.fetchBalances(userId: userId);
+
+      scaffoldMessenger.showSnackBar(
+        buildAppSnackBar(
+          'Investimento criado com sucesso!',
+          AppMessageType.success,
+        ),
+      );
+      navigator.pop();
     } on InsufficientFundsException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.message)));
+        scaffoldMessenger.showSnackBar(
+          buildAppSnackBar(e.message, AppMessageType.error),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Erro: ${e.toString()}')));
+        scaffoldMessenger.showSnackBar(
+          buildAppSnackBar(e.toString(), AppMessageType.error),
+        );
       }
     } finally {
       if (mounted) {
