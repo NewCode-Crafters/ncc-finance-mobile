@@ -1,5 +1,7 @@
+import 'package:bytebank/core/constants/app_assets.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
+import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/custom_text_field.dart';
@@ -67,36 +69,180 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final isLoading = context.watch<AuthNotifier>().state.isLoading;
     return Scaffold(
       appBar: AppBar(title: const Text("Criar Conta")),
-      body: Center(child: _buildRegisterForm(isLoading: isLoading)),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end, 
+              children: [ 
+                Card(
+                  color: AppColors.lightGreenColor,
+                  elevation: 1,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(150)),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center, 
+                    children: [ 
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center, 
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 50, right: 20),
+                            child: Text(
+                              'Crie uma nova conta',
+                              style: TextStyle(fontSize: 30, color: AppColors.brandTertiary, fontWeight: FontWeight.w900),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center, 
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10, right: 20),
+                            child: Text(
+                              'Preencha os campos abaixo para criar sua conta!',
+                              style: TextStyle(fontSize: 14, color: AppColors.brandTertiary, fontWeight: FontWeight.w700),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 1, left: 24, right: 24, top: 1),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          height: 400,
+                          child: _buildRegisterForm(isLoading: isLoading),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start, 
+                          children: [
+                            Image(image: const AssetImage(AppAssets.register),),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildRegisterForm({required bool isLoading}) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.only(bottom: 16, right: 16, left: 16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            'Crie uma nova conta',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: 32),
-          CustomTextField(
+          TextField(
             key: Key("register_name_field"),
-            label: "Nome",
+            cursorColor: AppColors.brandTertiary,
+            style: const TextStyle(
+              color: AppColors.brandTertiary,
+            ),
+            decoration: const InputDecoration(
+            labelText: 'Nome',
+            labelStyle: TextStyle(
+              color: AppColors.brandTertiary, 
+            ),
+            floatingLabelStyle: TextStyle(
+              color: AppColors.brandTertiary, 
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(
+                color: AppColors.lightGreenColor, 
+                width: 2.0,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(
+                color: AppColors.lightGreenColor, 
+                width: 2.0,
+              ),
+            ),
+            fillColor: Colors.white, 
+            filled: true,
+          ),
             controller: _nameController,
           ),
           const SizedBox(height: 16),
-          CustomTextField(
+          TextField(
             key: Key("register_email_field"),
-            label: "Email",
+            cursorColor: AppColors.brandTertiary,
+            style: const TextStyle(
+              color: AppColors.brandTertiary,
+            ),
+            decoration: const InputDecoration(
+              labelText: 'Email',
+              labelStyle: TextStyle(
+                color: AppColors.brandTertiary, 
+              ),
+              floatingLabelStyle: TextStyle(
+                color: AppColors.brandTertiary, 
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(
+                  color: AppColors.lightGreenColor, 
+                  width: 2.0,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(
+                  color: AppColors.lightGreenColor, 
+                  width: 2.0,
+                ),
+              ),
+              fillColor: Colors.white, 
+              filled: true,
+            ),
             controller: _emailController,
           ),
           const SizedBox(height: 16),
-          CustomTextField(
+          TextField(
             key: Key("register_password_field"),
-            label: "Senha",
+            cursorColor: AppColors.brandTertiary,
+            style: const TextStyle(
+              color: AppColors.brandTertiary,
+            ),
+            decoration: const InputDecoration(
+              labelText: 'Senha',
+              labelStyle: TextStyle(
+                color: AppColors.brandTertiary, 
+              ),
+              floatingLabelStyle: TextStyle(
+                color: AppColors.brandTertiary, 
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(
+                  color: AppColors.lightGreenColor, 
+                  width: 2.0,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(
+                  color: AppColors.lightGreenColor, 
+                  width: 2.0,
+                ),
+              ),
+              fillColor: Colors.white, 
+              filled: true,
+            ),
             controller: _passwordController,
             obscureText: true,
           ),
@@ -112,7 +258,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: const Text("Já tem uma conta? Acesse"),
+            child: const Text(
+              "Já tem uma conta? Acesse",
+              style: TextStyle(color: AppColors.brandTertiary, fontWeight: FontWeight.w800)
+            ),
           ),
         ],
       ),

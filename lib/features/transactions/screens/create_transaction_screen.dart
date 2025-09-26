@@ -154,14 +154,32 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
             const SizedBox(height: 24),
             DropdownButtonFormField<TransactionCategory>(
               value: _selectedCategory,
-              hint: const Text('Selecione uma categoria'),
-              decoration: const InputDecoration(border: OutlineInputBorder()),
+              hint: const Text(
+                'Selecione uma categoria', 
+                style: TextStyle(color: AppColors.textSubtle),
+              ),
+              decoration: const InputDecoration(
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    width: 2.0,
+                  ),
+                ),
+              ),
               items: categories.map((category) {
                 return DropdownMenuItem(
                   value: category,
                   child: Row(
                     children: [
-                      Icon(getIconForCategory(category.id), size: 20),
+                      Icon(getIconForCategory(category.id), size: 20, color: AppColors.lightGreenColor,),
                       const SizedBox(width: 8),
                       Text(category.label),
                     ],
@@ -177,18 +195,58 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
             const SizedBox(height: 16),
             TextField(
               controller: _amountController,
+              cursorColor: AppColors.textSubtle,
               decoration: const InputDecoration(
                 labelText: 'Valor',
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando não está focado
+                ),
+                floatingLabelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando está focado
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    width: 2.0,
+                  ),
+                ),
               ),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _descriptionController,
+              cursorColor: AppColors.textSubtle,
               decoration: const InputDecoration(
                 labelText: 'Descrição (opcional)',
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando não está focado
+                ),
+                floatingLabelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando está focado
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    width: 2.0,
+                  ),
+                ),
               ),
             ),
             const Spacer(),

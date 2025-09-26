@@ -1,3 +1,4 @@
+import 'package:bytebank/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/features/transactions/models/financial_transaction.dart';
@@ -176,6 +177,20 @@ class TransactionNotifier extends ChangeNotifier {
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
       locale: const Locale('pt', 'BR'), // Use the locale
+      builder: (BuildContext context, Widget? child) {
+      return Theme(
+          data: ThemeData(
+            primaryColor: AppColors.brandTertiary, // Cor principal (botões e cabeçalho)
+            colorScheme: ColorScheme.dark(
+              primary: AppColors.brandTertiary, // Cor do botão "OK" e "CANCELAR"
+              onPrimary: Colors.white, // Cor do texto nos botões
+              onSurface: Colors.white, // Cor do texto no calendário
+              secondary: AppColors.lightGreenColor
+            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.surfaceDefault), // Cor de fundo do DatePicker
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (newRange != null) {

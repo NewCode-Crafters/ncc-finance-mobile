@@ -1,3 +1,4 @@
+import 'package:bytebank/core/constants/app_assets.dart';
 import 'package:bytebank/core/widgets/nav_bar.dart';
 import 'package:bytebank/features/transactions/screens/expense_control_screen.dart';
 import 'package:bytebank/core/models/nav_model.dart';
@@ -134,17 +135,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         thickness: 1,
                       ),
                       const SizedBox(height: 8),
-                      if (balanceState.isLoading)
-                        const CircularProgressIndicator()
-                      else
-                        Text(
-                          _isBalanceVisible
-                              ? currencyFormatter.format(
-                                  balanceState.totalBalance,
-                                )
-                              : 'R\$ **,**',
-                          style: headlineLargeNeutral,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          if (balanceState.isLoading)
+                            const CircularProgressIndicator()
+                          else
+                            Text(
+                              _isBalanceVisible
+                                  ? currencyFormatter.format(
+                                      balanceState.totalBalance,
+                                    )
+                                  : 'R\$ **,**',
+                              style: Theme.of(context).textTheme.headlineLarge!
+                                  .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.neutral100,
+                                  ),
+                            ),
+                          Image(image: const AssetImage(AppAssets.card)),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -172,15 +183,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ).pushNamed(CreateInvestmentScreen.routeName);
                   },
                 ),
-                ActionCard(
-                  icon: Icons.receipt_long,
-                  label: 'Consultar\ngastos',
-                  onTap: () {},
-                ),
               ],
             ),
             const SizedBox(height: 24),
             SizedBox(height: 400, child: TransactionsScreen()),
+            const SizedBox(height: 60),
           ],
         ),
       ),

@@ -1,3 +1,4 @@
+import 'package:bytebank/features/transactions/screens/expense_control_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
@@ -106,6 +107,7 @@ class MyApp extends StatelessWidget {
           TransactionsScreen.routeName: (context) => const TransactionsScreen(),
           CreateTransactionScreen.routeName: (context) =>
               const CreateTransactionScreen(),
+          ExpenseControlScreen.routeName: (context) => const ExpenseControlScreen(),
           OnboardingCarouselScreen.routeName: (context) =>
               const OnboardingCarouselScreen(),
         },
