@@ -100,7 +100,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                 padding: const EdgeInsets.all(16.0),
                 children: [
                   _buildChart(investmentState),
-                  const SizedBox(height: 24),
+                  investmentState.chartData.isEmpty ? Container() : const SizedBox(height: 24),
                   _buildSummaryCards(investmentState),
                   const SizedBox(height: 24),
                   _buildInvestmentList(investmentState, _colors),

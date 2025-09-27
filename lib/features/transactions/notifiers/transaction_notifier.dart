@@ -114,7 +114,9 @@ class TransactionNotifier extends ChangeNotifier {
       // Agrupa valores negativos por categoria, exceto incomes
       final Map<String, double> chartData = {};
       for (final transaction in transactions) {
-        if (transaction.amount > 0) continue;
+        if (transaction.category == 'INVESTMENT' ||
+            transaction.category == 'INVESTMENT_REDEMPTION' ||
+            transaction.amount > 0) continue;
         chartData[transaction.category] =
             (chartData[transaction.category] ?? 0) + transaction.amount.abs();
       }
