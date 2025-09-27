@@ -19,8 +19,6 @@ class TransactionsScreen extends StatefulWidget {
 class _TransactionsScreenState extends State<TransactionsScreen> {
   final _searchController = TextEditingController();
   late final TransactionNotifier _transactionNotifier;
-  int selectedTab = 0;
-
 
   @override
   void initState() {
@@ -69,11 +67,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar'),
+            child: const Text('Cancelar', style: TextStyle(color: AppColors.brandSecondary),),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Excluir'),
+            child: const Text('Confirmar', style: TextStyle(color: AppColors.brandSecondary),),
           ),
         ],
       ),

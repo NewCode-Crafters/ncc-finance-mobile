@@ -18,3 +18,14 @@ class ColorHelper {
     return clampedHsl.toColor().withAlpha(255);
   }
 }
+
+/// Use `someColor.withOpacitySafe(0.6)` instead of `withOpacity`.
+extension ColorOpacityExtension on Color {
+  Color withOpacitySafe(double opacity) {
+    final clamped = opacity.clamp(0.0, 1.0);
+    return withAlpha((clamped * 255).round());
+  }
+}
+
+Color colorWithOpacity(Color color, double opacity) =>
+    color.withOpacitySafe(opacity);

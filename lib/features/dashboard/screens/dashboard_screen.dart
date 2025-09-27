@@ -1,3 +1,4 @@
+import 'package:bytebank/core/constants/app_assets.dart';
 import 'package:bytebank/core/widgets/nav_bar.dart';
 import 'package:bytebank/features/transactions/screens/expense_control_screen.dart';
 import 'package:bytebank/core/models/nav_model.dart';
@@ -57,6 +58,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final profileState = context.watch<ProfileNotifier>().state;
     final balanceState = context.watch<BalanceNotifier>().state;
 
+    // Reusable text theme
+    final textTheme = Theme.of(context).textTheme;
+    final titleMediumNeutral = textTheme.titleMedium?.copyWith(
+      fontWeight: FontWeight.w500,
+      color: AppColors.neutral100,
+    );
+    final headlineMedium = textTheme.headlineMedium;
+    final bodySmall = textTheme.bodySmall;
+    final headlineLargeNeutral = textTheme.headlineLarge?.copyWith(
+      fontWeight: FontWeight.bold,
+      color: AppColors.neutral100,
+    );
+
     // Formatters for date and currency
     final currencyFormatter = NumberFormat.currency(
       locale: 'pt_BR',
@@ -74,18 +88,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
-            Text(
-              'Bem-vindo de volta',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('Bem-vindo de volta', style: titleMediumNeutral),
             Text(
               profileState.userProfile?.name ?? 'Usuário',
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: headlineMedium,
             ),
-            Text(
-              dateFormatter.format(DateTime.now()),
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+            Text(dateFormatter.format(DateTime.now()), style: bodySmall),
             const SizedBox(height: 24),
             Card(
               elevation: 1,
@@ -104,7 +112,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     children: [
                       Row(
                         children: [
-                          const Text('Saldo', style: TextStyle(fontWeight: FontWeight.w500, color: AppColors.neutral100)),
+                          Text('Saldo', style: titleMediumNeutral),
                           IconButton(
                             icon: Icon(
                               _isBalanceVisible
@@ -122,19 +130,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ],
                       ),
-                      const Divider(color: AppColors.darkPurpleColor, thickness: 1),
+                      const Divider(
+                        color: AppColors.darkPurpleColor,
+                        thickness: 1,
+                      ),
                       const SizedBox(height: 8),
-                      if (balanceState.isLoading)
-                        const CircularProgressIndicator()
-                      else
-                        Text(
-                          _isBalanceVisible
-                              ? currencyFormatter.format(
-                                  balanceState.totalBalance,
-                                )
-                              : 'R\$ --,--',
-                          style: Theme.of(context).textTheme.headlineLarge!.copyWith(fontWeight: FontWeight.bold, color: AppColors.neutral100),
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          if (balanceState.isLoading)
+                            const CircularProgressIndicator()
+                          else
+                            Text(
+                              _isBalanceVisible
+                                  ? currencyFormatter.format(
+                                      balanceState.totalBalance,
+                                    )
+                                  : 'R\$ **,**',
+                              style: Theme.of(context).textTheme.headlineLarge!
+                                  .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.neutral100,
+                                  ),
+                            ),
+                          Image(image: const AssetImage(AppAssets.card)),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -162,41 +183,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ).pushNamed(CreateInvestmentScreen.routeName);
                   },
                 ),
-                ActionCard(
-                  icon: Icons.receipt_long,
-                  label: 'Consultar\ngastos',
-                  onTap: () {
-                    Navigator.of(
-                      context,
-                    ).pushNamed(ExpenseControlScreen.routeName);
-                  },
-                ),
               ],
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              height: 400,
-              child: TransactionsScreen(),
-            ),
+            SizedBox(height: 400, child: TransactionsScreen()),
             const SizedBox(height: 60),
           ],
         ),
       ),
-      // Tab 1: Controle de Gastos
       const ExpenseControlScreen(),
-      // Tab 2: Investimentos
       const InvestmentsScreen(),
-      // Tab 3: Perfil (exemplo)
-      const MyProfileScreen()
+      const MyProfileScreen(),
     ];
 
     return Scaffold(
       backgroundColor: AppColors.surfaceDefault,
       appBar: selectedTab == 0 ? const MainAppBar() : null,
-      body: IndexedStack(
-        index: selectedTab,
-        children: tabBodies,
-      ),
+      body: IndexedStack(index: selectedTab, children: tabBodies),
       bottomNavigationBar: NavBar(
         pageIndex: selectedTab,
         onTap: (index) {
@@ -208,4 +211,3 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
-

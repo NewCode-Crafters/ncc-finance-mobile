@@ -1,13 +1,13 @@
 import 'package:bytebank/core/widgets/main_app_bar.dart';
+import 'package:bytebank/features/dashboard/widgets/action_card.dart';
+import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
-import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
 import 'package:bytebank/features/investments/widgets/investment_list_item.dart';
-import 'package:bytebank/features/dashboard/widgets/action_card.dart';
 import 'package:provider/provider.dart';
 
 class InvestmentsScreen extends StatefulWidget {
@@ -21,14 +21,11 @@ class InvestmentsScreen extends StatefulWidget {
 
 class _InvestmentsScreenState extends State<InvestmentsScreen> {
   final List<Color> _colors = [
-    Colors.green,
-    Colors.blue,
-    Colors.purple,
-    Colors.orange,
-    Colors.red,
-    Colors.teal,
-    Colors.pink,
-    Colors.amber,
+    AppColors.chartDarkGreen,
+    AppColors.chartGreen,
+    AppColors.chartDarkPurple,
+    AppColors.chartPurple,
+    AppColors.chartBeige,
   ];
 
   @override
@@ -57,11 +54,17 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar'),
+            child: const Text(
+              'Cancelar',
+              style: TextStyle(color: AppColors.brandSecondary),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Confirmar'),
+            child: const Text(
+              'Confirmar',
+              style: TextStyle(color: AppColors.brandSecondary),
+            ),
           ),
         ],
       ),
@@ -110,21 +113,21 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   Widget _buildChart(InvestmentState state) {
     // Create a list of colors for the chart sections
     final colors = [
-      Colors.green,
-      Colors.blue,
-      Colors.purple,
-      Colors.orange,
-      Colors.red,
+      AppColors.chartDarkGreen,
+      AppColors.chartGreen,
+      AppColors.chartDarkPurple,
+      AppColors.chartPurple,
+      AppColors.chartBeige,
     ];
 
     final chartData = state.chartData.entries.toList();
 
     return SizedBox(
-      height: 200,
+      height: 150,
       child: Row(
         children: [
           Expanded(
-            flex: 2,
+            flex: 3,
             child: PieChart(
               PieChartData(
                 sections: List.generate(chartData.length, (index) {
@@ -133,11 +136,11 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     color: colors[index % colors.length],
                     value: entry.value,
                     title: '', // We use the legend instead
-                    radius: 50,
+                    radius: 30,
                   );
                 }),
                 sectionsSpace: 2,
-                centerSpaceRadius: 40,
+                centerSpaceRadius: 50,
               ),
             ),
           ),
@@ -152,8 +155,16 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     Icons.circle,
                     color: colors[index % colors.length],
                   ),
-                  title: Text(entry.key.replaceAll('_', ' ').toLowerCase(), textHeightBehavior: TextHeightBehavior(applyHeightToFirstAscent: false)),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+                  title: Text(
+                    entry.key.replaceAll('_', ' ').toLowerCase(),
+                    textHeightBehavior: TextHeightBehavior(
+                      applyHeightToFirstAscent: false,
+                    ),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 0.0,
+                  ),
                   minVerticalPadding: 0.0,
                 );
               },
@@ -179,26 +190,58 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.savings, size: 28, color: AppColors.darkPurpleColor),
+                        Icon(
+                          Icons.savings,
+                          size: 28,
+                          color: AppColors.darkPurpleColor,
+                        ),
                         const SizedBox(height: 4),
-                        Text('Renda Fixa', style: TextStyle(color: AppColors.neutral500,fontWeight: AppTypography.fontWeightBold,fontSize: 14.0,),),
-                        Text('R\$ ${state.totalFixedIncome.toStringAsFixed(2)}', style: TextStyle(color: AppColors.neutral500,fontWeight: AppTypography.fontWeightBold,fontSize: 16.0,),),
+                        Text(
+                          'Renda Fixa',
+                          style: TextStyle(
+                            color: AppColors.neutral500,
+                            fontWeight: AppTypography.fontWeightBold,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        Text(
+                          'R\$ ${state.totalFixedIncome.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            color: AppColors.neutral500,
+                            fontWeight: AppTypography.fontWeightBold,
+                            fontSize: 16.0,
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  Container(
-                    width: 1,
-                    height: 60,
-                    color: AppColors.neutral500,
-                  ),
+                  Container(width: 1, height: 60, color: AppColors.neutral500),
                   Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.show_chart, size: 28, color: AppColors.darkPurpleColor),
+                        Icon(
+                          Icons.show_chart,
+                          size: 28,
+                          color: AppColors.darkPurpleColor,
+                        ),
                         const SizedBox(height: 4),
-                        Text('Renda Variável', style: TextStyle(color: AppColors.neutral500,fontWeight: AppTypography.fontWeightBold,fontSize: 14.0,),),
-                        Text('R\$ ${state.totalVariableIncome.toStringAsFixed(2)}', style: TextStyle(color: AppColors.neutral500,fontWeight: AppTypography.fontWeightBold,fontSize: 16.0,),),
+                        Text(
+                          'Renda Variável',
+                          style: TextStyle(
+                            color: AppColors.neutral500,
+                            fontWeight: AppTypography.fontWeightBold,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                        Text(
+                          'R\$ ${state.totalVariableIncome.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            color: AppColors.neutral500,
+                            fontWeight: AppTypography.fontWeightBold,
+                            fontSize: 16.0,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -229,11 +272,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.receipt_long,
-              size: 80,
-              color: Colors.grey,
-            ),
+            Icon(Icons.receipt_long, size: 80, color: Colors.grey),
             SizedBox(height: 16),
             Text(
               'Nenhum investimento encontrado',
@@ -256,10 +295,6 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Meus Investimentos',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
         const SizedBox(height: 16),
         // Use shrinkWrap and physics for ListView inside another scrolling view.
         ListView.builder(

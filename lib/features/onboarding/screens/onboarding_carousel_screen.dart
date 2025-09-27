@@ -1,3 +1,4 @@
+import 'package:bytebank/core/utils/color_helper.dart';
 import 'package:bytebank/features/onboarding/models/onboarding_item.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -52,7 +53,6 @@ class _OnboardingCarouselScreenState extends State<OnboardingCarouselScreen> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       backgroundColor: const Color(0xFFC6E0AE),
@@ -111,7 +111,7 @@ class _OnboardingCarouselScreenState extends State<OnboardingCarouselScreen> {
                           decoration: BoxDecoration(
                             color: isActive
                                 ? cs.primary
-                                : cs.primary.withOpacity(0.25),
+                                : cs.primary.withOpacitySafe(0.25),
                             borderRadius: BorderRadius.circular(8),
                           ),
                         );
@@ -159,10 +159,10 @@ class _OnboardingCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: cs.primary.withOpacity(0.18)),
+        border: Border.all(color: cs.primary.withOpacitySafe(0.18)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withOpacitySafe(0.06),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -195,7 +195,7 @@ class _OnboardingCard extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.white.withOpacity(0.28),
+                      Colors.white.withOpacitySafe(0.28),
                     ],
                   ),
                 ),
@@ -211,7 +211,7 @@ class _OnboardingCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.86),
+                  color: Colors.white.withOpacitySafe(0.86),
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(12),
                   ),

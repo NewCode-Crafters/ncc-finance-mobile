@@ -5,7 +5,6 @@ import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
 import 'package:provider/provider.dart';
 
@@ -23,17 +22,6 @@ class ExpenseControlScreen extends StatefulWidget {
 }
 
 class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
-  final List<Color> _colors = [
-    Colors.green,
-    Colors.blue,
-    Colors.purple,
-    Colors.orange,
-    Colors.red,
-    Colors.teal,
-    Colors.pink,
-    Colors.amber,
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -79,6 +67,7 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     final colors = [
       AppColors.chartDarkGreen,
       AppColors.chartGreen,
+      AppColors.chartGrayGreen,
       AppColors.chartDarkPurple,
       AppColors.chartPurple,
       AppColors.chartBeige,
@@ -118,15 +107,22 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
               itemCount: chartData.length,
               itemBuilder: (context, index) {
                 final entry = chartData[index];
-                final label = context.read<TransactionNotifier>().getCategoryLabel(entry.key);
+                final label = context
+                    .read<TransactionNotifier>()
+                    .getCategoryLabel(entry.key);
                 final iconData = getIconForCategory(entry.key);
                 return ListTile(
-                  leading: Icon(
-                    iconData,
-                    color: colors[index % colors.length],
+                  leading: Icon(iconData, color: colors[index % colors.length]),
+                  title: Text(
+                    label,
+                    textHeightBehavior: TextHeightBehavior(
+                      applyHeightToFirstAscent: false,
+                    ),
                   ),
-                  title: Text(label, textHeightBehavior: TextHeightBehavior(applyHeightToFirstAscent: false)),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 0.0,
+                  ),
                   minVerticalPadding: 0.0,
                 );
               },
@@ -145,18 +141,14 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
           icon: Icons.swap_horiz,
           label: 'Fazer uma\ntransação',
           onTap: () {
-            Navigator.of(
-              context,
-            ).pushNamed(CreateTransactionScreen.routeName);
+            Navigator.of(context).pushNamed(CreateTransactionScreen.routeName);
           },
         ),
         ActionCard(
           icon: Icons.bar_chart,
           label: 'Fazer um\ninvestimento',
           onTap: () {
-            Navigator.of(
-              context,
-            ).pushNamed(CreateInvestmentScreen.routeName);
+            Navigator.of(context).pushNamed(CreateInvestmentScreen.routeName);
           },
         ),
       ],
@@ -196,7 +188,9 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
           (categoryTotals[transaction.category] ?? 0) + transaction.amount;
     }
     if (categoryTotals.isEmpty) {
-      return const Center(child: Text('Nenhuma transação (exceto investimentos) encontrada.'));
+      return const Center(
+        child: Text('Nenhuma transação (exceto investimentos) encontrada.'),
+      );
     }
     final entries = categoryTotals.entries.toList();
     return Column(
@@ -214,7 +208,9 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
           itemCount: entries.length,
           itemBuilder: (context, index) {
             final entry = entries[index];
-            final label = context.read<TransactionNotifier>().getCategoryLabel(entry.key);
+            final label = context.read<TransactionNotifier>().getCategoryLabel(
+              entry.key,
+            );
             final iconData = getIconForCategory(entry.key);
             final value = entry.value;
             return ActionCard(

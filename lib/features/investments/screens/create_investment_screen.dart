@@ -1,7 +1,8 @@
+import 'package:bytebank/core/widgets/app_snackbar.dart';
+import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/core/widgets/custom_text_field.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
@@ -42,12 +43,16 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
   }
 
   Future<void> _handleCreateInvestment() async {
-    final amountText = _amountController.text.replaceAll('R\$ ', '').replaceAll(',', '.');
+    final amountText = _amountController.text
+        .replaceAll('R\$ ', '')
+        .replaceAll(',', '.');
     final amount = double.tryParse(amountText);
 
     if (_selectedType == null || amount == null || amount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, preencha todos os campos.')),
+      showAppSnackBar(
+        context,
+        'Por favor, selecione um tipo de investimento e preencha o valor a ser investido.',
+        AppMessageType.warning,
       );
       return;
     }
@@ -56,11 +61,16 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
       _isLoading = true;
     });
 
-    try {
-      final investmentService = context.read<InvestmentService>();
-      final userId = FirebaseAuth.instance.currentUser?.uid;
-      final balances = await context.read<BalanceNotifier>().state.balances;
+    final investmentService = context.read<InvestmentService>();
+    final investmentNotifier = context.read<InvestmentNotifier>();
+    final balanceNotifier = context.read<BalanceNotifier>();
+    final transactionNotifier = context.read<TransactionNotifier>();
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    final balances = context.read<BalanceNotifier>().state.balances;
 
+    try {
       if (userId == null) {
         throw Exception("Usuário não encontrado.");
       }
@@ -70,7 +80,11 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
       }
 
       final balanceId = balances.first.id;
-      final category = _selectedType! == 'Tesouro Direto' || _selectedType! == 'Previdência Privada' ? 'FIXED_INCOME' : 'VARIABLE_INCOME';
+      final category =
+          _selectedType! == 'Tesouro Direto' ||
+              _selectedType! == 'Previdência Privada'
+          ? 'FIXED_INCOME'
+          : 'VARIABLE_INCOME';
       final investmentData = {
         'name': _selectedType!,
         'amount': amount,
@@ -85,30 +99,30 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
         data: investmentData,
       );
 
-      if (mounted) {
-        // Refresh the investments list
-        await context.read<InvestmentNotifier>().fetchInvestments(
-          userId: userId,
-        );
-        // Refresh the balances list
-        await context.read<BalanceNotifier>().fetchBalances(userId: userId);
+      if (!mounted) return;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Investimento criado com sucesso!')),
-        );
-        Navigator.of(context).pop();
-      }
+      await investmentNotifier.fetchInvestments(userId: userId);
+      await balanceNotifier.fetchBalances(userId: userId);
+      await transactionNotifier.fetchTransactions(userId);
+
+      scaffoldMessenger.showSnackBar(
+        buildAppSnackBar(
+          'Investimento criado com sucesso!',
+          AppMessageType.success,
+        ),
+      );
+      navigator.pop();
     } on InsufficientFundsException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.message)));
+        scaffoldMessenger.showSnackBar(
+          buildAppSnackBar(e.message, AppMessageType.error),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Erro: ${e.toString()}')));
+        scaffoldMessenger.showSnackBar(
+          buildAppSnackBar(e.toString(), AppMessageType.error),
+        );
       }
     } finally {
       if (mounted) {
@@ -139,14 +153,16 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
-                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    color: AppColors
+                        .lightGreenColor, // Set your desired border color for the enabled state
                     width: 2.0,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
-                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    color: AppColors
+                        .lightGreenColor, // Set your desired border color for the focused state
                     width: 2.0,
                   ),
                 ),
@@ -169,22 +185,26 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
               decoration: const InputDecoration(
                 labelText: 'Valor',
                 labelStyle: TextStyle(
-                  color: AppColors.textSubtle, // Cor do label quando não está focado
+                  color: AppColors
+                      .textSubtle, // Cor do label quando não está focado
                 ),
                 floatingLabelStyle: TextStyle(
-                  color: AppColors.textSubtle, // Cor do label quando está focado
+                  color:
+                      AppColors.textSubtle, // Cor do label quando está focado
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
-                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    color: AppColors
+                        .lightGreenColor, // Set your desired border color for the enabled state
                     width: 2.0,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
-                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    color: AppColors
+                        .lightGreenColor, // Set your desired border color for the focused state
                     width: 2.0,
                   ),
                 ),

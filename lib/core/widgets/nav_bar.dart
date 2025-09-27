@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bytebank/core/utils/color_helper.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -7,11 +8,7 @@ class NavBar extends StatelessWidget {
   final int pageIndex;
   final Function(int) onTap;
 
-  const NavBar({
-    super.key,
-    required this.pageIndex,
-    required this.onTap,
-  });
+  const NavBar({super.key, required this.pageIndex, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -65,11 +62,11 @@ class NavBar extends StatelessWidget {
   Widget navItem(IconData icon, bool selected, {Function()? onTap}) {
     return Expanded(
       child: InkWell(
-        overlayColor: const MaterialStatePropertyAll<Color>(Colors.transparent),
+        overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
         onTap: onTap,
         child: Icon(
           icon,
-          color: selected ? Colors.white : Colors.white.withOpacity(0.6),
+          color: selected ? Colors.white : Colors.white.withOpacitySafe(0.6),
         ),
       ),
     );

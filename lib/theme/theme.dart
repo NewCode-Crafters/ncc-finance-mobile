@@ -35,12 +35,16 @@ class AppColors {
   static const lightGreenColor = Color.fromRGBO(198, 224, 174, 1);
 
   static const cardSaldoGradient = LinearGradient(
-    colors: [Color.fromRGBO(34, 68, 30, 1), Color.fromRGBO(116, 146, 102, 1), Color.fromRGBO(198, 224, 174, 1)],
+    colors: [
+      Color.fromRGBO(34, 68, 30, 1),
+      Color.fromRGBO(116, 146, 102, 1),
+      Color.fromRGBO(198, 224, 174, 1),
+    ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   // Chart Colors
-  static const chartDarkGreen = Color(0xFF22441E);
+  static const chartDarkGreen = Color(0xFF5F7E43);
   static const chartGreen = Color(0xFF57A64E);
   static const chartDarkPurple = Color(0xFF8F3CFF);
   static const chartPurple = Color(0xFFBFA1E9);
@@ -48,6 +52,8 @@ class AppColors {
   static const chartBlue = Color(0xFF4B9CF2);
   static const chartYellow = Color(0xFFFFDF4D);
   static const chartOrange = Color(0xFFF29C4B);
+  static const chartGrayGreen = Color(0xFFC5F09D);
+
 }
 
 class AppTypography {
@@ -125,12 +131,10 @@ ThemeData appTheme = ThemeData(
     primary: AppColors.brandPrimary,
     secondary: AppColors.brandSecondary,
     surface: AppColors.surfaceDefault,
-    background: AppColors.surfaceDefault,
     error: AppColors.error,
     onPrimary: Colors.white,
     onSecondary: Colors.white,
     onSurface: AppColors.neutral900,
-    onBackground: AppColors.neutral900,
     onError: Colors.white,
     brightness: Brightness.light,
   ),

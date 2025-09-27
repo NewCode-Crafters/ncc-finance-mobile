@@ -1,6 +1,6 @@
+import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
@@ -34,6 +34,15 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
   bool _isLoading = false;
   TransactionType _selectedType = TransactionType.expense;
 
+  void _onToggleTypePressed(int index) {
+    setState(() {
+      _selectedType = index == 0
+          ? TransactionType.expense
+          : TransactionType.income;
+      _selectedCategory = null;
+    });
+  }
+
   Future<void> _handleCreateTransaction() async {
     if (_selectedCategory == null || _amountController.numberValue <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -48,8 +57,13 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
       _isLoading = true;
     });
 
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     try {
       final transactionService = context.read<FinancialTransactionService>();
+      final balanceNotifier = context.read<BalanceNotifier>();
+      final transactionNotifier = context.read<TransactionNotifier>();
+      final navigator = Navigator.of(context);
       final userId = FirebaseAuth.instance.currentUser!.uid;
       final balanceId = context.read<BalanceNotifier>().state.balances.first.id;
 
@@ -69,28 +83,25 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
       );
 
       if (mounted) {
-        await context.read<TransactionNotifier>().fetchTransactions(userId);
-        await context.read<BalanceNotifier>().fetchBalances(userId: userId);
+        await transactionNotifier.fetchTransactions(userId);
+        await balanceNotifier.fetchBalances(userId: userId);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 8),
-                Text('Transação realizada com sucesso!'),
-              ],
-            ),
-            backgroundColor: Colors.green[600],
+        scaffoldMessenger.showSnackBar(
+          buildAppSnackBar(
+            'Transação realizada com sucesso!',
+            AppMessageType.success,
           ),
         );
 
-        Navigator.of(context).pop();
+        navigator.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao criar transação: ${e.toString()}')),
+        scaffoldMessenger.showSnackBar(
+          buildAppSnackBar(
+            'Erro ao criar transação: ${e.toString()}',
+            AppMessageType.error,
+          ),
         );
       }
     } finally {
@@ -123,10 +134,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
                 _selectedType == TransactionType.income,
               ],
               onPressed: (index) {
-                setState(() {
-                  _selectedType = TransactionType.values[index];
-                  _selectedCategory = null;
-                });
+                _onToggleTypePressed(index);
               },
               borderRadius: BorderRadius.circular(8),
               selectedColor: Colors.white,
@@ -143,27 +151,6 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
                 ),
               ],
             ),
-            // CupertinoSlidingSegmentedControl<TransactionType>(
-            //   groupValue: _selectedType,
-            //   children: const {
-            //     TransactionType.expense: Padding(
-            //       padding: EdgeInsets.all(8),
-            //       child: Text('Despesa'),
-            //     ),
-            //     TransactionType.income: Padding(
-            //       padding: EdgeInsets.all(8),
-            //       child: Text('Receita'),
-            //     ),
-            //   },
-            //   onValueChanged: (value) {
-            //     if (value != null) {
-            //       setState(() {
-            //         _selectedType = value;
-            //         _selectedCategory = null;
-            //       });
-            //     }
-            //   },
-            // ),
             const SizedBox(height: 24),
             DropdownButtonFormField<TransactionCategory>(
               value: _selectedCategory,
