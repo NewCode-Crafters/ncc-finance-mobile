@@ -43,10 +43,11 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
   }
 
   Future<void> _handleCreateInvestment() async {
-    final amountText = _amountController.text
-        .replaceAll('R\$ ', '')
-        .replaceAll(',', '.');
-    final amount = double.tryParse(amountText);
+  final amountText = _amountController.text
+    .replaceAll('R\$ ', '')
+    .replaceAll('.', '')
+    .replaceAll(',', '.');
+  final amount = double.tryParse(amountText);
 
     if (_selectedType == null || amount == null || amount <= 0) {
       showAppSnackBar(
