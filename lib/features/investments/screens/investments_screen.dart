@@ -121,58 +121,62 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     ];
 
     final chartData = state.chartData.entries.toList();
-
-    return SizedBox(
-      height: 150,
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: PieChart(
-              PieChartData(
-                sections: List.generate(chartData.length, (index) {
-                  final entry = chartData[index];
-                  return PieChartSectionData(
-                    color: colors[index % colors.length],
-                    value: entry.value,
-                    title: '', // We use the legend instead
-                    radius: 30,
-                  );
-                }),
-                sectionsSpace: 2,
-                centerSpaceRadius: 50,
+    if(state.chartData.isEmpty) {
+      return const Center(
+      );
+    }else{
+      return SizedBox(
+        height: 150,
+        child: Row(
+          children: [
+            Expanded(
+              flex: 3,
+              child: PieChart(
+                PieChartData(
+                  sections: List.generate(chartData.length, (index) {
+                    final entry = chartData[index];
+                    return PieChartSectionData(
+                      color: colors[index % colors.length],
+                      value: entry.value,
+                      title: '', // We use the legend instead
+                      radius: 30,
+                    );
+                  }),
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 50,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            flex: 3,
-            child: ListView.builder(
-              itemCount: chartData.length,
-              itemBuilder: (context, index) {
-                final entry = chartData[index];
-                return ListTile(
-                  leading: Icon(
-                    Icons.circle,
-                    color: colors[index % colors.length],
-                  ),
-                  title: Text(
-                    entry.key.replaceAll('_', ' ').toLowerCase(),
-                    textHeightBehavior: TextHeightBehavior(
-                      applyHeightToFirstAscent: false,
+            Expanded(
+              flex: 3,
+              child: ListView.builder(
+                itemCount: chartData.length,
+                itemBuilder: (context, index) {
+                  final entry = chartData[index];
+                  return ListTile(
+                    leading: Icon(
+                      Icons.circle,
+                      color: colors[index % colors.length],
                     ),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 0.0,
-                  ),
-                  minVerticalPadding: 0.0,
-                );
-              },
+                    title: Text(
+                      entry.key.replaceAll('_', ' ').toLowerCase(),
+                      textHeightBehavior: TextHeightBehavior(
+                        applyHeightToFirstAscent: false,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 0.0,
+                    ),
+                    minVerticalPadding: 0.0,
+                  );
+                },
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    }
   }
 
   Widget _buildSummaryCards(InvestmentState state) {
@@ -275,11 +279,11 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             Icon(Icons.receipt_long, size: 80, color: Colors.grey),
             SizedBox(height: 16),
             Text(
-              'Nenhum investimento encontrado',
+              'Você não possui investimentos',
               style: TextStyle(fontSize: 18, color: Colors.grey),
             ),
             Text(
-              'Tente realizar um novo investimento.',
+              'Realize um novo investimento.',
               style: TextStyle(color: Colors.grey),
             ),
           ],
