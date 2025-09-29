@@ -46,11 +46,11 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.nccfinance.bytebank"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdkVersion(flutter.minSdkVersion)
+        // Respect the Flutter-provided minSdkVersion but ensure the minimum required by
+        // plugins (e.g. cloud_firestore). This avoids hardcoding while enforcing 23.
+        val flutterMinSdk = (flutter.minSdkVersion as? Int) ?: 16
+        minSdkVersion(maxOf(flutterMinSdk, 23))
         targetSdk = flutter.targetSdkVersion
         versionCode = calculatedBuildVersion
         versionName = flutter.versionName
@@ -71,10 +71,16 @@ android {
                 keyPassword = System.getenv()["CM_KEY_PASSWORD"]                
             } else {
                 // Local development: read from key.properties (keystoreProperties)
-                keyAlias = keystoreProperties.getProperty("keyAlias")
-                keyPassword = keystoreProperties.getProperty("keyPassword")
-                storeFile = file(keystoreProperties.getProperty("storeFile"))
-                storePassword = keystoreProperties.getProperty("storePassword")            
+                // Only set values when they're present in key.properties to avoid nulls
+                val keyAliasProp = keystoreProperties.getProperty("keyAlias")?.takeIf { it.isNotBlank() }
+                val keyPasswordProp = keystoreProperties.getProperty("keyPassword")?.takeIf { it.isNotBlank() }
+                val storeFileProp = keystoreProperties.getProperty("storeFile")?.takeIf { it.isNotBlank() }
+                val storePasswordProp = keystoreProperties.getProperty("storePassword")?.takeIf { it.isNotBlank() }
+
+                keyAliasProp?.let { keyAlias = it }
+                keyPasswordProp?.let { keyPassword = it }
+                storeFileProp?.let { storeFile = file(it) }
+                storePasswordProp?.let { storePassword = it }
             }
         }        
     } 
