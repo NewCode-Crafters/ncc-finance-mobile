@@ -44,16 +44,21 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     // We use a Consumer to listen for changes in the AuthNotifier.
     final authNotifier = context.watch<AuthNotifier>();
+
+    final height = MediaQuery.of(context).size.height;
+    final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+    final compact = height < 700 || keyboardOpen;
+
     return Scaffold(
       body: Stack(
         children: [
           SafeArea(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start, 
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const SizedBox(height: 90), 
+                const SizedBox(height: 90),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center, 
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image(image: const AssetImage(AppAssets.byteBankLogo)),
                     const SizedBox(width: 8),
@@ -64,121 +69,132 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end, 
-              children: [ 
-                Card(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.85,
+                  maxWidth: MediaQuery.of(context).size.width,
+                ),
+                child: Card(
                   color: AppColors.lightGreenColor,
                   elevation: 1,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(topRight: Radius.circular(150)),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(150),
+                    ),
                   ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center, 
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(top: 40, right: 20),
+                        padding: EdgeInsets.only(
+                          top: compact ? 20 : 40,
+                          right: 20,
+                        ),
                         child: Text(
                           'Login',
-                          style: TextStyle(fontSize: 30, color: AppColors.brandTertiary, fontWeight: FontWeight.w900),
+                          style: TextStyle(
+                            fontSize: compact ? 24 : 30,
+                            color: AppColors.brandTertiary,
+                            fontWeight: FontWeight.w900,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 1, left: 24, right: 24, top: 1),
+                        padding: EdgeInsets.only(
+                          bottom: compact ? 8 : 16,
+                          left: 24,
+                          right: 24,
+                          top: compact ? 8 : 1,
+                        ),
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.85,
-                          height: 400,
-                          child: _buildLoginForm(isLoading: authNotifier.state.isLoading),
+                          child: _buildLoginForm(
+                            isLoading: authNotifier.state.isLoading,
+                            compact: compact,
+                          ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end, 
-                          children: [
-                            Image(image: const AssetImage(AppAssets.login),),
-                          ],
+                      // hide or shrink the decorative image on compact screens
+                      if (!compact)
+                        Padding(
+                          padding: const EdgeInsets.all(0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Image(image: const AssetImage(AppAssets.login)),
+                            ],
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
-        ] 
+        ],
       ),
     );
   }
 
-  Widget _buildLoginForm({required bool isLoading}) {
+  Widget _buildLoginForm({required bool isLoading, bool compact = false}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const SizedBox(height: 40),
+        SizedBox(height: compact ? 12 : 40),
         TextField(
           key: Key('login_email_field'),
           cursorColor: AppColors.brandTertiary,
-          style: const TextStyle(
-            color: AppColors.brandTertiary,
-          ),
+          style: const TextStyle(color: AppColors.brandTertiary),
           decoration: const InputDecoration(
             labelText: 'Email',
-            labelStyle: TextStyle(
-              color: AppColors.brandTertiary, 
-            ),
-            floatingLabelStyle: TextStyle(
-              color: AppColors.brandTertiary, 
-            ),
+            labelStyle: TextStyle(color: AppColors.brandTertiary),
+            floatingLabelStyle: TextStyle(color: AppColors.brandTertiary),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
               borderSide: BorderSide(
-                color: AppColors.lightGreenColor, 
+                color: AppColors.lightGreenColor,
                 width: 2.0,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
               borderSide: BorderSide(
-                color: AppColors.lightGreenColor, 
+                color: AppColors.lightGreenColor,
                 width: 2.0,
               ),
             ),
-            fillColor: Colors.white, 
+            fillColor: Colors.white,
             filled: true,
           ),
           controller: _emailController,
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: compact ? 10 : 16),
         TextField(
           key: const Key('login_password_field'),
-          style: const TextStyle(
-            color: AppColors.brandTertiary,
-          ),
+          style: const TextStyle(color: AppColors.brandTertiary),
           decoration: const InputDecoration(
             labelText: 'Senha',
-            labelStyle: TextStyle(
-              color: AppColors.brandTertiary, 
-            ),
-            floatingLabelStyle: TextStyle(
-              color: AppColors.brandTertiary, 
-            ),
+            labelStyle: TextStyle(color: AppColors.brandTertiary),
+            floatingLabelStyle: TextStyle(color: AppColors.brandTertiary),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
               borderSide: BorderSide(
-                color: AppColors.lightGreenColor, 
+                color: AppColors.lightGreenColor,
                 width: 2.0,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(10)),
               borderSide: BorderSide(
-                color: AppColors.lightGreenColor, 
+                color: AppColors.lightGreenColor,
                 width: 2.0,
               ),
             ),
-            fillColor: Colors.white, 
+            fillColor: Colors.white,
             filled: true,
           ),
           obscureText: true,
@@ -189,12 +205,15 @@ class _LoginScreenState extends State<LoginScreen> {
           child: TextButton(
             onPressed: () {}, // TODO: Implement forgot password
             child: const Text(
-              "Esqueci a senha?", 
-              style: TextStyle(color: AppColors.brandTertiary, fontWeight: FontWeight.w800),
+              "Esqueci a senha?",
+              style: TextStyle(
+                color: AppColors.brandTertiary,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: compact ? 8 : 16),
         isLoading
             ? const CircularProgressIndicator()
             : PrimaryButton(
@@ -202,14 +221,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: _handleLogin,
                 text: 'Acessar',
               ),
-        const SizedBox(height: 10),
+        SizedBox(height: compact ? 8 : 10),
         TextButton(
           onPressed: () {
             Navigator.of(context).pushNamed(RegisterScreen.routeName);
           },
           child: const Text(
-            "Cadastre-se", 
-            style: TextStyle(color: AppColors.brandTertiary, fontWeight: FontWeight.w800),
+            "Cadastre-se",
+            style: TextStyle(
+              color: AppColors.brandTertiary,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ),
       ],
