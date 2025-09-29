@@ -49,7 +49,7 @@ android {
         applicationId = "com.nccfinance.bytebank"
         // Respect the Flutter-provided minSdkVersion but ensure the minimum required by
         // plugins (e.g. cloud_firestore). This avoids hardcoding while enforcing 23.
-        val flutterMinSdk = (flutter.minSdkVersion as? Int) ?: 16
+        val flutterMinSdk = (flutter.minSdkVersion as? Int) ?: 23
         minSdkVersion(maxOf(flutterMinSdk, 23))
         targetSdk = flutter.targetSdkVersion
         versionCode = calculatedBuildVersion
