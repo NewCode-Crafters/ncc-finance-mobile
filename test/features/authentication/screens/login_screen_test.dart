@@ -64,12 +64,7 @@ void main() {
     final passwordFieldFinder = find.byKey(const Key('login_password_field'));
     expect(passwordFieldFinder, findsOneWidget);
 
-    final textField = tester.widget<TextField>(
-      find.descendant(
-        of: passwordFieldFinder,
-        matching: find.byType(TextField),
-      ),
-    );
+    final textField = tester.widget<TextField>(passwordFieldFinder);
     expect(textField.obscureText, isTrue);
   });
 
