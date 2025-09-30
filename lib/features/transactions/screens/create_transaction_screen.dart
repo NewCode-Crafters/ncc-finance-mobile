@@ -60,12 +60,12 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
   Future<void> _handleCreateTransaction() async {
     if (_selectedCategory == null || _amountController.numberValue <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Por favor, selecione uma categoria e defina um valor.',
-          ),
+        buildAppSnackBar(
+          'Por favor, selecione uma categoria e preencha o valor.',
+          AppMessageType.warning,
         ),
       );
+
       return;
     }
 
