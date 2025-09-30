@@ -5,6 +5,7 @@ import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/features/splash/screens/splash_screen.dart';
 import 'package:bytebank/features/transactions/models/financial_transaction.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
+import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/features/transactions/screens/create_transaction_screen.dart';
 import 'package:bytebank/features/transactions/screens/edit_transaction_screen.dart';
 import 'package:bytebank/features/transactions/screens/transactions_screen.dart';
@@ -82,6 +83,10 @@ class MyApp extends StatelessWidget {
             context.read<MetadataService>(),
           ),
         ),
+        // Local attachments selection for transaction creation
+        ChangeNotifierProvider<TransactionAttachmentsNotifier>(
+          create: (_) => TransactionAttachmentsNotifier(),
+        ),
       ],
       child: MaterialApp(
         title: 'Bytebank',
@@ -107,7 +112,8 @@ class MyApp extends StatelessWidget {
           TransactionsScreen.routeName: (context) => const TransactionsScreen(),
           CreateTransactionScreen.routeName: (context) =>
               const CreateTransactionScreen(),
-          ExpenseControlScreen.routeName: (context) => const ExpenseControlScreen(),
+          ExpenseControlScreen.routeName: (context) =>
+              const ExpenseControlScreen(),
           OnboardingCarouselScreen.routeName: (context) =>
               const OnboardingCarouselScreen(),
         },
