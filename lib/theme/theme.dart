@@ -29,11 +29,31 @@ class AppColors {
 
   static const textSubtle = Color(0xFFC8C8C8);
 
+  static const darkPurpleColor = Color(0xFFBFA1E9);
+  static const lightPurpleColor = Color.fromRGBO(227, 207, 255, 1);
+  static const darkGreenColor = Color(0xFF22441E);
+  static const lightGreenColor = Color.fromRGBO(198, 224, 174, 1);
+
+  static const cardSaldoGradient = LinearGradient(
+    colors: [
+      Color.fromRGBO(34, 68, 30, 1),
+      Color.fromRGBO(116, 146, 102, 1),
+      Color.fromRGBO(198, 224, 174, 1),
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
   // Chart Colors
-  static const chartBlue = Color(0xFF2567F9);
-  static const chartPurple = Color(0xFF8F3CFF);
-  static const chartOrange = Color(0xFFF1823D);
-  static const chartMagenta = Color(0xFFFF3C82);
+  static const chartDarkGreen = Color(0xFF5F7E43);
+  static const chartGreen = Color(0xFF57A64E);
+  static const chartDarkPurple = Color(0xFF8F3CFF);
+  static const chartPurple = Color(0xFFBFA1E9);
+  static const chartBeige = Color(0xFFDEE0AE);
+  static const chartBlue = Color(0xFF4B9CF2);
+  static const chartYellow = Color(0xFFFFDF4D);
+  static const chartOrange = Color(0xFFF29C4B);
+  static const chartGrayGreen = Color(0xFFC5F09D);
+
 }
 
 class AppTypography {
@@ -111,12 +131,10 @@ ThemeData appTheme = ThemeData(
     primary: AppColors.brandPrimary,
     secondary: AppColors.brandSecondary,
     surface: AppColors.surfaceDefault,
-    background: AppColors.surfaceDefault,
     error: AppColors.error,
     onPrimary: Colors.white,
     onSecondary: Colors.white,
     onSurface: AppColors.neutral900,
-    onBackground: AppColors.neutral900,
     onError: Colors.white,
     brightness: Brightness.light,
   ),

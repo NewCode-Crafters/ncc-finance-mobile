@@ -1,3 +1,4 @@
+import 'package:bytebank/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/constants/app_assets.dart';
 import 'package:bytebank/core/widgets/custom_text_field.dart';
@@ -28,35 +29,174 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     final authNotifier = context.read<AuthNotifier>();
-    await authNotifier.login(_emailController.text, _passwordController.text);
+    final success = await authNotifier.login(
+      _emailController.text,
+      _passwordController.text,
+    );
+
+    if (success) {
+      // Close this login screen so the AuthGate (root) can render the Dashboard.
+      if (mounted) Navigator.of(context).pop();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     // We use a Consumer to listen for changes in the AuthNotifier.
     final authNotifier = context.watch<AuthNotifier>();
+
+    final height = MediaQuery.of(context).size.height;
+    final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+    final compact = height < 700 || keyboardOpen;
+
     return Scaffold(
-      body: Center(
-        child: _buildLoginForm(isLoading: authNotifier.state.isLoading),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(height: 90),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image(image: const AssetImage(AppAssets.byteBankLogo)),
+                    const SizedBox(width: 8),
+                    Image(image: const AssetImage(AppAssets.byteBankName)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.85,
+                  maxWidth: MediaQuery.of(context).size.width,
+                ),
+                child: Card(
+                  color: AppColors.lightGreenColor,
+                  elevation: 1,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(150),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: compact ? 20 : 40,
+                          right: 20,
+                        ),
+                        child: Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: compact ? 24 : 30,
+                            color: AppColors.brandTertiary,
+                            fontWeight: FontWeight.w900,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          bottom: compact ? 8 : 16,
+                          left: 24,
+                          right: 24,
+                          top: compact ? 8 : 1,
+                        ),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          child: _buildLoginForm(
+                            isLoading: authNotifier.state.isLoading,
+                            compact: compact,
+                          ),
+                        ),
+                      ),
+                      // hide or shrink the decorative image on compact screens
+                      if (!compact)
+                        Padding(
+                          padding: const EdgeInsets.all(0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Image(image: const AssetImage(AppAssets.login)),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildLoginForm({required bool isLoading}) {
+  Widget _buildLoginForm({required bool isLoading, bool compact = false}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image(image: const AssetImage(AppAssets.byteBankLogo)),
-        const SizedBox(height: 40),
-        CustomTextField(
+        SizedBox(height: compact ? 12 : 40),
+        TextField(
           key: Key('login_email_field'),
-          label: 'Email',
+          cursorColor: AppColors.brandTertiary,
+          style: const TextStyle(color: AppColors.brandTertiary),
+          decoration: const InputDecoration(
+            labelText: 'Email',
+            labelStyle: TextStyle(color: AppColors.brandTertiary),
+            floatingLabelStyle: TextStyle(color: AppColors.brandTertiary),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(
+                color: AppColors.lightGreenColor,
+                width: 2.0,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(
+                color: AppColors.lightGreenColor,
+                width: 2.0,
+              ),
+            ),
+            fillColor: Colors.white,
+            filled: true,
+          ),
           controller: _emailController,
         ),
-        const SizedBox(height: 16),
-        CustomTextField(
+        SizedBox(height: compact ? 10 : 16),
+        TextField(
           key: const Key('login_password_field'),
-          label: 'Senha',
+          style: const TextStyle(color: AppColors.brandTertiary),
+          decoration: const InputDecoration(
+            labelText: 'Senha',
+            labelStyle: TextStyle(color: AppColors.brandTertiary),
+            floatingLabelStyle: TextStyle(color: AppColors.brandTertiary),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(
+                color: AppColors.lightGreenColor,
+                width: 2.0,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              borderSide: BorderSide(
+                color: AppColors.lightGreenColor,
+                width: 2.0,
+              ),
+            ),
+            fillColor: Colors.white,
+            filled: true,
+          ),
           obscureText: true,
           controller: _passwordController,
         ),
@@ -64,10 +204,16 @@ class _LoginScreenState extends State<LoginScreen> {
           alignment: Alignment.centerRight,
           child: TextButton(
             onPressed: () {}, // TODO: Implement forgot password
-            child: const Text("Esqueci a senha?"),
+            child: const Text(
+              "Esqueci a senha?",
+              style: TextStyle(
+                color: AppColors.brandTertiary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: compact ? 8 : 16),
         isLoading
             ? const CircularProgressIndicator()
             : PrimaryButton(
@@ -75,12 +221,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: _handleLogin,
                 text: 'Acessar',
               ),
-        const SizedBox(height: 16),
+        SizedBox(height: compact ? 8 : 10),
         TextButton(
           onPressed: () {
             Navigator.of(context).pushNamed(RegisterScreen.routeName);
           },
-          child: const Text("Cadastre-se"),
+          child: const Text(
+            "Cadastre-se",
+            style: TextStyle(
+              color: AppColors.brandTertiary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
         ),
       ],
     );

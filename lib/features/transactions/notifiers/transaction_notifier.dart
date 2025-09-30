@@ -1,3 +1,4 @@
+import 'package:bytebank/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/features/transactions/models/financial_transaction.dart';
@@ -14,6 +15,7 @@ class TransactionState {
   final String searchText;
   final DateTime startDate;
   final DateTime endDate;
+  final Map<String, double> chartData;
 
   TransactionState({
     this.transactions = const [],
@@ -24,6 +26,7 @@ class TransactionState {
     DateTime? startDate, // Make nullable for default
     DateTime? endDate,
     this.searchText = '',
+    this.chartData = const {},
   }) : startDate = startDate ?? _startOfMonth(DateTime.now()),
        endDate = endDate ?? DateTime.now();
 
@@ -36,6 +39,7 @@ class TransactionState {
     String? searchText,
     DateTime? startDate,
     DateTime? endDate,
+    Map<String, double>? chartData,
   }) {
     return TransactionState(
       transactions: transactions ?? this.transactions,
@@ -46,6 +50,7 @@ class TransactionState {
       searchText: searchText ?? this.searchText,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
+      chartData: chartData ?? this.chartData,
     );
   }
 }
@@ -106,10 +111,19 @@ class TransactionNotifier extends ChangeNotifier {
           ? await _metadataService.getTransactionCategories()
           : _state.categories;
 
+      // Agrupa valores negativos por categoria, exceto incomes
+      final Map<String, double> chartData = {};
+      for (final transaction in transactions) {
+        if (transaction.amount > 0) continue;
+        chartData[transaction.category] =
+            (chartData[transaction.category] ?? 0) + transaction.amount.abs();
+      }
+
       _state = _state.copyWith(
         transactions: transactions,
         categories: categories,
         isLoading: false,
+        chartData: chartData,
       );
     } catch (e) {
       _state = _state.copyWith(isLoading: false, error: e.toString());
@@ -163,6 +177,20 @@ class TransactionNotifier extends ChangeNotifier {
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
       locale: const Locale('pt', 'BR'), // Use the locale
+      builder: (BuildContext context, Widget? child) {
+      return Theme(
+          data: ThemeData(
+            primaryColor: AppColors.brandTertiary, // Cor principal (botões e cabeçalho)
+            colorScheme: ColorScheme.dark(
+              primary: AppColors.brandTertiary, // Cor do botão "OK" e "CANCELAR"
+              onPrimary: Colors.white, // Cor do texto nos botões
+              onSurface: Colors.white, // Cor do texto no calendário
+              secondary: AppColors.lightGreenColor
+            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.surfaceDefault), // Cor de fundo do DatePicker
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (newRange != null) {

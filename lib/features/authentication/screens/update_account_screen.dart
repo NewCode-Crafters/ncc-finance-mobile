@@ -22,7 +22,6 @@ class _UpdateAccountScreenState extends State<UpdateAccountScreen> {
   void initState() {
     super.initState();
     final userProfile = context.read<ProfileNotifier>().state.userProfile;
-    print(userProfile?.email);
     _nameController = TextEditingController(text: userProfile?.name);
     _emailController = TextEditingController(text: userProfile?.email);
   }

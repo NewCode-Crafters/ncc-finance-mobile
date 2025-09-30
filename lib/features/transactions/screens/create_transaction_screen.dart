@@ -1,5 +1,6 @@
+import 'package:bytebank/core/widgets/app_snackbar.dart';
+import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
@@ -33,6 +34,15 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
   bool _isLoading = false;
   TransactionType _selectedType = TransactionType.expense;
 
+  void _onToggleTypePressed(int index) {
+    setState(() {
+      _selectedType = index == 0
+          ? TransactionType.expense
+          : TransactionType.income;
+      _selectedCategory = null;
+    });
+  }
+
   Future<void> _handleCreateTransaction() async {
     if (_selectedCategory == null || _amountController.numberValue <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -47,8 +57,13 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
       _isLoading = true;
     });
 
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     try {
       final transactionService = context.read<FinancialTransactionService>();
+      final balanceNotifier = context.read<BalanceNotifier>();
+      final transactionNotifier = context.read<TransactionNotifier>();
+      final navigator = Navigator.of(context);
       final userId = FirebaseAuth.instance.currentUser!.uid;
       final balanceId = context.read<BalanceNotifier>().state.balances.first.id;
 
@@ -68,28 +83,25 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
       );
 
       if (mounted) {
-        await context.read<TransactionNotifier>().fetchTransactions(userId);
-        await context.read<BalanceNotifier>().fetchBalances(userId: userId);
+        await transactionNotifier.fetchTransactions(userId);
+        await balanceNotifier.fetchBalances(userId: userId);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.check_circle, color: Colors.white),
-                SizedBox(width: 8),
-                Text('Transação realizada com sucesso!'),
-              ],
-            ),
-            backgroundColor: Colors.green[600],
+        scaffoldMessenger.showSnackBar(
+          buildAppSnackBar(
+            'Transação realizada com sucesso!',
+            AppMessageType.success,
           ),
         );
 
-        Navigator.of(context).pop();
+        navigator.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao criar transação: ${e.toString()}')),
+        scaffoldMessenger.showSnackBar(
+          buildAppSnackBar(
+            'Erro ao criar transação: ${e.toString()}',
+            AppMessageType.error,
+          ),
         );
       }
     } finally {
@@ -111,42 +123,63 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Criar Transação')),
+      backgroundColor: AppColors.surfaceDefault,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            CupertinoSlidingSegmentedControl<TransactionType>(
-              groupValue: _selectedType,
-              children: const {
-                TransactionType.expense: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text('Despesa'),
-                ),
-                TransactionType.income: Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Text('Receita'),
-                ),
+            ToggleButtons(
+              isSelected: [
+                _selectedType == TransactionType.expense,
+                _selectedType == TransactionType.income,
+              ],
+              onPressed: (index) {
+                _onToggleTypePressed(index);
               },
-              onValueChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _selectedType = value;
-                    _selectedCategory = null;
-                  });
-                }
-              },
+              borderRadius: BorderRadius.circular(8),
+              selectedColor: Colors.white,
+              fillColor: AppColors.brandTertiary,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
+              children: const [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text('Saída'),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text('Entrada'),
+                ),
+              ],
             ),
             const SizedBox(height: 24),
             DropdownButtonFormField<TransactionCategory>(
               value: _selectedCategory,
-              hint: const Text('Selecione uma categoria'),
-              decoration: const InputDecoration(border: OutlineInputBorder()),
+              hint: const Text(
+                'Selecione uma categoria', 
+                style: TextStyle(color: AppColors.textSubtle),
+              ),
+              decoration: const InputDecoration(
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    width: 2.0,
+                  ),
+                ),
+              ),
               items: categories.map((category) {
                 return DropdownMenuItem(
                   value: category,
                   child: Row(
                     children: [
-                      Icon(getIconForCategory(category.id), size: 20),
+                      Icon(getIconForCategory(category.id), size: 20, color: AppColors.lightGreenColor,),
                       const SizedBox(width: 8),
                       Text(category.label),
                     ],
@@ -162,18 +195,58 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
             const SizedBox(height: 16),
             TextField(
               controller: _amountController,
+              cursorColor: AppColors.textSubtle,
               decoration: const InputDecoration(
                 labelText: 'Valor',
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando não está focado
+                ),
+                floatingLabelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando está focado
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    width: 2.0,
+                  ),
+                ),
               ),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _descriptionController,
+              cursorColor: AppColors.textSubtle,
               decoration: const InputDecoration(
                 labelText: 'Descrição (opcional)',
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando não está focado
+                ),
+                floatingLabelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando está focado
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    width: 2.0,
+                  ),
+                ),
               ),
             ),
             const Spacer(),

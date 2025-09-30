@@ -1,6 +1,10 @@
+import 'package:bytebank/core/constants/app_assets.dart';
 import 'package:bytebank/core/widgets/nav_bar.dart';
-import 'package:bytebank/features/pokemons/screens/pokemons_screen.dart';
+import 'package:bytebank/features/transactions/screens/expense_control_screen.dart';
 import 'package:bytebank/core/models/nav_model.dart';
+import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
+import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
+import 'package:bytebank/features/transactions/screens/create_transaction_screen.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +29,8 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _isBalanceVisible = true;
   final homeNavKey = GlobalKey<NavigatorState>();
-  final searchNavKey = GlobalKey<NavigatorState>();
-  final notificationNavKey = GlobalKey<NavigatorState>();
+  final investmentsNavKey = GlobalKey<NavigatorState>();
+  final expenseNavKey = GlobalKey<NavigatorState>();
   final profileNavKey = GlobalKey<NavigatorState>();
   int selectedTab = 0;
   List<NavModel> items = [];
@@ -35,10 +39,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     items = [
-      NavModel(page: const TabPage(tab: 1), navKey: homeNavKey),
-      NavModel(page: const TabPage(tab: 2), navKey: searchNavKey),
-      NavModel(page: const TabPage(tab: 3), navKey: notificationNavKey),
-      NavModel(page: const TabPage(tab: 4), navKey: profileNavKey),
+      NavModel(page: const DashboardScreen(), navKey: homeNavKey),
+      NavModel(page: const ExpenseControlScreen(), navKey: expenseNavKey),
+      NavModel(page: const InvestmentsScreen(), navKey: investmentsNavKey),
+      NavModel(page: const MyProfileScreen(), navKey: profileNavKey),
     ];
   }
 
@@ -54,6 +58,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final profileState = context.watch<ProfileNotifier>().state;
     final balanceState = context.watch<BalanceNotifier>().state;
 
+    // Reusable text theme
+    final textTheme = Theme.of(context).textTheme;
+    final titleMediumNeutral = textTheme.titleMedium?.copyWith(
+      fontWeight: FontWeight.w500,
+      color: AppColors.neutral100,
+    );
+    final headlineMedium = textTheme.headlineMedium;
+    final bodySmall = textTheme.bodySmall;
+    final headlineLargeNeutral = textTheme.headlineLarge?.copyWith(
+      fontWeight: FontWeight.bold,
+      color: AppColors.neutral100,
+    );
+
     // Formatters for date and currency
     final currencyFormatter = NumberFormat.currency(
       locale: 'pt_BR',
@@ -64,70 +81,83 @@ class _DashboardScreenState extends State<DashboardScreen> {
       'pt_BR',
     );
 
-    final currentNavigator = items.isNotEmpty
-        ? items[selectedTab].navKey.currentState
-        : null;
-    final canPopNested = currentNavigator?.canPop() ?? false;
-
-    return Scaffold(
-      backgroundColor: AppColors.surfaceDefault,
-      appBar: const MainAppBar(),
-      body: RefreshIndicator(
+    final List<Widget> tabBodies = [
+      // Tab 0: Dashboard principal
+      RefreshIndicator(
         onRefresh: _refreshData,
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
-            Text(
-              'Bem-vindo de volta',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('Bem-vindo de volta', style: titleMediumNeutral),
             Text(
               profileState.userProfile?.name ?? 'Usuário',
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: headlineMedium,
             ),
-            Text(
-              dateFormatter.format(DateTime.now()),
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+            Text(dateFormatter.format(DateTime.now()), style: bodySmall),
             const SizedBox(height: 24),
             Card(
-              color: Colors.green.shade100,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Text('Saldo'),
-                        const Spacer(),
-                        IconButton(
-                          icon: Icon(
-                            _isBalanceVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: AppColors.cardSaldoGradient,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text('Saldo', style: titleMediumNeutral),
+                          IconButton(
+                            icon: Icon(
+                              _isBalanceVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isBalanceVisible = !_isBalanceVisible;
+                              });
+                            },
+                            style: IconButton.styleFrom(
+                              foregroundColor: AppColors.darkPurpleColor,
+                            ),
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _isBalanceVisible = !_isBalanceVisible;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    if (balanceState.isLoading)
-                      const CircularProgressIndicator()
-                    else
-                      Text(
-                        _isBalanceVisible
-                            ? currencyFormatter.format(
-                                balanceState.totalBalance,
-                              )
-                            : 'R\$ --,--',
-                        style: Theme.of(context).textTheme.headlineLarge,
+                        ],
                       ),
-                  ],
+                      const Divider(
+                        color: AppColors.darkPurpleColor,
+                        thickness: 1,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          if (balanceState.isLoading)
+                            const CircularProgressIndicator()
+                          else
+                            Text(
+                              _isBalanceVisible
+                                  ? currencyFormatter.format(
+                                      balanceState.totalBalance,
+                                    )
+                                  : 'R\$ **,**',
+                              style: Theme.of(context).textTheme.headlineLarge!
+                                  .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.neutral100,
+                                  ),
+                            ),
+                          Image(image: const AssetImage(AppAssets.card)),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -141,7 +171,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onTap: () {
                     Navigator.of(
                       context,
-                    ).pushNamed(TransactionsScreen.routeName);
+                    ).pushNamed(CreateTransactionScreen.routeName);
                   },
                 ),
                 ActionCard(
@@ -150,105 +180,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onTap: () {
                     Navigator.of(
                       context,
-                    ).pushNamed(InvestmentsScreen.routeName);
+                    ).pushNamed(CreateInvestmentScreen.routeName);
                   },
-                ),
-                ActionCard(
-                  icon: Icons.receipt_long,
-                  label: 'Consultar\ngastos',
-                  onTap: () {}, // Void for now
                 ),
               ],
             ),
-            PopScope(
-              canPop: !canPopNested,
-              onPopInvokedWithResult: (bool didPop, _) {
-                // If the pop was vetoed (didPop: false), it means our nested navigator can pop.
-                // We handle it manually here. If the pop was allowed (didPop: true), we do nothing.
-                if (didPop) return;
-                currentNavigator?.pop();
-              },
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.5,
-                child: IndexedStack(
-                  index: selectedTab,
-                  children: items
-                      .map(
-                        (page) => Navigator(
-                          key: page.navKey,
-                          onGenerateInitialRoutes: (navigator, initialRoute) {
-                            return [
-                              MaterialPageRoute(
-                                builder: (context) => page.page,
-                              ),
-                            ];
-                          },
-                        ),
-                      )
-                      .toList(),
-                ),
-              ),
-            ),
+            const SizedBox(height: 24),
+            SizedBox(height: 400, child: TransactionsScreen()),
+            const SizedBox(height: 60),
           ],
         ),
       ),
+      const ExpenseControlScreen(),
+      const InvestmentsScreen(),
+      const MyProfileScreen(),
+    ];
+
+    return Scaffold(
+      backgroundColor: AppColors.surfaceDefault,
+      appBar: selectedTab == 0 ? const MainAppBar() : null,
+      body: IndexedStack(index: selectedTab, children: tabBodies),
       bottomNavigationBar: NavBar(
         pageIndex: selectedTab,
         onTap: (index) {
-          if (index == selectedTab) {
-            items[index].navKey.currentState?.popUntil(
-              (route) => route.isFirst,
-            );
-          } else {
-            setState(() {
-              selectedTab = index;
-            });
-          }
+          setState(() {
+            selectedTab = index;
+          });
         },
       ),
-    );
-  }
-}
-
-class TabPage extends StatelessWidget {
-  final int tab;
-
-  const TabPage({Key? key, required this.tab}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Tab $tab')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Tab $tab'),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (context) => Page(tab: tab)));
-              },
-              child: const Text('Go to page'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class Page extends StatelessWidget {
-  final int tab;
-
-  const Page({super.key, required this.tab});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Page Tab $tab')),
-      body: Center(child: tab != 1 ? Text('Tab $tab') : PokemonListScreen()),
     );
   }
 }

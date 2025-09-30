@@ -1,3 +1,4 @@
+import 'package:bytebank/features/transactions/screens/expense_control_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
@@ -28,6 +29,7 @@ import 'package:bytebank/features/investments/services/investment_service.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
 import 'package:bytebank/features/profile/services/profile_service.dart';
+import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.dart';
 import 'package:bytebank/firebase_options.dart';
 import 'package:bytebank/theme/theme.dart';
 
@@ -105,6 +107,9 @@ class MyApp extends StatelessWidget {
           TransactionsScreen.routeName: (context) => const TransactionsScreen(),
           CreateTransactionScreen.routeName: (context) =>
               const CreateTransactionScreen(),
+          ExpenseControlScreen.routeName: (context) => const ExpenseControlScreen(),
+          OnboardingCarouselScreen.routeName: (context) =>
+              const OnboardingCarouselScreen(),
         },
         onGenerateRoute: (settings) {
           if (settings.name == EditTransactionScreen.routeName) {

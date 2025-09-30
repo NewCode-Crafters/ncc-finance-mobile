@@ -5,14 +5,15 @@ import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
 import 'package:provider/provider.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const MainAppBar({super.key});
+  final String title;
+  const MainAppBar({super.key, this.title = 'Bytebank'});
 
   @override
   Widget build(BuildContext context) {
     final userProfile = context.watch<ProfileNotifier>().state.userProfile;
 
     return AppBar(
-      title: const Text('Bytebank'),
+      title: Text(title),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 8.0),

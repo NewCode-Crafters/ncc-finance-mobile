@@ -1,3 +1,4 @@
+import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
@@ -108,13 +109,28 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
             DropdownButtonFormField<TransactionCategory>(
               value: _selectedCategory,
               hint: const Text('Selecione uma categoria'),
-              decoration: const InputDecoration(border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    width: 2.0,
+                  ),
+                ),
+              ),
               items: categories.map((category) {
                 return DropdownMenuItem(
                   value: category,
                   child: Row(
                     children: [
-                      Icon(getIconForCategory(category.id), size: 20),
+                      Icon(getIconForCategory(category.id), size: 20, color: AppColors.lightGreenColor,),
                       const SizedBox(width: 8),
                       Text(category.label),
                     ],
@@ -131,20 +147,59 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
 
             TextField(
               controller: _amountController,
+              cursorColor: AppColors.textSubtle,
               readOnly: true,
               decoration: const InputDecoration(
                 labelText: 'Valor',
-                border: OutlineInputBorder(),
-                filled: true,
+                labelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando não está focado
+                ),
+                floatingLabelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando está focado
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    width: 2.0,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 16),
 
             TextField(
               controller: _descriptionController,
+              cursorColor: AppColors.textSubtle,
               decoration: const InputDecoration(
                 labelText: 'Descrição (opcional)',
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando não está focado
+                ),
+                floatingLabelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando está focado
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    width: 2.0,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -154,7 +209,26 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
               readOnly: true,
               decoration: const InputDecoration(
                 labelText: 'Data',
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando não está focado
+                ),
+                floatingLabelStyle: TextStyle(
+                  color: AppColors.textSubtle, // Cor do label quando está focado
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    width: 2.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderSide: BorderSide(
+                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    width: 2.0,
+                  ),
+                ),
                 filled: true,
               ),
             ),

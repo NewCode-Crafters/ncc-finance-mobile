@@ -1,8 +1,9 @@
+import 'package:bytebank/core/constants/app_assets.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
+import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/core/widgets/custom_text_field.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
 import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
 import 'package:provider/provider.dart';
@@ -65,54 +66,213 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoading = context.watch<AuthNotifier>().state.isLoading;
+    final height = MediaQuery.of(context).size.height;
+    final keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+    final compact = height < 700 || keyboardOpen;
+
     return Scaffold(
       appBar: AppBar(title: const Text("Criar Conta")),
-      body: Center(child: _buildRegisterForm(isLoading: isLoading)),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.85,
+                    maxWidth: MediaQuery.of(context).size.width,
+                  ),
+                  child: Card(
+                    color: AppColors.lightGreenColor,
+                    elevation: 1,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(150),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: compact ? 28 : 50,
+                            right: 20,
+                          ),
+                          child: Text(
+                            'Crie uma nova conta',
+                            style: TextStyle(
+                              fontSize: compact ? 22 : 30,
+                              color: AppColors.brandTertiary,
+                              fontWeight: FontWeight.w900,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: compact ? 8 : 10,
+                            bottom: 10,
+                          ),
+                          child: Text(
+                            'Preencha os campos abaixo para criar sua conta!',
+                            style: TextStyle(
+                              fontSize: compact ? 12 : 14,
+                              color: AppColors.brandTertiary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: 1,
+                            left: 24,
+                            right: 24,
+                          ),
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.85,
+                            child: _buildRegisterForm(
+                              isLoading: isLoading,
+                              compact: compact,
+                            ),
+                          ),
+                        ),
+                        // hide decorative image on compact screens so content fits
+                        if (!compact)
+                          Padding(
+                            padding: const EdgeInsets.all(0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Image(
+                                  image: const AssetImage(AppAssets.register),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildRegisterForm({required bool isLoading}) {
+  Widget _buildRegisterForm({required bool isLoading, bool compact = false}) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.only(bottom: compact ? 12 : 16, right: 16, left: 16),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            'Crie uma nova conta',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: 32),
-          CustomTextField(
-            key: Key("register_name_field"),
-            label: "Nome",
+          TextField(
+            key: const Key("register_name_field"),
+            cursorColor: AppColors.brandTertiary,
+            style: const TextStyle(color: AppColors.brandTertiary),
+            decoration: const InputDecoration(
+              labelText: 'Nome',
+              labelStyle: TextStyle(color: AppColors.brandTertiary),
+              floatingLabelStyle: TextStyle(color: AppColors.brandTertiary),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(
+                  color: AppColors.lightGreenColor,
+                  width: 2.0,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(
+                  color: AppColors.lightGreenColor,
+                  width: 2.0,
+                ),
+              ),
+              fillColor: Colors.white,
+              filled: true,
+            ),
             controller: _nameController,
           ),
-          const SizedBox(height: 16),
-          CustomTextField(
-            key: Key("register_email_field"),
-            label: "Email",
+          SizedBox(height: compact ? 10 : 16),
+          TextField(
+            key: const Key("register_email_field"),
+            cursorColor: AppColors.brandTertiary,
+            style: const TextStyle(color: AppColors.brandTertiary),
+            decoration: const InputDecoration(
+              labelText: 'Email',
+              labelStyle: TextStyle(color: AppColors.brandTertiary),
+              floatingLabelStyle: TextStyle(color: AppColors.brandTertiary),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(
+                  color: AppColors.lightGreenColor,
+                  width: 2.0,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(
+                  color: AppColors.lightGreenColor,
+                  width: 2.0,
+                ),
+              ),
+              fillColor: Colors.white,
+              filled: true,
+            ),
             controller: _emailController,
           ),
-          const SizedBox(height: 16),
-          CustomTextField(
-            key: Key("register_password_field"),
-            label: "Senha",
+          SizedBox(height: compact ? 10 : 16),
+          TextField(
+            key: const Key("register_password_field"),
+            cursorColor: AppColors.brandTertiary,
+            style: const TextStyle(color: AppColors.brandTertiary),
+            decoration: const InputDecoration(
+              labelText: 'Senha',
+              labelStyle: TextStyle(color: AppColors.brandTertiary),
+              floatingLabelStyle: TextStyle(color: AppColors.brandTertiary),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(
+                  color: AppColors.lightGreenColor,
+                  width: 2.0,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderSide: BorderSide(
+                  color: AppColors.lightGreenColor,
+                  width: 2.0,
+                ),
+              ),
+              fillColor: Colors.white,
+              filled: true,
+            ),
             controller: _passwordController,
             obscureText: true,
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: compact ? 16 : 24),
           isLoading
               ? const CircularProgressIndicator()
               : PrimaryButton(
                   text: "Criar conta",
                   onPressed: isLoading ? null : _handleSignUp,
                 ),
-          const SizedBox(height: 16),
+          SizedBox(height: compact ? 12 : 16),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: const Text("Já tem uma conta? Acesse"),
+            child: const Text(
+              "Já tem uma conta? Acesse",
+              style: TextStyle(
+                color: AppColors.brandTertiary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
           ),
         ],
       ),
