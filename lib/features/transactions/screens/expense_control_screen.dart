@@ -195,7 +195,26 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     }
     if (categoryTotals.isEmpty) {
       return const Center(
-        child: Text('Você não possui despesas.'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.receipt_long,
+              size: 80,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Você não possui despesas',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+            Text(
+              'Realize uma nova transação do tipo saída para controlar suas despesas.',
+              style: TextStyle(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       );
     }
     final entries = categoryTotals.entries.toList();
