@@ -1,7 +1,6 @@
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
 import 'package:bytebank/features/transactions/models/financial_transaction.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
@@ -9,6 +8,7 @@ import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:bytebank/features/transactions/widgets/edit_attachments_section.dart';
 
 class EditTransactionScreen extends StatefulWidget {
   static const String routeName = '/edit-transaction';
@@ -24,8 +24,9 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
   late final TextEditingController _descriptionController;
   late final MoneyMaskedTextController _amountController;
   late final TextEditingController _dateController;
-  TransactionCategory? _selectedCategory;
+  String? _selectedCategoryId;
   bool _isLoading = false;
+  late final EditAttachmentsController _attachmentsController;
 
   @override
   void initState() {
@@ -46,16 +47,18 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
     );
 
     try {
-      _selectedCategory = notifier.state.categories.firstWhere(
+      final exists = notifier.state.categories.any(
         (c) => c.id == widget.transaction.category,
       );
+      _selectedCategoryId = exists ? widget.transaction.category : null;
     } catch (e) {
-      _selectedCategory = null;
+      _selectedCategoryId = null;
     }
+    _attachmentsController = EditAttachmentsController();
   }
 
   Future<void> _handleUpdateTransaction() async {
-    if (_selectedCategory == null) return;
+    if (_selectedCategoryId == null) return;
 
     setState(() {
       _isLoading = true;
@@ -69,10 +72,14 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
         userId: userId,
         transactionId: widget.transaction.id,
         data: {
-          'category': _selectedCategory!.id,
+          'category': _selectedCategoryId,
           'description': _descriptionController.text,
         },
       );
+      // After successfully updating transaction metadata, commit any staged attachment ops
+      if (_attachmentsController.hasPendingChanges) {
+        await _attachmentsController.commit(userId);
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -102,35 +109,41 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Editar Transação')),
-      body: Padding(
+      // Make the main content scrollable to avoid overflow when keyboard appears
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            DropdownButtonFormField<TransactionCategory>(
-              value: _selectedCategory,
+            DropdownButtonFormField<String>(
+              value: _selectedCategoryId,
               hint: const Text('Selecione uma categoria'),
               decoration: const InputDecoration(
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
-                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    color: AppColors.lightGreenColor,
                     width: 2.0,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
-                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    color: AppColors.lightGreenColor,
                     width: 2.0,
                   ),
                 ),
               ),
               items: categories.map((category) {
-                return DropdownMenuItem(
-                  value: category,
+                return DropdownMenuItem<String>(
+                  value: category.id,
                   child: Row(
                     children: [
-                      Icon(getIconForCategory(category.id), size: 20, color: AppColors.lightGreenColor,),
+                      Icon(
+                        getIconForCategory(category.id),
+                        size: 20,
+                        color: AppColors.lightGreenColor,
+                      ),
                       const SizedBox(width: 8),
                       Text(category.label),
                     ],
@@ -139,7 +152,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
               }).toList(),
               onChanged: (value) {
                 setState(() {
-                  _selectedCategory = value;
+                  _selectedCategoryId = value;
                 });
               },
             ),
@@ -151,96 +164,91 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
               readOnly: true,
               decoration: const InputDecoration(
                 labelText: 'Valor',
-                labelStyle: TextStyle(
-                  color: AppColors.textSubtle, // Cor do label quando não está focado
-                ),
-                floatingLabelStyle: TextStyle(
-                  color: AppColors.textSubtle, // Cor do label quando está focado
-                ),
+                labelStyle: TextStyle(color: AppColors.textSubtle),
+                floatingLabelStyle: TextStyle(color: AppColors.textSubtle),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
-                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    color: AppColors.lightGreenColor,
                     width: 2.0,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
-                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    color: AppColors.lightGreenColor,
                     width: 2.0,
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-
             TextField(
               controller: _descriptionController,
               cursorColor: AppColors.textSubtle,
               decoration: const InputDecoration(
                 labelText: 'Descrição (opcional)',
-                labelStyle: TextStyle(
-                  color: AppColors.textSubtle, // Cor do label quando não está focado
-                ),
-                floatingLabelStyle: TextStyle(
-                  color: AppColors.textSubtle, // Cor do label quando está focado
-                ),
+                labelStyle: TextStyle(color: AppColors.textSubtle),
+                floatingLabelStyle: TextStyle(color: AppColors.textSubtle),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
-                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    color: AppColors.lightGreenColor,
                     width: 2.0,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
-                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    color: AppColors.lightGreenColor,
                     width: 2.0,
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-
             TextField(
               controller: _dateController,
               readOnly: true,
               decoration: const InputDecoration(
                 labelText: 'Data',
-                labelStyle: TextStyle(
-                  color: AppColors.textSubtle, // Cor do label quando não está focado
-                ),
-                floatingLabelStyle: TextStyle(
-                  color: AppColors.textSubtle, // Cor do label quando está focado
-                ),
+                labelStyle: TextStyle(color: AppColors.textSubtle),
+                floatingLabelStyle: TextStyle(color: AppColors.textSubtle),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
-                    color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
+                    color: AppColors.lightGreenColor,
                     width: 2.0,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
                   borderSide: BorderSide(
-                    color: AppColors.lightGreenColor, // Set your desired border color for the focused state
+                    color: AppColors.lightGreenColor,
                     width: 2.0,
                   ),
                 ),
                 filled: true,
               ),
             ),
-            const Spacer(),
-            if (_isLoading)
-              const CircularProgressIndicator()
-            else
-              PrimaryButton(
-                text: 'Salvar Alterações',
-                onPressed: _handleUpdateTransaction,
-              ),
+            const SizedBox(height: 16),
+            EditAttachmentsSection(
+              transactionId: widget.transaction.id,
+              controller: _attachmentsController,
+            ),
           ],
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.all(16.0),
+        child: SizedBox(
+          height: 56,
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : PrimaryButton(
+                  text: 'Salvar Alterações',
+                  onPressed: _handleUpdateTransaction,
+                ),
         ),
       ),
     );

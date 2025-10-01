@@ -66,12 +66,13 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       appBar: AppBar(title: const Text('Meu perfil')),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Center(
+          : SafeArea(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
                 children: [
-                  Expanded(
-                    flex: 2,
+                  // Top section: avatar and basic info. Use a proportional height so layout adapts
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.32,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -88,16 +89,24 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const SizedBox(height: 8),
-                        Text(
-                          userProfile?.email ?? '',
-                          style: Theme.of(context).textTheme.bodyLarge,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          child: Text(
+                            userProfile?.email ?? '',
+                            style: Theme.of(context).textTheme.bodyLarge,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),
                   ),
+                  // Bottom section: actions list, scrollable
                   Expanded(
-                    flex: 3,
                     child: ListView(
+                      padding: const EdgeInsets.only(top: 8.0),
                       children: [
                         ListTile(
                           leading: const Icon(Icons.person_outline),

@@ -79,21 +79,21 @@ Prerequisites
 Clone and install dependencies
 
 ```bash
-git clone <repo-url>
-cd bytebank
+git clone git@github.com:NewCode-Crafters/ncc-finance-mobile.git
+cd ncc-finance-mobile
 flutter pub get
 ```
 
-Configure Firebase (if you need to regenerate configuration)
+Configure Firebase (demo)
 
-```bash
-# Install Firebase CLI and FlutterFire CLI if needed
-# Refer to: https://firebase.google.com/docs/cli and https://firebase.flutter.dev/docs/cli
-flutterfire configure
-# Place generated files accordingly:
-# android/app/google-services.json
-# ios/Runner/GoogleService-Info.plist
-```
+For the classroom demo we'll provide the Firebase config files so teachers can run the app quickly. Drop the provided files into these exact paths in the project root:
+
+- Android: `android/app/google-services.json`
+- iOS: `ios/Runner/GoogleService-Info.plist`
+
+You don't need to inspect or modify the files for the demo. After the evaluation phase we will rotate/change these demo credentials and restore the project to use the normal production configuration.
+
+If you run into problems, contact **joeltonmatos@gmail.com** for assistance.
 
 Run the app
 
