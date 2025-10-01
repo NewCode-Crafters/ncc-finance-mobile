@@ -53,8 +53,8 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
                 children: [
                   _buildChart(transactionState),
                   transactionState.chartData.isEmpty ? Container() : const SizedBox(height: 24),
-                  _buildSummaryCards(transactionState),
-                  const SizedBox(height: 24),
+                  // _buildSummaryCards(transactionState),
+                  // const SizedBox(height: 24),
                   _buildTransactionList(transactionState),
                 ],
               ),
@@ -172,11 +172,11 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
             ),
             SizedBox(height: 16),
             Text(
-              'Nenhuma despesa encontrada',
+              'Você não possui despesas',
               style: TextStyle(fontSize: 18, color: Colors.grey),
             ),
             Text(
-              'Tente realizar uma nova transação do tipo saída para controlar suas despesas.',
+              'Realize uma nova transação do tipo saída para controlar suas despesas.',
               style: TextStyle(color: Colors.grey),
               textAlign: TextAlign.center,
             ),
@@ -195,7 +195,7 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     }
     if (categoryTotals.isEmpty) {
       return const Center(
-        child: Text('Nenhuma despesa encontrada.'),
+        child: Text('Você não possui despesas.'),
       );
     }
     final entries = categoryTotals.entries.toList();

@@ -95,7 +95,32 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _fetchData,
-        child: Column(
+        child: state.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : notifier.state.transactions.isEmpty
+            ? const Center(
+                child: Column(
+                  //mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.receipt_long,
+                        size: 80,
+                        color: Colors.grey,
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'Você não possui transações.',
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
+                      Text(
+                        'Suas transações e investimentos aparecem aqui.',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                )
+              : 
+        Column(
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -146,31 +171,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               ),
             ),
             Expanded(
-              child: state.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : notifier.visibleTransactions.isEmpty
-                  ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.receipt_long,
-                            size: 80,
-                            color: Colors.grey,
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'Nenhuma transação encontrada',
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          ),
-                          Text(
-                            'Tente ajustar o filtro de data ou a sua busca.',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
+              child: ListView.builder(
                       itemCount: notifier.visibleTransactions.length,
                       itemBuilder: (context, index) {
                         final transaction = notifier.visibleTransactions[index];

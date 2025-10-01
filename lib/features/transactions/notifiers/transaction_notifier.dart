@@ -27,7 +27,7 @@ class TransactionState {
     DateTime? endDate,
     this.searchText = '',
     this.chartData = const {},
-  }) : startDate = startDate ?? _startOfMonth(DateTime.now()),
+  }) : startDate = startDate ?? DateTime.now().subtract(const Duration(days: 30)),
        endDate = endDate ?? DateTime.now();
 
   TransactionState copyWith({
