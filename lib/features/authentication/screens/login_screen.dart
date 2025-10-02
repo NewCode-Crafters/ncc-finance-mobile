@@ -1,3 +1,4 @@
+import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/constants/app_assets.dart';
@@ -41,23 +42,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleForgotPassword() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          'Funcionalidade em desenvolvimento. Entre em contato com o suporte para redefinir sua senha.',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: AppColors.warning,
-        duration: const Duration(seconds: 4),
-        behavior: SnackBarBehavior.floating,
-        action: SnackBarAction(
-          label: 'OK',
-          textColor: Colors.white,
-          onPressed: () {
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          },
-        ),
-      ),
+    showAppSnackBar(
+      context,
+      'Entre em contato com o suporte para redefinir sua senha.',
+      AppMessageType.warning,
     );
   }
 
