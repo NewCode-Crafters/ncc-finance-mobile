@@ -40,6 +40,27 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _handleForgotPassword() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          'Funcionalidade em desenvolvimento. Entre em contato com o suporte para redefinir sua senha.',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: AppColors.warning,
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: 'OK',
+          textColor: Colors.white,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // We use a Consumer to listen for changes in the AuthNotifier.
@@ -203,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
-            onPressed: () {}, // TODO: Implement forgot password
+            onPressed: _handleForgotPassword,
             child: const Text(
               "Esqueci a senha?",
               style: TextStyle(
