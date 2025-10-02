@@ -189,7 +189,9 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     for (final transaction in transactionState.transactions) {
       if (transaction.category == 'INVESTMENT' ||
           transaction.category == 'INVESTMENT_REDEMPTION' ||
-          transaction.amount > 0) continue;
+          transaction.amount > 0) {
+        continue;
+      }
       categoryTotals[transaction.category] =
           (categoryTotals[transaction.category] ?? 0) + transaction.amount;
     }

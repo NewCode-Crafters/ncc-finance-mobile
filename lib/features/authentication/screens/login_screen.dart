@@ -1,7 +1,6 @@
 import 'package:bytebank/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/constants/app_assets.dart';
-import 'package:bytebank/core/widgets/custom_text_field.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
 import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
 import 'package:bytebank/features/authentication/screens/register_screen.dart';

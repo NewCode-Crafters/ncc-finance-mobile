@@ -116,7 +116,9 @@ class TransactionNotifier extends ChangeNotifier {
       for (final transaction in transactions) {
         if (transaction.category == 'INVESTMENT' ||
             transaction.category == 'INVESTMENT_REDEMPTION' ||
-            transaction.amount > 0) continue;
+            transaction.amount > 0) {
+          continue;
+        }
         chartData[transaction.category] =
             (chartData[transaction.category] ?? 0) + transaction.amount.abs();
       }
