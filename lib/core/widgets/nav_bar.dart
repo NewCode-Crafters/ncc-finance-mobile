@@ -12,15 +12,11 @@ class NavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        bottom: Platform.isAndroid ? 16 : 0,
-      ),
-      child: BottomAppBar(
-        color: Colors.transparent,
-        elevation: 0.0,
+    return BottomAppBar(
+      color: Colors.transparent,
+      elevation: 0.0,
+      child: Padding(
+        padding: EdgeInsets.only(left: 16, right: 16, bottom: Platform.isAndroid ? 10 : 0),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(25),
           child: Container(
@@ -66,7 +62,7 @@ class NavBar extends StatelessWidget {
         onTap: onTap,
         child: Icon(
           icon,
-          color: selected ? Colors.white : Colors.white.withOpacitySafe(0.6),
+          color: selected ? Colors.white : Colors.white.withOpacity(0.6),
         ),
       ),
     );

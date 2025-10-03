@@ -198,6 +198,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.surfaceDefault,
+      extendBody: true,
       appBar: selectedTab == 0 ? const MainAppBar() : null,
       body: IndexedStack(index: selectedTab, children: tabBodies),
       bottomNavigationBar: NavBar(

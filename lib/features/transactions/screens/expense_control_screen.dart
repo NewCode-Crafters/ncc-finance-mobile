@@ -52,9 +52,9 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
                 padding: const EdgeInsets.all(16.0),
                 children: [
                   _buildChart(transactionState),
-                  const SizedBox(height: 24),
-                  _buildSummaryCards(transactionState),
-                  const SizedBox(height: 24),
+                  transactionState.chartData.isEmpty ? Container() : const SizedBox(height: 24),
+                  // _buildSummaryCards(transactionState),
+                  // const SizedBox(height: 24),
                   _buildTransactionList(transactionState),
                 ],
               ),
@@ -77,60 +77,64 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     ];
 
     final chartData = state.chartData.entries.toList();
-
-    return SizedBox(
-      height: 150,
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: PieChart(
-              PieChartData(
-                sections: List.generate(chartData.length, (index) {
-                  final entry = chartData[index];
-                  return PieChartSectionData(
-                    color: colors[index % colors.length],
-                    value: entry.value,
-                    title: '', // We use the legend instead
-                    radius: 30,
-                    showTitle: false,
-                  );
-                }),
-                sectionsSpace: 1,
-                centerSpaceRadius: 50,
+    if(state.chartData.isEmpty) {
+      return const Center(
+      );
+    }else{
+      return SizedBox(
+        height: 150,
+        child: Row(
+          children: [
+            Expanded(
+              flex: 3,
+              child: PieChart(
+                PieChartData(
+                  sections: List.generate(chartData.length, (index) {
+                    final entry = chartData[index];
+                    return PieChartSectionData(
+                      color: colors[index % colors.length],
+                      value: entry.value,
+                      title: '', // We use the legend instead
+                      radius: 30,
+                      showTitle: false,
+                    );
+                  }),
+                  sectionsSpace: 1,
+                  centerSpaceRadius: 50,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            flex: 3,
-            child: ListView.builder(
-              itemCount: chartData.length,
-              itemBuilder: (context, index) {
-                final entry = chartData[index];
-                final label = context
-                    .read<TransactionNotifier>()
-                    .getCategoryLabel(entry.key);
-                final iconData = getIconForCategory(entry.key);
-                return ListTile(
-                  leading: Icon(iconData, color: colors[index % colors.length]),
-                  title: Text(
-                    label,
-                    textHeightBehavior: TextHeightBehavior(
-                      applyHeightToFirstAscent: false,
+            Expanded(
+              flex: 3,
+              child: ListView.builder(
+                itemCount: chartData.length,
+                itemBuilder: (context, index) {
+                  final entry = chartData[index];
+                  final label = context
+                      .read<TransactionNotifier>()
+                      .getCategoryLabel(entry.key);
+                  final iconData = getIconForCategory(entry.key);
+                  return ListTile(
+                    leading: Icon(iconData, color: colors[index % colors.length]),
+                    title: Text(
+                      label,
+                      textHeightBehavior: TextHeightBehavior(
+                        applyHeightToFirstAscent: false,
+                      ),
                     ),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 0.0,
-                  ),
-                  minVerticalPadding: 0.0,
-                );
-              },
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 0.0,
+                    ),
+                    minVerticalPadding: 0.0,
+                  );
+                },
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    }
   }
 
   Widget _buildSummaryCards(TransactionState state) {
@@ -168,11 +172,11 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
             ),
             SizedBox(height: 16),
             Text(
-              'Nenhuma despesa encontrada',
+              'Você não possui despesas',
               style: TextStyle(fontSize: 18, color: Colors.grey),
             ),
             Text(
-              'Tente realizar uma nova transação do tipo saída para controlar suas despesas.',
+              'Realize uma nova transação do tipo saída para controlar suas despesas.',
               style: TextStyle(color: Colors.grey),
               textAlign: TextAlign.center,
             ),
@@ -183,13 +187,15 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     // Agrupa valores por categoria, excluindo depósitos
     final Map<String, double> categoryTotals = {};
     for (final transaction in transactionState.transactions) {
-      if (transaction.amount > 0) continue;
+      if (transaction.category == 'INVESTMENT' ||
+          transaction.category == 'INVESTMENT_REDEMPTION' ||
+          transaction.amount > 0) continue;
       categoryTotals[transaction.category] =
           (categoryTotals[transaction.category] ?? 0) + transaction.amount;
     }
     if (categoryTotals.isEmpty) {
       return const Center(
-        child: Text('Nenhuma transação (exceto investimentos) encontrada.'),
+        child: Text('Você não possui despesas.'),
       );
     }
     final entries = categoryTotals.entries.toList();
