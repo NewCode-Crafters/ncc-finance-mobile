@@ -26,10 +26,10 @@ class FirebaseAuthService implements AuthService {
       } else if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
         throw InvalidCredentialsException();
       } else {
-        throw Exception('An unknown error occurred: ${e.code}');
+        throw Exception('Ocorreu um erro desconhecido: ${e.code}');
       }
     } catch (e) {
-      throw Exception('An unknown error occurred');
+      throw Exception('Ocorreu um erro desconhecido');
     }
   }
 
@@ -48,7 +48,7 @@ class FirebaseAuthService implements AuthService {
       final user = userCredential.user;
 
       if (user == null) {
-        throw Exception('User creation failed, please try again later.');
+        throw Exception('Falha na criação do usuário, por favor, tente novamente mais tarde.');
       }
 
       final userDocRef = _firestore.collection("users").doc(user.uid);
@@ -70,10 +70,10 @@ class FirebaseAuthService implements AuthService {
       } else if (e.code == 'email-already-in-use') {
         throw EmailAlreadyInUseException();
       } else {
-        throw Exception('An unknown Firebase error occurred: ${e.code}');
+        throw Exception('Ocorreu um erro desconhecido do Firebase: ${e.code}');
       }
     } catch (e) {
-      throw Exception('An unknown error occurred');
+      throw Exception('Ocorreu um erro desconhecido');
     }
   }
 
@@ -82,9 +82,9 @@ class FirebaseAuthService implements AuthService {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
-      throw Exception('An unknown Firebase error occurred: ${e.code}');
+      throw Exception('Ocorreu um erro desconhecido do Firebase: ${e.code}');
     } catch (e) {
-      throw Exception('An unknown error occurred.');
+      throw Exception('Ocorreu um erro desconhecido.');
     }
   }
 
@@ -93,7 +93,7 @@ class FirebaseAuthService implements AuthService {
     try {
       await _firebaseAuth.signOut();
     } catch (e) {
-      throw Exception('An error occurred during logout.');
+      throw Exception('Ocorreu um erro durante o logout.');
     }
   }
 
@@ -103,14 +103,14 @@ class FirebaseAuthService implements AuthService {
       final user = _firebaseAuth.currentUser;
 
       if (user == null) {
-        throw Exception("No authenticated user found.");
+        throw Exception("Nenhum usuário autenticado encontrado.");
       }
 
       await _firestore.collection('users').doc(user.uid).update({
         'photoUrl': url,
       });
     } catch (e) {
-      throw Exception('Failed to update photo URL.');
+      throw Exception('Falha ao atualizar a URL da foto.');
     }
   }
 
@@ -119,13 +119,13 @@ class FirebaseAuthService implements AuthService {
     try {
       final user = _firebaseAuth.currentUser;
       if (user == null) {
-        throw Exception("Cannot update name for a non-authenticated user.");
+        throw Exception("Não é possível atualizar o nome de um usuário não autenticado.");
       }
       await _firestore.collection('users').doc(user.uid).update({
         'name': newName,
       });
     } catch (e) {
-      throw Exception('Failed to update user name.');
+      throw Exception('Falha ao atualizar o nome do usuário.');
     }
   }
 }

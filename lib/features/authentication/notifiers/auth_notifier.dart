@@ -53,7 +53,7 @@ class AuthNotifier extends ChangeNotifier {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
-        errorMessage: 'Please enter a valid email.',
+        errorMessage: 'Por favor, insira um e-mail válido.',
       );
       notifyListeners();
       return false;
@@ -71,7 +71,7 @@ class AuthNotifier extends ChangeNotifier {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
-        errorMessage: 'Please enter a valid email.',
+        errorMessage: 'Por favor, insira um e-mail válido.',
       );
       notifyListeners();
       return false;
@@ -100,7 +100,7 @@ class AuthNotifier extends ChangeNotifier {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
-        errorMessage: "Invalid credentials. Please try again.",
+        errorMessage: "Credenciais inválidas. Por favor, tente novamente.",
       );
       notifyListeners();
       return false;
@@ -108,7 +108,7 @@ class AuthNotifier extends ChangeNotifier {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
-        errorMessage: "User not found. Please check the email or sign up.",
+        errorMessage: "Usuário não encontrado. Por favor, verifique o e-mail ou cadastre-se.",
       );
       notifyListeners();
       return false;
@@ -117,7 +117,7 @@ class AuthNotifier extends ChangeNotifier {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
-        errorMessage: 'This email is already in use by another account.',
+        errorMessage: 'Este e-mail já está em uso por outra conta.',
       );
       notifyListeners();
       return false;
@@ -126,7 +126,7 @@ class AuthNotifier extends ChangeNotifier {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
-        errorMessage: 'The password is too weak. Please choose a stronger one.',
+        errorMessage: 'A senha é muito fraca. Por favor, escolha uma mais forte.',
       );
       notifyListeners();
       return false;
@@ -134,7 +134,7 @@ class AuthNotifier extends ChangeNotifier {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
-        errorMessage: 'An unknown error occurred.',
+        errorMessage: 'Ocorreu um erro desconhecido.',
       );
       notifyListeners();
       return false;
@@ -154,12 +154,12 @@ class AuthNotifier extends ChangeNotifier {
       await _authService.sendPasswordResetEmail(email: email);
       _state = _state.copyWith(
         isLoading: false,
-        successMessage: 'Password reset email sent. Please check your inbox.',
+        successMessage: 'E-mail de redefinição de senha enviado. Por favor, verifique sua caixa de entrada.',
       );
     } catch (e) {
       _state = _state.copyWith(
         isLoading: false,
-        errorMessage: 'An unknown error occurred.',
+        errorMessage: 'Ocorreu um erro desconhecido.',
       );
     }
 
@@ -176,7 +176,7 @@ class AuthNotifier extends ChangeNotifier {
     } catch (e) {
       _state = _state.copyWith(
         isLoading: false,
-        errorMessage: 'Logout failed. Please try again.',
+        errorMessage: 'Falha ao encerrar a sessão. Por favor, tente novamente.',
       );
     }
 
