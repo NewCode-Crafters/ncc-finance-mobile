@@ -6,6 +6,7 @@ import 'package:bytebank/features/transactions/notifiers/transaction_notifier.da
 import 'package:bytebank/features/transactions/screens/edit_transaction_screen.dart';
 import 'package:bytebank/features/transactions/widgets/transaction_list_item.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 class TransactionsScreen extends StatefulWidget {
   static const String routeName = '/transactions';
@@ -15,45 +16,39 @@ class TransactionsScreen extends StatefulWidget {
   State<TransactionsScreen> createState() => _TransactionsScreenState();
 }
 
-class _TransactionsScreenState extends State<TransactionsScreen> with SingleTickerProviderStateMixin {
+class _TransactionsScreenState extends State<TransactionsScreen> {
   final _searchController = TextEditingController();
+  Timer? _searchDebounce;
   late final TransactionNotifier _transactionNotifier;
   late final ScrollController _scrollController;
-  late AnimationController _loadingController;
-  final int _itemsPerPage = 5;
-  int _currentMax = 5;
-  bool _isLoadingMore = false;
 
   @override
   void initState() {
     super.initState();
 
-  _transactionNotifier = context.read<TransactionNotifier>();
-  _scrollController = ScrollController();
-  _scrollController.addListener(_onScroll);
-
-    _loadingController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
+    _transactionNotifier = context.read<TransactionNotifier>();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
 
     _searchController.addListener(() {
-      context.read<TransactionNotifier>().updateSearchText(
-        _searchController.text,
-      );
-      // reset pagination when searching
-      setState(() {
-        _currentMax = _itemsPerPage;
+      final text = _searchController.text;
+      // debounce search input
+      _searchDebounce?.cancel();
+      _searchDebounce = Timer(const Duration(milliseconds: 1500), () {
+        final notifier = context.read<TransactionNotifier>();
+        // avoid triggering a fetch if the search text didn't actually change
+        if (notifier.state.searchText == text) return;
+        notifier.updateSearchText(text);
+        final userId = FirebaseAuth.instance.currentUser?.uid;
+        if (userId != null) Future.microtask(() => notifier.fetchFirstPage(userId));
+        if (_scrollController.hasClients) {
+          try {
+            _scrollController.jumpTo(0);
+          } catch (_) {}
+        }
       });
-      // scroll to top so user sees first page
-      if (_scrollController.hasClients) {
-        try {
-          _scrollController.jumpTo(0);
-        } catch (_) {}
-      }
     });
 
-    // Schedule initial fetch after first frame in a microtask to avoid blocking UI
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.microtask(() => _fetchData());
     });
@@ -61,12 +56,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> with SingleTick
 
   @override
   void dispose() {
-    _searchController.dispose();
+  _searchDebounce?.cancel();
+  _searchController.dispose();
     _transactionNotifier.resetFilters();
-  _scrollController.removeListener(_onScroll);
-  _scrollController.dispose();
-  _loadingController.dispose();
-
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -74,73 +68,29 @@ class _TransactionsScreenState extends State<TransactionsScreen> with SingleTick
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
       await context.read<TransactionNotifier>().fetchTransactions(userId);
-
-      // reset pagination after fresh load to first page or available total
       final total = context.read<TransactionNotifier>().visibleTransactions.length;
-      debugPrint('[transactions] fetchData -> total=$total');
-
-      if (!mounted) return;
-      setState(() {
-        _currentMax = total < _itemsPerPage ? total : _itemsPerPage;
-      });
+      //debugPrint('[transactions] fetchData -> total=$total');
     }
   }
 
   void _onScroll() {
-    if (_isLoadingMore) return;
     if (!_scrollController.hasClients) return;
     try {
       final notifier = context.read<TransactionNotifier>();
-      final total = notifier.visibleTransactions.length;
-      if (total <= _currentMax) {
-        debugPrint('[transactions] onScroll: no more to load (total=$total currentMax=$_currentMax)');
-        return;
-      }
-      final pos = _scrollController.position;
-      debugPrint('[transactions] onScroll: extentAfter=${pos.extentAfter}, pixels=${pos.pixels}, currentMax=$_currentMax, total=$total');
-      // if at bottom edge (not top), load more
+  if (notifier.isFetchingMore) return;
+  if (!notifier.hasMore) return;
+  final pos = _scrollController.position;
+      //debugPrint('[transactions] onScroll: extentAfter=${pos.extentAfter}, pixels=${pos.pixels}');
       if (pos.atEdge && pos.pixels != 0) {
-        _loadMoreItems();
+        final userId = FirebaseAuth.instance.currentUser?.uid;
+        if (userId != null) Future.microtask(() => notifier.fetchNextPage(userId));
         return;
       }
-      // fallback: when within 300px of bottom
       if (pos.extentAfter < 300) {
-        _loadMoreItems();
+        final userId = FirebaseAuth.instance.currentUser?.uid;
+        if (userId != null) Future.microtask(() => notifier.fetchNextPage(userId));
       }
     } catch (_) {}
-  }
-
-  Future<void> _loadMoreItems() async {
-    if (_isLoadingMore) return;
-    final notifier = context.read<TransactionNotifier>();
-    final total = notifier.visibleTransactions.length;
-    if (_currentMax >= total) {
-      debugPrint('[transactions] loadMore: nothing to load (currentMax=$_currentMax total=$total)');
-      return; // nothing to load
-    }
-
-    final old = _currentMax;
-    final newMax = (_currentMax + _itemsPerPage).clamp(0, total);
-    debugPrint('[transactions] loadMore: old=$old new=$newMax total=$total');
-
-    if (!mounted) return;
-
-    // show loading overlay and simulate 3s load when loading more
-    setState(() {
-      _isLoadingMore = true;
-    });
-    _loadingController.repeat();
-
-    // artificial delay for UX
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (!mounted) return;
-    _loadingController.stop();
-    _loadingController.reset();
-    setState(() {
-      _currentMax = newMax;
-      _isLoadingMore = false;
-    });
   }
 
   Future<void> _showDeleteConfirmation(
@@ -182,139 +132,135 @@ class _TransactionsScreenState extends State<TransactionsScreen> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-  final notifier = context.watch<TransactionNotifier>();
-  final state = notifier.state;
-  final userId = FirebaseAuth.instance.currentUser!.uid;
+    final notifier = context.watch<TransactionNotifier>();
+    final state = notifier.state;
+    final userId = FirebaseAuth.instance.currentUser!.uid;
 
-  // pagination slice: only render up to _currentMax items even if notifier has more
-  final int _totalTransactions = notifier.visibleTransactions.length;
-  final int _shownCount = _currentMax.clamp(0, _totalTransactions);
-  final visibleSlice = notifier.visibleTransactions.take(_shownCount).toList();
+    final transactions = notifier.visibleTransactions;
+    final int total = transactions.length;
 
     return Scaffold(
-      body: Stack(children: [
-        RefreshIndicator(
-          onRefresh: _fetchData,
-          child: state.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : notifier.state.transactions.isEmpty
-                  ? const Center(
-                      child: Column(
-                        //mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.receipt_long,
-                            size: 80,
-                            color: Colors.grey,
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'Você não possui transações.',
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          ),
-                          Text(
-                            'Suas transações e investimentos aparecem aqui.',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    )
-                  : Column(
+      body: RefreshIndicator(
+        onRefresh: _fetchData,
+        child: state.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : notifier.state.transactions.isEmpty && _searchController.text.isEmpty
+                ? const Center(
+                    child: Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    flex: 4,
-                                    child: TextField(
-                                      controller: _searchController,
-                                      cursorColor: AppColors.textSubtle,
-                                      decoration: const InputDecoration(
-                                        hintText: 'Pesquise uma transação',
-                                        prefixIcon: Icon(Icons.search),
-                                        enabledBorder: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                                          borderSide: BorderSide(
-                                            color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
-                                            width: 2.0,
-                                          ),
-                                        ),
-                                        focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
-                                            color: AppColors.lightGreenColor, // Set your desired border color for the focused state
-                                            width: 2.0,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded (
-                                    flex: 1,
-                                    child: IconButton (
-                                      icon: const Icon(
-                                        Icons.calendar_today, 
-                                        size: 30, 
-                                        color: AppColors.lightGreenColor,
-                                      ),
-                                      onPressed: () =>
-                                        notifier.updateDateRange(context, userId),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                        Icon(
+                          Icons.receipt_long,
+                          size: 80,
+                          color: Colors.grey,
                         ),
-                        Expanded(
-                          child: ListView.builder(
-                                  controller: _scrollController,
-                                  itemCount: _shownCount + (_shownCount < _totalTransactions ? 1 : 0),
-                                  itemBuilder: (context, index) {
-                                    // loading indicator row
-                                    if (index >= _shownCount) {
-                                      return const Padding(
-                                        padding: EdgeInsets.symmetric(vertical: 12.0),
-                                        child: Center(child: CircularProgressIndicator()),
-                                      );
-                                    }
-
-                                    // sentinel: when last visible item is built, request more
-                                    if (index == _shownCount - 1 && _shownCount < _totalTransactions) {
-                                      Future.microtask(() => _loadMoreItems());
-                                    }
-
-                                    final transaction = visibleSlice[index];
-
-                              final bool isInvestmentTransaction =
-                                  transaction.category == 'INVESTMENT' ||
-                                  transaction.category == 'INVESTMENT_REDEMPTION';
-
-                              return TransactionListItem(
-                                transaction: transaction,
-                                categoryLabel: notifier.getCategoryLabel(
-                                  transaction.category,
-                                ),
-                                onDelete: () =>
-                                    _showDeleteConfirmation(context, transaction.id),
-                                onEdit: () {
-                                  Navigator.of(context).pushNamed(
-                                    EditTransactionScreen.routeName,
-                                    arguments: transaction,
-                                  );
-                                },
-                                isReadOnly: isInvestmentTransaction,
-                              );
-                            },
-                          ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Você não possui transações.',
+                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                        ),
+                        Text(
+                          'Suas transações e investimentos aparecem aqui.',
+                          style: TextStyle(color: Colors.grey),
                         ),
                       ],
                     ),
-        ),          
-      ]),
+                  )
+                : Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  flex: 4,
+                                  child: TextField(
+                                    controller: _searchController,
+                                    cursorColor: AppColors.textSubtle,
+                                    decoration: const InputDecoration(
+                                      hintText: 'Pesquise uma transação',
+                                      prefixIcon: Icon(Icons.search),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                                        borderSide: BorderSide(
+                                          color: AppColors.lightGreenColor,
+                                          width: 2.0,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: AppColors.lightGreenColor,
+                                          width: 2.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded (
+                                  flex: 1,
+                                  child: IconButton (
+                                    icon: const Icon(
+                                      Icons.calendar_today, 
+                                      size: 30, 
+                                      color: AppColors.lightGreenColor,
+                                    ),
+                                    onPressed: () =>
+                                      notifier.updateDateRange(context, userId),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: total + ((notifier.isFetchingMore && notifier.hasMore) ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index >= total) {
+                              // show footer loader only when there are more pages
+                              if (notifier.isFetchingMore && notifier.hasMore) {
+                                return const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                                  child: Center(child: CircularProgressIndicator()),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            }
+
+                            if (index == total - 1 && !notifier.isFetchingMore && notifier.hasMore) {
+                              Future.microtask(() => notifier.fetchNextPage(userId));
+                            }
+
+                            final transaction = transactions[index];
+                            final bool isInvestmentTransaction =
+                                transaction.category == 'INVESTMENT' ||
+                                transaction.category == 'INVESTMENT_REDEMPTION';
+
+                            return TransactionListItem(
+                              transaction: transaction,
+                              categoryLabel: notifier.getCategoryLabel(
+                                transaction.category,
+                              ),
+                              onDelete: () => _showDeleteConfirmation(context, transaction.id),
+                              onEdit: () {
+                                Navigator.of(context).pushNamed(
+                                  EditTransactionScreen.routeName,
+                                  arguments: transaction,
+                                );
+                              },
+                              isReadOnly: isInvestmentTransaction,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+      ),
     );
   }
 }
+

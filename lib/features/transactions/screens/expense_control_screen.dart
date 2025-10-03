@@ -160,7 +160,7 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
   }
 
   Widget _buildTransactionList(TransactionState transactionState) {
-    if (transactionState.transactions.isEmpty) {
+    if (transactionState.allTransactions.isEmpty) {
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -186,7 +186,7 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     }
     // Agrupa valores por categoria, excluindo depósitos
     final Map<String, double> categoryTotals = {};
-    for (final transaction in transactionState.transactions) {
+    for (final transaction in transactionState.allTransactions) {
       if (transaction.category == 'INVESTMENT' ||
           transaction.category == 'INVESTMENT_REDEMPTION' ||
           transaction.amount > 0) continue;
