@@ -69,7 +69,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     if (userId != null) {
       await context.read<TransactionNotifier>().fetchTransactions(userId);
       final total = context.read<TransactionNotifier>().visibleTransactions.length;
-      //debugPrint('[transactions] fetchData -> total=$total');
     }
   }
 
@@ -80,7 +79,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   if (notifier.isFetchingMore) return;
   if (!notifier.hasMore) return;
   final pos = _scrollController.position;
-      //debugPrint('[transactions] onScroll: extentAfter=${pos.extentAfter}, pixels=${pos.pixels}');
       if (pos.atEdge && pos.pixels != 0) {
         final userId = FirebaseAuth.instance.currentUser?.uid;
         if (userId != null) Future.microtask(() => notifier.fetchNextPage(userId));

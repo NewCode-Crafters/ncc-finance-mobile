@@ -51,7 +51,7 @@ class FinancialTransactionService {
         stackTrace: stackTrace,
         name: 'FinancialTransactionService',
       );
-      throw TransactionException('Failed to create transaction.');
+      throw TransactionException('Falha ao criar transação.');
     }
   }
 
@@ -96,7 +96,7 @@ class FinancialTransactionService {
           .map((doc) => FinancialTransaction.fromFirestore(doc))
           .toList();
     } catch (e) {
-      throw TransactionException('Failed to fetch transactions.');
+      throw TransactionException('Falha ao buscar transações.');
     }
   }
 
@@ -158,7 +158,7 @@ class FinancialTransactionService {
       final snapshot = await query.get();
       return snapshot;
     } catch (e) {
-      throw TransactionException('Failed to fetch transactions page: $e');
+      throw TransactionException('Falha ao buscar transações paginadas.');
     }
   }
 
@@ -194,7 +194,7 @@ class FinancialTransactionService {
         await batch.commit();
       }
     } catch (e) {
-      throw TransactionException('Failed to delete transaction.');
+      throw TransactionException('Falha ao excluir transação.');
     }
   }
 
@@ -211,7 +211,7 @@ class FinancialTransactionService {
           .doc(transactionId)
           .update(updateData);
     } catch (e) {
-      throw TransactionException('Failed to update transaction.');
+      throw TransactionException('Falha ao atualizar transação.');
     }
   }
 }
