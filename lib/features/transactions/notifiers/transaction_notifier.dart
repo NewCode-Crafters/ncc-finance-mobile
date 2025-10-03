@@ -1,13 +1,13 @@
 import 'package:bytebank/theme/theme.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/features/transactions/models/financial_transaction.dart';
 import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
 
-DateTime _startOfMonth(DateTime date) => DateTime(date.year, date.month, 1);
-
 class TransactionState {
   final List<FinancialTransaction> transactions;
+  final List<FinancialTransaction> allTransactions;
   final List<TransactionCategory> categories;
   final bool isLoading;
   final String? error;
@@ -18,6 +18,7 @@ class TransactionState {
   final Map<String, double> chartData;
 
   TransactionState({
+    this.allTransactions = const [],
     this.transactions = const [],
     this.categories = const [],
     this.isLoading = false,
@@ -31,6 +32,7 @@ class TransactionState {
        endDate = endDate ?? DateTime.now();
 
   TransactionState copyWith({
+    List<FinancialTransaction>? allTransactions,
     List<FinancialTransaction>? transactions,
     List<TransactionCategory>? categories,
     bool? isLoading,
@@ -42,6 +44,7 @@ class TransactionState {
     Map<String, double>? chartData,
   }) {
     return TransactionState(
+      allTransactions: allTransactions ?? this.allTransactions,
       transactions: transactions ?? this.transactions,
       categories: categories ?? this.categories,
       isLoading: isLoading ?? this.isLoading,
@@ -62,20 +65,33 @@ class TransactionNotifier extends ChangeNotifier {
   TransactionState _state = TransactionState();
   TransactionState get state => _state;
 
+  // Pagination state
+  DocumentSnapshot? _lastDocument;
+  bool _isFetchingMore = false;
+  final int _pageSize = 10;
+  bool _hasMore = true;
+  // Throttle consecutive fetchNextPage calls
+  DateTime? _lastFetchMoreAt;
+  final Duration _fetchMoreThrottle = const Duration(milliseconds: 500);
+
   TransactionNotifier(this._transactionService, this._metadataService);
 
   List<FinancialTransaction> get visibleTransactions {
-    final query = _state.searchText.toLowerCase();
-    if (query.isEmpty) {
+    final query = _state.searchText.trim().toLowerCase();
+    if (query.isEmpty) return _state.transactions;
+
+    final querysemfiltro = _state.searchText.toLowerCase();
+
+    if (querysemfiltro.isEmpty) {
       return _state.transactions;
     }
 
-    return _state.transactions.where((t) {
+    return _state.allTransactions.where((t) {
       final descriptionMatch =
-          t.description?.toLowerCase().contains(query) ?? false;
+          t.description?.toLowerCase().contains(querysemfiltro) ?? false;
       final categoryMatch = getCategoryLabel(
         t.category,
-      ).toLowerCase().contains(query);
+      ).toLowerCase().contains(querysemfiltro);
       return descriptionMatch || categoryMatch;
     }).toList();
   }
@@ -98,22 +114,51 @@ class TransactionNotifier extends ChangeNotifier {
   List<TransactionCategory> get expenseCategories => _filterAndSort('expense');
 
   Future<void> fetchTransactions(String userId) async {
+    // initial load (first page)
+    await fetchFirstPage(userId);
+  }
+
+  Future<void> fetchFirstPage(String userId) async {
     _state = _state.copyWith(isLoading: true);
+  _lastDocument = null;
+  _hasMore = true;
     notifyListeners();
 
     try {
-      final transactions = await _transactionService.getTransactions(
+      final snapshot = await _transactionService.getTransactionsPage(
+        userId: userId,
+        startDate: _state.startDate,
+        endDate: _state.endDate,
+        startAfterDoc: null,
+        limit: _pageSize,
+      );
+
+      final allTransactions = await _transactionService.getTransactions(
         userId: userId,
         startDate: _state.startDate,
         endDate: _state.endDate,
       );
+
       final categories = _state.categories.isEmpty
           ? await _metadataService.getTransactionCategories()
           : _state.categories;
 
-      // Agrupa valores negativos por categoria, exceto incomes
+      final transactions = snapshot.docs
+          .map((doc) => FinancialTransaction.fromFirestore(doc))
+          .toList();
+
+      // save last doc for pagination — if fewer than pageSize results, no more pages
+      if (snapshot.docs.length < _pageSize) {
+        _lastDocument = null;
+        _hasMore = false;
+      } else {
+        _lastDocument = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
+        _hasMore = _lastDocument != null;
+      }
+
+      // compute chartData across fetched page (you can aggregate across all loaded pages if desired)
       final Map<String, double> chartData = {};
-      for (final transaction in transactions) {
+      for (final transaction in allTransactions) {
         if (transaction.category == 'INVESTMENT' ||
             transaction.category == 'INVESTMENT_REDEMPTION' ||
             transaction.amount > 0) {
@@ -124,6 +169,7 @@ class TransactionNotifier extends ChangeNotifier {
       }
 
       _state = _state.copyWith(
+        allTransactions: allTransactions,
         transactions: transactions,
         categories: categories,
         isLoading: false,
@@ -134,6 +180,82 @@ class TransactionNotifier extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  Future<void> fetchNextPage(String userId) async {
+    if (_isFetchingMore) return;
+    if (!_hasMore) return; // early return when there are truly no more pages
+
+    // throttle rapid consecutive calls
+    final now = DateTime.now();
+    if (_lastFetchMoreAt != null && now.difference(_lastFetchMoreAt!) < _fetchMoreThrottle) {
+      return;
+    }
+    _lastFetchMoreAt = now;
+    // also guard when lastDocument is null
+    if (_lastDocument == null) return; // no more pages
+
+    _isFetchingMore = true;
+    notifyListeners();
+
+    try {
+      final snapshot = await _transactionService.getTransactionsPage(
+        userId: userId,
+        startDate: _state.startDate,
+        endDate: _state.endDate,
+        startAfterDoc: _lastDocument,
+        limit: _pageSize,
+      );
+
+      final allTransactions = await _transactionService.getTransactions(
+        userId: userId,
+        startDate: _state.startDate,
+        endDate: _state.endDate,
+      );
+
+
+      final more = snapshot.docs
+          .map((doc) => FinancialTransaction.fromFirestore(doc))
+          .toList();
+
+      // update last doc — determine if there are more pages
+      if (snapshot.docs.length < _pageSize) {
+        _lastDocument = null;
+        _hasMore = false;
+      } else {
+        _lastDocument = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
+        _hasMore = _lastDocument != null;
+      }
+
+      // append
+      final updated = List<FinancialTransaction>.from(_state.transactions)
+        ..addAll(more);
+
+      // recompute chartData across all loaded transactions
+      final Map<String, double> chartData = {};
+      for (final transaction in allTransactions) {
+        if (transaction.category == 'INVESTMENT' ||
+            transaction.category == 'INVESTMENT_REDEMPTION' ||
+            transaction.amount > 0) continue;
+        chartData[transaction.category] =
+            (chartData[transaction.category] ?? 0) + transaction.amount.abs();
+      }
+
+      _state = _state.copyWith(
+        allTransactions: allTransactions,
+        transactions: updated,
+        chartData: chartData,
+      );
+    } catch (e) {
+      _state = _state.copyWith(error: e.toString());
+    }
+
+    _isFetchingMore = false;
+    notifyListeners();
+  }
+
+  bool get isFetchingMore => _isFetchingMore;
+
+  bool get hasMore => _hasMore;
 
   Future<void> deleteTransaction({
     required String userId,
