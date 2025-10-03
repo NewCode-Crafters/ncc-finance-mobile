@@ -1,3 +1,4 @@
+import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/constants/app_assets.dart';
@@ -37,6 +38,14 @@ class _LoginScreenState extends State<LoginScreen> {
       // Close this login screen so the AuthGate (root) can render the Dashboard.
       if (mounted) Navigator.of(context).pop();
     }
+  }
+
+  void _handleForgotPassword() {
+    showAppSnackBar(
+      context,
+      'Entre em contato com o suporte para redefinir sua senha.',
+      AppMessageType.warning,
+    );
   }
 
   @override
@@ -202,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
-            onPressed: () {}, // TODO: Implement forgot password
+            onPressed: _handleForgotPassword,
             child: const Text(
               "Esqueci a senha?",
               style: TextStyle(
