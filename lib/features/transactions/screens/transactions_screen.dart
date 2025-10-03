@@ -5,7 +5,6 @@ import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:bytebank/features/transactions/screens/edit_transaction_screen.dart';
 import 'package:bytebank/features/transactions/widgets/transaction_list_item.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class TransactionsScreen extends StatefulWidget {
@@ -171,33 +170,58 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                      itemCount: notifier.visibleTransactions.length,
-                      itemBuilder: (context, index) {
-                        final transaction = notifier.visibleTransactions[index];
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (ScrollNotification scrollInfo) {
+                  if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent &&
+                      notifier.state.hasMore &&
+                      !notifier.state.isLoadingMore) {
+                    notifier.loadMoreTransactions();
+                  }
+                  return false;
+                },
+                child: ListView.builder(
+                  itemCount: notifier.visibleTransactions.length + 
+                             (notifier.state.hasMore ? 1 : 0), // +1 para o indicador de loading
+                  itemBuilder: (context, index) {
+                    // Se chegou no final da lista e ainda há mais itens, mostra loading
+                    if (index == notifier.visibleTransactions.length) {
+                      return Container(
+                        padding: const EdgeInsets.all(16.0),
+                        alignment: Alignment.center,
+                        child: notifier.state.isLoadingMore
+                            ? const CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.lightGreenColor,
+                                ),
+                              )
+                            : const SizedBox(),
+                      );
+                    }
 
-                        final bool isInvestmentTransaction =
-                            transaction.category == 'INVESTMENT' ||
-                            transaction.category == 'INVESTMENT_REDEMPTION';
+                    final transaction = notifier.visibleTransactions[index];
 
-                        return TransactionListItem(
-                          transaction: transaction,
-                          categoryLabel: notifier.getCategoryLabel(
-                            transaction.category,
-                          ),
-                          onDelete: () =>
-                              _showDeleteConfirmation(context, transaction.id),
-                          onEdit: () {
-                            Navigator.of(context).pushNamed(
-                              EditTransactionScreen.routeName,
-                              arguments: transaction,
-                            );
-                          },
-                          isReadOnly: isInvestmentTransaction,
+                    final bool isInvestmentTransaction =
+                        transaction.category == 'INVESTMENT' ||
+                        transaction.category == 'INVESTMENT_REDEMPTION';
+
+                    return TransactionListItem(
+                      transaction: transaction,
+                      categoryLabel: notifier.getCategoryLabel(
+                        transaction.category,
+                      ),
+                      onDelete: () =>
+                          _showDeleteConfirmation(context, transaction.id),
+                      onEdit: () {
+                        Navigator.of(context).pushNamed(
+                          EditTransactionScreen.routeName,
+                          arguments: transaction,
                         );
                       },
-                    ),
-
+                      isReadOnly: isInvestmentTransaction,
+                    );
+                  },
+                ),
+              ),
             ),
           ],
         ),

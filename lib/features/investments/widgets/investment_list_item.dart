@@ -27,10 +27,24 @@ class InvestmentListItem extends StatelessWidget {
           DismissDirection.endToStart, // Only allow swipe from right to left
       confirmDismiss: (_) => onConfirmDelete(),
       background: Container(
-        color: Colors.red,
+        color: Colors.orange,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: const Icon(Icons.delete, color: Colors.white),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.account_balance_wallet, color: Colors.white),
+            SizedBox(height: 4),
+            Text(
+              'Resgatar',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
       child: Card(
         child: ListTile(

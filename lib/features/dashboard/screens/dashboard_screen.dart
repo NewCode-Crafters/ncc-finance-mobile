@@ -94,7 +94,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: headlineMedium,
             ),
             Text(dateFormatter.format(DateTime.now()), style: bodySmall),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
             Card(
               elevation: 1,
               shape: RoundedRectangleBorder(
@@ -161,7 +161,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -185,9 +185,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
             SizedBox(height: 400, child: TransactionsScreen()),
-            const SizedBox(height: 60),
+            const SizedBox(height: 30),
           ],
         ),
       ),

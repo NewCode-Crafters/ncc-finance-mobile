@@ -97,8 +97,10 @@ class InvestmentService {
 
       final batch = _firestore.batch();
 
+      // Delete only the investment document (keep the original transaction)
       batch.delete(investmentRef);
 
+      // Create redemption transaction
       await _transactionService.createTransaction(
         userId: userId,
         data: {
@@ -106,7 +108,7 @@ class InvestmentService {
           'balanceId': investmentData['balanceId'],
           'category': 'INVESTMENT_REDEMPTION',
           'date': DateTime.now(),
-          'description': 'Redemption of ${investmentData['name']}',
+          'description': 'Resgate de ${investmentData['name']}',
           'investmentId': investmentId,
         },
         batch: batch,

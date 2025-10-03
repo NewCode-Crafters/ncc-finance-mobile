@@ -43,17 +43,20 @@ class TransactionListItem extends StatelessWidget {
 
     final tileContent = Card(
       // Make read-only items look slightly different
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       child: InkWell(
         // Disable long-press if read-only
         onLongPress: () {
           if (isReadOnly) {
+            final message = transaction.category == 'INVESTMENT_REDEMPTION'
+                ? 'Transações de resgate de investimento não podem ser editadas ou excluídas.'
+                : 'Transações de investimento são somente para visualização.';
+            
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Transações de investimento são somente para visualização.',
-                ),
-                duration: Duration(seconds: 2),
+              SnackBar(
+                content: Text(message),
+                duration: const Duration(seconds: 3),
+                backgroundColor: AppColors.brandSecondary,
               ),
             );
           } else {
@@ -89,10 +92,16 @@ class TransactionListItem extends StatelessWidget {
           ),
           title: Row(
             children: [
-              Text(categoryLabel),
-              const SizedBox(width: 8),
-              if (isReadOnly)
+              Expanded(
+                child: Text(
+                  categoryLabel,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (isReadOnly) ...[
+                const SizedBox(width: 4),
                 Icon(Icons.lock, size: 14, color: Colors.grey.shade500),
+              ],
             ],
           ),
           subtitle: Column(
@@ -111,11 +120,16 @@ class TransactionListItem extends StatelessWidget {
                 ),
             ],
           ),
-          trailing: Text(
-            currencyFormatter.format(transaction.amount),
-            style: TextStyle(
-              color: isIncome ? Colors.green : Colors.red,
-              fontWeight: FontWeight.bold,
+          trailing: SizedBox(
+            width: 90, // Aumentado de 120 para 200 pixels
+            child: Text(
+              currencyFormatter.format(transaction.amount),
+              style: TextStyle(
+                color: isIncome ? Colors.green : Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.right,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
