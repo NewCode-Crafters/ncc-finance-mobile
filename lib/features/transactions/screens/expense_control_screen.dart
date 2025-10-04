@@ -1,4 +1,5 @@
 import 'package:bytebank/core/widgets/main_app_bar.dart';
+import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -83,21 +84,60 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
           children: [
             Expanded(
               flex: 3,
-              child: PieChart(
-                PieChartData(
-                  sections: List.generate(chartData.length, (index) {
-                    final entry = chartData[index];
-                    return PieChartSectionData(
-                      color: colors[index % colors.length],
-                      value: entry.value,
-                      title: '', // We use the legend instead
-                      radius: 30,
-                      showTitle: false,
+              child: Consumer<ChartAnimationNotifier>(
+                builder: (context, chartNotifier, child) {
+                  final shouldAnimate = chartNotifier.shouldAnimateCharts && 
+                                      chartNotifier.currentTabIndex == 1; // Expense tab index
+                  final isVisible = chartNotifier.chartsVisible && 
+                                   chartNotifier.currentTabIndex == 1;
+                  
+                  if (shouldAnimate) {
+                    return TweenAnimationBuilder<double>(
+                      duration: const Duration(milliseconds: 1200),
+                      tween: Tween<double>(begin: 0.0, end: 1.0),
+                      curve: Curves.elasticOut,
+                      builder: (context, animationValue, child) {
+                        return PieChart(
+                          PieChartData(
+                            sections: List.generate(chartData.length, (index) {
+                              final entry = chartData[index];
+                              return PieChartSectionData(
+                                color: colors[index % colors.length],
+                                value: entry.value * animationValue,
+                                title: '', // We use the legend instead
+                                radius: 30 * animationValue,
+                                showTitle: false,
+                              );
+                            }),
+                            sectionsSpace: 1,
+                            centerSpaceRadius: 50 * animationValue,
+                          ),
+                        );
+                      },
                     );
-                  }),
-                  sectionsSpace: 1,
-                  centerSpaceRadius: 50,
-                ),
+                  } else if (isVisible) {
+                    // Mostra gráfico estático após animação
+                    return PieChart(
+                      PieChartData(
+                        sections: List.generate(chartData.length, (index) {
+                          final entry = chartData[index];
+                          return PieChartSectionData(
+                            color: colors[index % colors.length],
+                            value: entry.value,
+                            title: '', // We use the legend instead
+                            radius: 30,
+                            showTitle: false,
+                          );
+                        }),
+                        sectionsSpace: 1,
+                        centerSpaceRadius: 50,
+                      ),
+                    );
+                  } else {
+                    // Mostra gráfico invisível (sem tamanho) para não piscar
+                    return Container();
+                  }
+                },
               ),
             ),
             Expanded(
@@ -110,15 +150,11 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
                       .read<TransactionNotifier>()
                       .getCategoryLabel(entry.key);
                   final iconData = getIconForCategory(entry.key);
+                  
                   return ListTile(
                     leading: Icon(iconData, color: colors[index % colors.length]),
-                    title: Text(
-                      label,
-                      textHeightBehavior: TextHeightBehavior(
-                        applyHeightToFirstAscent: false,
-                      ),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(
+                    title: Text(label),
+                    contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16.0,
                       vertical: 0.0,
                     ),

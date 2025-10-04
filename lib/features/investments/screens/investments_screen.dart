@@ -1,4 +1,5 @@
 import 'package:bytebank/core/widgets/main_app_bar.dart';
+import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
 import 'package:bytebank/features/dashboard/widgets/action_card.dart';
 import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
 import 'package:bytebank/theme/theme.dart';
@@ -158,20 +159,58 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           children: [
             Expanded(
               flex: 3,
-              child: PieChart(
-                PieChartData(
-                  sections: List.generate(chartData.length, (index) {
-                    final entry = chartData[index];
-                    return PieChartSectionData(
-                      color: colors[index % colors.length],
-                      value: entry.value,
-                      title: '', // We use the legend instead
-                      radius: 30,
+              child: Consumer<ChartAnimationNotifier>(
+                builder: (context, chartNotifier, child) {
+                  final shouldAnimate = chartNotifier.shouldAnimateCharts && 
+                                      chartNotifier.currentTabIndex == 2; // Investments tab index
+                  final isVisible = chartNotifier.chartsVisible && 
+                                   chartNotifier.currentTabIndex == 2;
+                  
+                  if (shouldAnimate) {
+                    return TweenAnimationBuilder<double>(
+                      duration: const Duration(milliseconds: 1200),
+                      tween: Tween<double>(begin: 0.0, end: 1.0),
+                      curve: Curves.elasticOut,
+                      builder: (context, animationValue, child) {
+                        return PieChart(
+                          PieChartData(
+                            sections: List.generate(chartData.length, (index) {
+                              final entry = chartData[index];
+                              return PieChartSectionData(
+                                color: colors[index % colors.length],
+                                value: entry.value * animationValue,
+                                title: '', // We use the legend instead
+                                radius: 30 * animationValue,
+                              );
+                            }),
+                            sectionsSpace: 2,
+                            centerSpaceRadius: 50 * animationValue,
+                          ),
+                        );
+                      },
                     );
-                  }),
-                  sectionsSpace: 2,
-                  centerSpaceRadius: 50,
-                ),
+                  } else if (isVisible) {
+                    // Mostra gráfico estático após animação
+                    return PieChart(
+                      PieChartData(
+                        sections: List.generate(chartData.length, (index) {
+                          final entry = chartData[index];
+                          return PieChartSectionData(
+                            color: colors[index % colors.length],
+                            value: entry.value,
+                            title: '', // We use the legend instead
+                            radius: 30,
+                          );
+                        }),
+                        sectionsSpace: 2,
+                        centerSpaceRadius: 50,
+                      ),
+                    );
+                  } else {
+                    // Mostra container vazio para não piscar
+                    return Container();
+                  }
+                },
               ),
             ),
             Expanded(
