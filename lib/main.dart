@@ -1,4 +1,5 @@
 import 'package:bytebank/features/transactions/screens/expense_control_screen.dart';
+import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
@@ -76,6 +77,10 @@ class MyApp extends StatelessWidget {
         Provider<MetadataService>(create: (_) => MetadataService()),
         Provider<FinancialTransactionService>(
           create: (_) => FinancialTransactionService(),
+        ),
+        // --- Chart Animation ---
+        ChangeNotifierProvider<ChartAnimationNotifier>(
+          create: (_) => ChartAnimationNotifier(),
         ),
         ChangeNotifierProvider<TransactionNotifier>(
           create: (context) => TransactionNotifier(

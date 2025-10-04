@@ -1,55 +1,20 @@
 import 'package:flutter/material.dart';
 
-/// Widget que combina animações de slide e fade para transições entre telas
-class SlideAndFadeTransition extends StatelessWidget {
-  final Widget child;
-  final Animation<double> animation;
-  final Offset? slideDirection;
-
-  const SlideAndFadeTransition({
-    Key? key,
-    required this.child,
-    required this.animation,
-    this.slideDirection,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SlideTransition(
-      position: Tween<Offset>(
-        begin: slideDirection ?? const Offset(1.0, 0.0), // Slide da direita
-        end: Offset.zero,
-      ).animate(CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeOutQuart,
-      )),
-      child: FadeTransition(
-        opacity: Tween<double>(
-          begin: 0.0,
-          end: 1.0,
-        ).animate(CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutQuart,
-        )),
-        child: child,
-      ),
-    );
-  }
-}
-
 /// Widget personalizado para transição entre abas do menu inferior
 /// Mantém estado com IndexedStack e adiciona slide sutil sem piscar
 class AnimatedTabSwitcher extends StatefulWidget {
   final int selectedIndex;
   final List<Widget> children;
   final Duration duration;
+  final VoidCallback? onAnimationComplete;
 
   const AnimatedTabSwitcher({
-    Key? key,
+    super.key,
     required this.selectedIndex,
     required this.children,
-    this.duration = const Duration(milliseconds: 250),
-  }) : super(key: key);
+    this.duration = const Duration(milliseconds: 375), // Aumentado de 250ms para 375ms
+    this.onAnimationComplete,
+  });
 
   @override
   State<AnimatedTabSwitcher> createState() => _AnimatedTabSwitcherState();
@@ -88,6 +53,12 @@ class _AnimatedTabSwitcherState extends State<AnimatedTabSwitcher>
       parent: _controller,
       curve: Curves.easeOutCubic,
     ));
+
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed && widget.onAnimationComplete != null) {
+        widget.onAnimationComplete!();
+      }
+    });
   }
 
   @override
