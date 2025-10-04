@@ -66,10 +66,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
     final headlineMedium = textTheme.headlineMedium;
     final bodySmall = textTheme.bodySmall;
-    final headlineLargeNeutral = textTheme.headlineLarge?.copyWith(
-      fontWeight: FontWeight.bold,
-      color: AppColors.neutral100,
-    );
 
     // Formatters for date and currency
     final currencyFormatter = NumberFormat.currency(
@@ -85,110 +81,125 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // Tab 0: Dashboard principal
       RefreshIndicator(
         onRefresh: _refreshData,
-        child: ListView(
-          physics: const ClampingScrollPhysics(), // Impede o "bounce" que causa o scroll excessivo
-          padding: const EdgeInsets.all(16.0),
+        child: Column(
           children: [
-            Text('Bem-vindo de volta', style: titleMediumNeutral),
-            Text(
-              profileState.userProfile?.name ?? 'Usuário',
-              style: headlineMedium,
-            ),
-            Text(dateFormatter.format(DateTime.now()), style: bodySmall),
-            const SizedBox(height: 12),
-            Card(
-              elevation: 1,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: AppColors.cardSaldoGradient,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text('Saldo', style: titleMediumNeutral),
-                          IconButton(
-                            icon: Icon(
-                              _isBalanceVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isBalanceVisible = !_isBalanceVisible;
-                              });
-                            },
-                            style: IconButton.styleFrom(
-                              foregroundColor: AppColors.darkPurpleColor,
-                            ),
-                          ),
-                        ],
+            // Header fixo (não rola)
+            Container(
+              color: AppColors.surfaceDefault,
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Bem-vindo de volta', style: titleMediumNeutral),
+                  Text(
+                    profileState.userProfile?.name ?? 'Usuário',
+                    style: headlineMedium,
+                  ),
+                  Text(dateFormatter.format(DateTime.now()), style: bodySmall),
+                  const SizedBox(height: 6),
+                  Card(
+                    elevation: 1,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: AppColors.cardSaldoGradient,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      const Divider(
-                        color: AppColors.darkPurpleColor,
-                        thickness: 1,
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          if (balanceState.isLoading)
-                            const CircularProgressIndicator()
-                          else
-                            Text(
-                              _isBalanceVisible
-                                  ? currencyFormatter.format(
-                                      balanceState.totalBalance,
-                                    )
-                                  : 'R\$ **,**',
-                              style: Theme.of(context).textTheme.headlineLarge!
-                                  .copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.neutral100,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text('Saldo', style: titleMediumNeutral),
+                                IconButton(
+                                  icon: Icon(
+                                    _isBalanceVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
                                   ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isBalanceVisible = !_isBalanceVisible;
+                                    });
+                                  },
+                                  style: IconButton.styleFrom(
+                                    foregroundColor: AppColors.darkPurpleColor,
+                                  ),
+                                ),
+                              ],
                             ),
-                          Image(image: const AssetImage(AppAssets.card)),
-                        ],
+                            const Divider(
+                              color: AppColors.darkPurpleColor,
+                              thickness: 1,
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                if (balanceState.isLoading)
+                                  const CircularProgressIndicator()
+                                else
+                                  Flexible(
+                                    child: Text(
+                                      _isBalanceVisible
+                                          ? currencyFormatter.format(
+                                              balanceState.totalBalance,
+                                            )
+                                          : 'R\$ **,**',
+                                      style: Theme.of(context).textTheme.headlineLarge!
+                                          .copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.neutral100,
+                                          ),
+                                    ),
+                                  ),
+                                const SizedBox(width: 8),
+                                Image(image: const AssetImage(AppAssets.card)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      ActionCard(
+                        icon: Icons.swap_horiz,
+                        label: 'Fazer uma\ntransação',
+                        onTap: () {
+                          Navigator.of(
+                            context,
+                          ).pushNamed(CreateTransactionScreen.routeName);
+                        },
+                      ),
+                      ActionCard(
+                        icon: Icons.bar_chart,
+                        label: 'Fazer um\ninvestimento',
+                        onTap: () {
+                          Navigator.of(
+                            context,
+                          ).pushNamed(CreateInvestmentScreen.routeName);
+                        },
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                ActionCard(
-                  icon: Icons.swap_horiz,
-                  label: 'Fazer uma\ntransação',
-                  onTap: () {
-                    Navigator.of(
-                      context,
-                    ).pushNamed(CreateTransactionScreen.routeName);
-                  },
-                ),
-                ActionCard(
-                  icon: Icons.bar_chart,
-                  label: 'Fazer um\ninvestimento',
-                  onTap: () {
-                    Navigator.of(
-                      context,
-                    ).pushNamed(CreateInvestmentScreen.routeName);
-                  },
-                ),
-              ],
+            // Área de transações que rola
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: TransactionsScreen(),
+              ),
             ),
-            const SizedBox(height: 12),
-            SizedBox(height: 400, child: TransactionsScreen()),
-            const SizedBox(height: 30),
           ],
         ),
       ),
