@@ -1,6 +1,4 @@
 import 'package:bytebank/core/widgets/main_app_bar.dart';
-import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
-import 'package:bytebank/features/transactions/screens/create_transaction_screen.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -135,28 +133,6 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
         ),
       );
     }
-  }
-
-  Widget _buildSummaryCards(TransactionState state) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        ActionCard(
-          icon: Icons.swap_horiz,
-          label: 'Fazer uma\ntransação',
-          onTap: () {
-            Navigator.of(context).pushNamed(CreateTransactionScreen.routeName);
-          },
-        ),
-        ActionCard(
-          icon: Icons.bar_chart,
-          label: 'Fazer um\ninvestimento',
-          onTap: () {
-            Navigator.of(context).pushNamed(CreateInvestmentScreen.routeName);
-          },
-        ),
-      ],
-    );
   }
 
   Widget _buildTransactionList(TransactionState transactionState) {

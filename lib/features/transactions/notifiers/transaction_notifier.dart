@@ -10,30 +10,24 @@ class TransactionState {
   final List<FinancialTransaction> allTransactions;
   final List<TransactionCategory> categories;
   final bool isLoading;
-  final bool isLoadingMore;
   final String? error;
   final String? successMessage;
   final String searchText;
   final DateTime startDate;
   final DateTime endDate;
   final Map<String, double> chartData;
-  final int displayedItemsCount;
-  final bool hasMore;
 
   TransactionState({
     this.allTransactions = const [],
     this.transactions = const [],
     this.categories = const [],
     this.isLoading = false,
-    this.isLoadingMore = false,
     this.error,
     this.successMessage,
     DateTime? startDate, // Make nullable for default
     DateTime? endDate,
     this.searchText = '',
     this.chartData = const {},
-    this.displayedItemsCount = 3, // Começar com 3 itens
-    this.hasMore = true,
   }) : startDate = startDate ?? DateTime.now().subtract(const Duration(days: 30)),
        endDate = endDate ?? DateTime.now();
 
@@ -42,30 +36,24 @@ class TransactionState {
     List<FinancialTransaction>? transactions,
     List<TransactionCategory>? categories,
     bool? isLoading,
-    bool? isLoadingMore,
     String? error,
     String? successMessage,
     String? searchText,
     DateTime? startDate,
     DateTime? endDate,
     Map<String, double>? chartData,
-    int? displayedItemsCount,
-    bool? hasMore,
   }) {
     return TransactionState(
       allTransactions: allTransactions ?? this.allTransactions,
       transactions: transactions ?? this.transactions,
       categories: categories ?? this.categories,
       isLoading: isLoading ?? this.isLoading,
-      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       error: error,
       successMessage: successMessage,
       searchText: searchText ?? this.searchText,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
       chartData: chartData ?? this.chartData,
-      displayedItemsCount: displayedItemsCount ?? this.displayedItemsCount,
-      hasMore: hasMore ?? this.hasMore,
     );
   }
 }
@@ -90,27 +78,22 @@ class TransactionNotifier extends ChangeNotifier {
 
   List<FinancialTransaction> get visibleTransactions {
     final query = _state.searchText.trim().toLowerCase();
-    List<FinancialTransaction> filtered;
-    
-    if (query.isEmpty) {
-      filtered = _state.transactions;
-    } else {
-      filtered = _state.allTransactions.where((t) {
-        final descriptionMatch =
-            t.description?.toLowerCase().contains(query) ?? false;
-        final categoryMatch = getCategoryLabel(
-          t.category,
-        ).toLowerCase().contains(query);
-        return descriptionMatch || categoryMatch;
-      }).toList();
+    if (query.isEmpty) return _state.transactions;
+
+    final querysemfiltro = _state.searchText.toLowerCase();
+
+    if (querysemfiltro.isEmpty) {
+      return _state.transactions;
     }
 
-    // Retorna apenas os itens que devem ser exibidos (lazy loading)
-    final maxItems = _state.displayedItemsCount;
-    if (filtered.length > maxItems) {
-      return filtered.take(maxItems).toList();
-    }
-    return filtered;
+    return _state.allTransactions.where((t) {
+      final descriptionMatch =
+          t.description?.toLowerCase().contains(querysemfiltro) ?? false;
+      final categoryMatch = getCategoryLabel(
+        t.category,
+      ).toLowerCase().contains(querysemfiltro);
+      return descriptionMatch || categoryMatch;
+    }).toList();
   }
 
   List<TransactionCategory> _filterAndSort(String type) {
@@ -191,8 +174,6 @@ class TransactionNotifier extends ChangeNotifier {
         categories: categories,
         isLoading: false,
         chartData: chartData,
-        displayedItemsCount: 3, // Reset para 3 itens ao carregar
-        hasMore: transactions.length > 3, // Verifica se há mais itens
       );
     } catch (e) {
       _state = _state.copyWith(isLoading: false, error: e.toString());
@@ -254,9 +235,7 @@ class TransactionNotifier extends ChangeNotifier {
       for (final transaction in allTransactions) {
         if (transaction.category == 'INVESTMENT' ||
             transaction.category == 'INVESTMENT_REDEMPTION' ||
-            transaction.amount > 0) {
-          continue;
-        }
+            transaction.amount > 0) continue;
         chartData[transaction.category] =
             (chartData[transaction.category] ?? 0) + transaction.amount.abs();
       }
@@ -302,14 +281,6 @@ class TransactionNotifier extends ChangeNotifier {
   }
 
   String getCategoryLabel(String categoryId) {
-    // Handle special investment categories
-    if (categoryId == 'INVESTMENT') {
-      return 'Investimento';
-    }
-    if (categoryId == 'INVESTMENT_REDEMPTION') {
-      return 'Resgate de Investimento';
-    }
-    
     try {
       return _state.categories.firstWhere((c) => c.id == categoryId).label;
     } catch (e) {
@@ -318,37 +289,7 @@ class TransactionNotifier extends ChangeNotifier {
   }
 
   void updateSearchText(String text) {
-    _state = _state.copyWith(
-      searchText: text,
-      displayedItemsCount: 3, // Reset para 3 itens ao pesquisar
-    );
-    notifyListeners();
-  }
-
-  Future<void> loadMoreTransactions() async {
-    if (_state.isLoadingMore || !_state.hasMore) return;
-
-    _state = _state.copyWith(isLoadingMore: true);
-    notifyListeners();
-
-    // Simula delay de carregamento
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    final currentCount = _state.displayedItemsCount;
-    final newCount = currentCount + 3; // Carregar mais 3 itens
-    final totalItems = _state.searchText.isEmpty 
-        ? _state.transactions.length 
-        : _state.allTransactions.where((t) {
-            final descriptionMatch = t.description?.toLowerCase().contains(_state.searchText.toLowerCase()) ?? false;
-            final categoryMatch = getCategoryLabel(t.category).toLowerCase().contains(_state.searchText.toLowerCase());
-            return descriptionMatch || categoryMatch;
-          }).length;
-
-    _state = _state.copyWith(
-      isLoadingMore: false,
-      displayedItemsCount: newCount,
-      hasMore: newCount < totalItems,
-    );
+    _state = _state.copyWith(searchText: text);
     notifyListeners();
   }
 

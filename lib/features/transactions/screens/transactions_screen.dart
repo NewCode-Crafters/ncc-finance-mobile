@@ -75,13 +75,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     if (!_scrollController.hasClients) return;
     try {
       final notifier = context.read<TransactionNotifier>();
-      if (notifier.state.isLoadingMore) return;
-      if (!notifier.state.hasMore) return;
-      
-      final pos = _scrollController.position;
-      // Detecta quando chega próximo ao final da lista
+  if (notifier.isFetchingMore) return;
+  if (!notifier.hasMore) return;
+  final pos = _scrollController.position;
+      if (pos.atEdge && pos.pixels != 0) {
+        final userId = FirebaseAuth.instance.currentUser?.uid;
+        if (userId != null) Future.microtask(() => notifier.fetchNextPage(userId));
+        return;
+      }
       if (pos.extentAfter < 300) {
-        notifier.loadMoreTransactions();
+        final userId = FirebaseAuth.instance.currentUser?.uid;
+        if (userId != null) Future.microtask(() => notifier.fetchNextPage(userId));
       }
     } catch (_) {}
   }
@@ -211,17 +215,21 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       Expanded(
                         child: ListView.builder(
                           controller: _scrollController,
-                          itemCount: total + ((notifier.state.isLoadingMore && notifier.state.hasMore) ? 1 : 0),
+                          itemCount: total + ((notifier.isFetchingMore && notifier.hasMore) ? 1 : 0),
                           itemBuilder: (context, index) {
                             if (index >= total) {
                               // show footer loader only when there are more pages
-                              if (notifier.state.isLoadingMore && notifier.state.hasMore) {
+                              if (notifier.isFetchingMore && notifier.hasMore) {
                                 return const Padding(
                                   padding: EdgeInsets.symmetric(vertical: 12.0),
                                   child: Center(child: CircularProgressIndicator()),
                                 );
                               }
                               return const SizedBox.shrink();
+                            }
+
+                            if (index == total - 1 && !notifier.isFetchingMore && notifier.hasMore) {
+                              Future.microtask(() => notifier.fetchNextPage(userId));
                             }
 
                             final transaction = transactions[index];
