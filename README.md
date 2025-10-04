@@ -12,16 +12,9 @@ A Flutter mobile application for personal finance management. Bytebank (package 
 - Localization for Brazilian Portuguese (`pt_BR`)
 - State management using `provider`
 
-## Quick facts
-
-- **Project name (pubspec):** `bytebank`
-- **Flutter SDK constraint:** `>=3.8.1 <4.0.0`
-- **Supported locale:** `pt_BR` (Brazilian Portuguese)
-- **Firebase:** Uses `firebase_options.dart` (generated). Place `google-services.json` in `android/app/` and `GoogleService-Info.plist` in `ios/Runner/`.
-- **Assets:** `assets/images/` contains app icons and splash images
-
 ## Table of contents
 
+- [Testing on your device](#testing-on-your-device)
 - [Project structure](#project-structure)
 - [Getting started](#getting-started)
 - [CI/CD](#ci-cd)
@@ -32,6 +25,43 @@ A Flutter mobile application for personal finance management. Bytebank (package 
 - [Unit tests](#unit-tests)
 - [Authors](#authors)
 - [External links](#external-links)
+
+## Testing on your device
+
+Prefer to test the app directly on your device or emulator? We make it easy for evaluators and reviewers:
+
+- Latest APK: a ready-to-install Android APK is available under the repository folder `app-artifacts/`. Use that APK to quickly install the app on physical devices or emulators.
+- Sensitive config files: for convenience during evaluation the repo also includes the platform Firebase config files (`android/app/google-services.json` and `ios/Runner/GoogleService-Info.plist`). These are provided only to make local testing straightforward for evaluators. After the evaluation period finishes these keys/files will be invalidated, turned private and replaced with fresh credentials.
+
+Quick install / run examples:
+
+Install the APK on an Android device (via adb):
+
+```bash
+adb install -r app-artifact/app-release.apk
+```
+
+Run directly from source (recommended) — debug mode:
+
+```bash
+# list connected devices
+flutter devices
+
+# Run on a device (replace <device-id>)
+flutter run -d <device-id>
+```
+
+Where to put the Firebase platform files (if you received them separately):
+
+```bash
+cp ~/Downloads/google-services.json android/app/google-services.json
+cp ~/Downloads/GoogleService-Info.plist ios/Runner/GoogleService-Info.plist
+```
+
+Notes:
+
+- iOS: open `ios/Runner.xcworkspace` in Xcode to adjust signing & provisioning if you run on a real device.
+- Android: enable USB debugging on a physical device or launch an AVD emulator before `flutter run`.
 
 ## Project structure
 
