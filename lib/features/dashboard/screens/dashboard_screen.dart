@@ -5,6 +5,7 @@ import 'package:bytebank/core/models/nav_model.dart';
 import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
 import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
 import 'package:bytebank/features/transactions/screens/create_transaction_screen.dart';
+import 'package:bytebank/core/widgets/animated_tab_switcher.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -219,7 +220,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: AppColors.surfaceDefault,
       extendBody: true,
       appBar: selectedTab == 0 ? const MainAppBar() : null,
-      body: IndexedStack(index: selectedTab, children: tabBodies),
+      body: AnimatedTabSwitcher(
+        selectedIndex: selectedTab,
+        children: tabBodies,
+        duration: const Duration(milliseconds: 300),
+      ),
       bottomNavigationBar: NavBar(
         pageIndex: selectedTab,
         onTap: (index) {

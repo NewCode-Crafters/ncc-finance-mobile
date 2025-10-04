@@ -85,46 +85,68 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
           children: [
             Expanded(
               flex: 3,
-              child: PieChart(
-                PieChartData(
-                  sections: List.generate(chartData.length, (index) {
-                    final entry = chartData[index];
-                    return PieChartSectionData(
-                      color: colors[index % colors.length],
-                      value: entry.value,
-                      title: '', // We use the legend instead
-                      radius: 30,
-                      showTitle: false,
-                    );
-                  }),
-                  sectionsSpace: 1,
-                  centerSpaceRadius: 50,
-                ),
+              child: TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 1200),
+                tween: Tween<double>(begin: 0.0, end: 1.0),
+                curve: Curves.elasticOut,
+                builder: (context, animationValue, child) {
+                  return PieChart(
+                    PieChartData(
+                      sections: List.generate(chartData.length, (index) {
+                        final entry = chartData[index];
+                        return PieChartSectionData(
+                          color: colors[index % colors.length],
+                          value: entry.value * animationValue,
+                          title: '', // We use the legend instead
+                          radius: 30 * animationValue,
+                          showTitle: false,
+                        );
+                      }),
+                      sectionsSpace: 1,
+                      centerSpaceRadius: 50 * animationValue,
+                    ),
+                  );
+                },
               ),
             ),
             Expanded(
               flex: 3,
-              child: ListView.builder(
-                itemCount: chartData.length,
-                itemBuilder: (context, index) {
+              child: AnimatedList(
+                initialItemCount: chartData.length,
+                itemBuilder: (context, index, animation) {
+                  if (index >= chartData.length) return const SizedBox.shrink();
+                  
                   final entry = chartData[index];
                   final label = context
                       .read<TransactionNotifier>()
                       .getCategoryLabel(entry.key);
                   final iconData = getIconForCategory(entry.key);
-                  return ListTile(
-                    leading: Icon(iconData, color: colors[index % colors.length]),
-                    title: Text(
-                      label,
-                      textHeightBehavior: TextHeightBehavior(
-                        applyHeightToFirstAscent: false,
+                  
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(1.0, 0.0),
+                      end: Offset.zero,
+                    ).animate(CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeOutQuart,
+                    )),
+                    child: FadeTransition(
+                      opacity: animation,
+                      child: ListTile(
+                        leading: Icon(iconData, color: colors[index % colors.length]),
+                        title: Text(
+                          label,
+                          textHeightBehavior: TextHeightBehavior(
+                            applyHeightToFirstAscent: false,
+                          ),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 0.0,
+                        ),
+                        minVerticalPadding: 0.0,
                       ),
                     ),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 0.0,
-                    ),
-                    minVerticalPadding: 0.0,
                   );
                 },
               ),

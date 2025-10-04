@@ -158,20 +158,27 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           children: [
             Expanded(
               flex: 3,
-              child: PieChart(
-                PieChartData(
-                  sections: List.generate(chartData.length, (index) {
-                    final entry = chartData[index];
-                    return PieChartSectionData(
-                      color: colors[index % colors.length],
-                      value: entry.value,
-                      title: '', // We use the legend instead
-                      radius: 30,
-                    );
-                  }),
-                  sectionsSpace: 2,
-                  centerSpaceRadius: 50,
-                ),
+              child: TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 1200),
+                tween: Tween<double>(begin: 0.0, end: 1.0),
+                curve: Curves.elasticOut,
+                builder: (context, animationValue, child) {
+                  return PieChart(
+                    PieChartData(
+                      sections: List.generate(chartData.length, (index) {
+                        final entry = chartData[index];
+                        return PieChartSectionData(
+                          color: colors[index % colors.length],
+                          value: entry.value * animationValue,
+                          title: '', // We use the legend instead
+                          radius: 30 * animationValue,
+                        );
+                      }),
+                      sectionsSpace: 2,
+                      centerSpaceRadius: 50 * animationValue,
+                    ),
+                  );
+                },
               ),
             ),
             Expanded(
