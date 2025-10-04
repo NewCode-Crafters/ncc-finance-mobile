@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
 import 'package:bytebank/features/investments/widgets/investment_list_item.dart';
+import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:provider/provider.dart';
 
 class InvestmentsScreen extends StatefulWidget {
@@ -47,9 +48,13 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     return await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirmar Exclusão'),
+        title: const Text('Confirmar Resgate'),
         content: const Text(
-          'Deseja realmente resgatar este investimento? A ação criará uma transação de entrada no seu saldo.',
+          'Deseja realmente resgatar este investimento?\n\n'
+          '• O investimento será removido da sua carteira\n'
+          '• Uma transação de resgate será criada\n'
+          '• O valor será creditado no seu saldo\n'
+          '• Esta ação não pode ser desfeita',
         ),
         actions: [
           TextButton(
@@ -62,7 +67,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: const Text(
-              'Confirmar',
+              'Resgatar',
               style: TextStyle(color: AppColors.brandSecondary),
             ),
           ),
@@ -76,12 +81,34 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
       final userId = FirebaseAuth.instance.currentUser!.uid;
       final investmentNotifier = context.read<InvestmentNotifier>();
       final balanceNotifier = context.read<BalanceNotifier>();
+      final transactionNotifier = context.read<TransactionNotifier>();
 
-      await investmentNotifier.deleteInvestment(
-        userId: userId,
-        investmentId: investmentId,
-      );
-      await balanceNotifier.fetchBalances(userId: userId);
+      try {
+        await investmentNotifier.deleteInvestment(
+          userId: userId,
+          investmentId: investmentId,
+        );
+        await balanceNotifier.fetchBalances(userId: userId);
+        await transactionNotifier.fetchTransactions(userId);
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Investimento resgatado com sucesso!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Erro ao resgatar investimento. Tente novamente.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 

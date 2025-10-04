@@ -21,7 +21,7 @@ IconData getIconForCategory(String categoryId) {
     case 'INVESTMENT':
       return Icons.bar_chart;
     case 'INVESTMENT_REDEMPTION':
-      return Icons.trending_up;
+      return Icons.account_balance_wallet;
     default:
       return Icons.category;
   }
