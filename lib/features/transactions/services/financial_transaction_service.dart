@@ -14,6 +14,7 @@ class FinancialTransactionService {
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
        _balanceService = balanceService ?? BalanceService();
 
+
   Future<DocumentReference> createTransaction({
     required String userId,
     required Map<String, dynamic> data,
@@ -91,9 +92,6 @@ class FinancialTransactionService {
       }
 
       final snapshot = await query.get();
-      if (snapshot.docs.isEmpty) {
-        throw TransactionException('Nenhuma transação encontrada ou sem conexão.');
-      }
       return snapshot.docs
           .map((doc) => FinancialTransaction.fromFirestore(doc))
           .toList();
@@ -159,9 +157,6 @@ class FinancialTransactionService {
       query = query.limit(limit);
       
       final snapshot = await query.get();
-      if (snapshot.docs.isEmpty) {
-        throw TransactionException('Nenhuma transação encontrada ou sem conexão.');
-      }
       return snapshot;
     } catch (e) {
       throw TransactionException('Falha ao buscar transações paginadas.');

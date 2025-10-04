@@ -7,6 +7,7 @@ import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
 import 'package:bytebank/features/transactions/screens/create_transaction_screen.dart';
 import 'package:bytebank/core/widgets/animated_tab_switcher.dart';
 import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
+import 'package:bytebank/features/transactions/screens/view_transaction_screen.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -201,6 +202,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ).pushNamed(CreateInvestmentScreen.routeName);
                   },
                 ),
+                ActionCard(
+                  icon: Icons.receipt_long,
+                  label: 'Ver \nExtrato',
+                  onTap: () {
+                    Navigator.of(
+                      context,
+                    ).pushNamed(ViewTransactionScreen.routeName);
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 8),
@@ -226,7 +236,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         duration: const Duration(milliseconds: 300),
         children: tabBodies,
         onAnimationComplete: () {
-          context.read<ChartAnimationNotifier>().onTabAnimationComplete(selectedTab);
+          context.read<ChartAnimationNotifier>().onTabAnimationComplete(
+            selectedTab,
+          );
         },
       ),
       bottomNavigationBar: NavBar(
