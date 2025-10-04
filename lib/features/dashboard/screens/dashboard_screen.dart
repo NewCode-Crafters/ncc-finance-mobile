@@ -201,7 +201,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   },
                 ),
                 ActionCard(
-                  icon: Icons.bar_chart,
+                  icon: Icons.receipt_long,
                   label: 'Ver \nExtrato',
                   onTap: () {
                     Navigator.of(
