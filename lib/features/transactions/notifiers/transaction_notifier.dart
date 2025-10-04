@@ -90,22 +90,27 @@ class TransactionNotifier extends ChangeNotifier {
 
   List<FinancialTransaction> get visibleTransactions {
     final query = _state.searchText.trim().toLowerCase();
-    if (query.isEmpty) return _state.transactions;
-
-    final querysemfiltro = _state.searchText.toLowerCase();
-
-    if (querysemfiltro.isEmpty) {
-      return _state.transactions;
+    List<FinancialTransaction> filtered;
+    
+    if (query.isEmpty) {
+      filtered = _state.transactions;
+    } else {
+      filtered = _state.allTransactions.where((t) {
+        final descriptionMatch =
+            t.description?.toLowerCase().contains(query) ?? false;
+        final categoryMatch = getCategoryLabel(
+          t.category,
+        ).toLowerCase().contains(query);
+        return descriptionMatch || categoryMatch;
+      }).toList();
     }
 
-    return _state.allTransactions.where((t) {
-      final descriptionMatch =
-          t.description?.toLowerCase().contains(querysemfiltro) ?? false;
-      final categoryMatch = getCategoryLabel(
-        t.category,
-      ).toLowerCase().contains(querysemfiltro);
-      return descriptionMatch || categoryMatch;
-    }).toList();
+    // Retorna apenas os itens que devem ser exibidos (lazy loading)
+    final maxItems = _state.displayedItemsCount;
+    if (filtered.length > maxItems) {
+      return filtered.take(maxItems).toList();
+    }
+    return filtered;
   }
 
   List<TransactionCategory> _filterAndSort(String type) {
@@ -249,7 +254,9 @@ class TransactionNotifier extends ChangeNotifier {
       for (final transaction in allTransactions) {
         if (transaction.category == 'INVESTMENT' ||
             transaction.category == 'INVESTMENT_REDEMPTION' ||
-            transaction.amount > 0) continue;
+            transaction.amount > 0) {
+          continue;
+        }
         chartData[transaction.category] =
             (chartData[transaction.category] ?? 0) + transaction.amount.abs();
       }
@@ -331,7 +338,7 @@ class TransactionNotifier extends ChangeNotifier {
     final newCount = currentCount + 3; // Carregar mais 3 itens
     final totalItems = _state.searchText.isEmpty 
         ? _state.transactions.length 
-        : _state.transactions.where((t) {
+        : _state.allTransactions.where((t) {
             final descriptionMatch = t.description?.toLowerCase().contains(_state.searchText.toLowerCase()) ?? false;
             final categoryMatch = getCategoryLabel(t.category).toLowerCase().contains(_state.searchText.toLowerCase());
             return descriptionMatch || categoryMatch;
