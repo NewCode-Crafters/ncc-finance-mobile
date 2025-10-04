@@ -5,6 +5,7 @@ import 'package:bytebank/core/models/nav_model.dart';
 import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
 import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
 import 'package:bytebank/features/transactions/screens/create_transaction_screen.dart';
+import 'package:bytebank/features/transactions/screens/view_transaction_screen.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -197,6 +198,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Navigator.of(
                       context,
                     ).pushNamed(CreateInvestmentScreen.routeName);
+                  },
+                ),
+                ActionCard(
+                  icon: Icons.bar_chart,
+                  label: 'Ver \nExtrato',
+                  onTap: () {
+                    Navigator.of(
+                      context,
+                    ).pushNamed(ViewTransactionScreen.routeName);
                   },
                 ),
               ],

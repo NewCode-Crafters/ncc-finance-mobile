@@ -1,32 +1,31 @@
-import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:bytebank/features/transactions/screens/edit_transaction_screen.dart';
 import 'package:bytebank/features/transactions/widgets/transaction_list_item.dart';
-import 'package:provider/provider.dart';
 import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
+import 'package:bytebank/theme/theme.dart';
 
-class TransactionsScreen extends StatefulWidget {
-  static const String routeName = '/transactions';
-  const TransactionsScreen({super.key});
+
+class ViewTransactionScreen extends StatefulWidget {
+  static const String routeName = '/view-transaction';
+  const ViewTransactionScreen({super.key});
 
   @override
-  State<TransactionsScreen> createState() => _TransactionsScreenState();
+  State<ViewTransactionScreen> createState() => _ViewTransactionScreenState();
 }
 
-class _TransactionsScreenState extends State<TransactionsScreen> {
+class _ViewTransactionScreenState extends State<ViewTransactionScreen> {
   final _searchController = TextEditingController();
   Timer? _searchDebounce;
-  late final TransactionNotifier _transactionNotifier;
   late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
 
-    _transactionNotifier = context.read<TransactionNotifier>();
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
 
@@ -56,9 +55,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   @override
   void dispose() {
-  _searchDebounce?.cancel();
-  _searchController.dispose();
-    _transactionNotifier.resetFilters();
+    _searchDebounce?.cancel();
+    _searchController.dispose();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
@@ -75,9 +73,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     if (!_scrollController.hasClients) return;
     try {
       final notifier = context.read<TransactionNotifier>();
-  if (notifier.isFetchingMore) return;
-  if (!notifier.hasMore) return;
-  final pos = _scrollController.position;
+      if (notifier.isFetchingMore) return;
+      if (!notifier.hasMore) return;
+      final pos = _scrollController.position;
       if (pos.atEdge && pos.pixels != 0) {
         final userId = FirebaseAuth.instance.currentUser?.uid;
         if (userId != null) Future.microtask(() => notifier.fetchNextPage(userId));
@@ -137,6 +135,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     final int total = transactions.length;
 
     return Scaffold(
+      appBar: AppBar(title: const Text('Extrato')),
+      backgroundColor: AppColors.surfaceDefault,
       body: RefreshIndicator(
         onRefresh: _fetchData,
         child: state.isLoading
@@ -354,4 +354,3 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     );
   }
 }
-

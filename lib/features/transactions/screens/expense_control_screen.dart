@@ -51,8 +51,6 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
                 children: [
                   _buildChart(transactionState),
                   transactionState.chartData.isEmpty ? Container() : const SizedBox(height: 24),
-                  // _buildSummaryCards(transactionState),
-                  // const SizedBox(height: 24),
                   _buildTransactionList(transactionState),
                 ],
               ),

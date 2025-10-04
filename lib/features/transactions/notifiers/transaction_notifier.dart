@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:bytebank/theme/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ class TransactionState {
   final String searchText;
   final DateTime startDate;
   final DateTime endDate;
+  final bool filteredDate;
   final Map<String, double> chartData;
 
   TransactionState({
@@ -26,6 +29,7 @@ class TransactionState {
     this.successMessage,
     DateTime? startDate, // Make nullable for default
     DateTime? endDate,
+    this.filteredDate = false,
     this.searchText = '',
     this.chartData = const {},
   }) : startDate = startDate ?? DateTime.now().subtract(const Duration(days: 30)),
@@ -41,6 +45,7 @@ class TransactionState {
     String? searchText,
     DateTime? startDate,
     DateTime? endDate,
+    bool? filteredDate,
     Map<String, double>? chartData,
   }) {
     return TransactionState(
@@ -53,6 +58,7 @@ class TransactionState {
       searchText: searchText ?? this.searchText,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
+      filteredDate: filteredDate ?? this.filteredDate,
       chartData: chartData ?? this.chartData,
     );
   }
@@ -116,6 +122,38 @@ class TransactionNotifier extends ChangeNotifier {
   Future<void> fetchTransactions(String userId) async {
     // initial load (first page)
     await fetchFirstPage(userId);
+    await fetchAllTransactions(userId);
+  }
+
+  Future<void> fetchAllTransactions(String userId) async {
+    _state = _state.copyWith(isLoading: true);
+    notifyListeners();
+
+    final allTransactions = await _transactionService.getTransactions(
+      userId: userId,
+      startDate: DateTime.now().subtract(const Duration(days: 30)),
+      endDate: DateTime.now(),
+    );
+    // compute chartData across fetched page (you can aggregate across all loaded pages if desired)
+    final Map<String, double> chartData = {};
+    for (final transaction in allTransactions) {
+      if (transaction.category == 'INVESTMENT' ||
+          transaction.category == 'INVESTMENT_REDEMPTION' ||
+          transaction.amount > 0) {
+        continue;
+      }
+      chartData[transaction.category] =
+          (chartData[transaction.category] ?? 0) + transaction.amount.abs();
+    }
+
+    _state = _state.copyWith(
+      allTransactions: allTransactions,
+      isLoading: false,
+      chartData: chartData,
+    );
+    notifyListeners();
+
+
   }
 
   Future<void> fetchFirstPage(String userId) async {
@@ -133,11 +171,6 @@ class TransactionNotifier extends ChangeNotifier {
         limit: _pageSize,
       );
 
-      final allTransactions = await _transactionService.getTransactions(
-        userId: userId,
-        startDate: _state.startDate,
-        endDate: _state.endDate,
-      );
 
       final categories = _state.categories.isEmpty
           ? await _metadataService.getTransactionCategories()
@@ -156,24 +189,12 @@ class TransactionNotifier extends ChangeNotifier {
         _hasMore = _lastDocument != null;
       }
 
-      // compute chartData across fetched page (you can aggregate across all loaded pages if desired)
-      final Map<String, double> chartData = {};
-      for (final transaction in allTransactions) {
-        if (transaction.category == 'INVESTMENT' ||
-            transaction.category == 'INVESTMENT_REDEMPTION' ||
-            transaction.amount > 0) {
-          continue;
-        }
-        chartData[transaction.category] =
-            (chartData[transaction.category] ?? 0) + transaction.amount.abs();
-      }
+      
 
       _state = _state.copyWith(
-        allTransactions: allTransactions,
         transactions: transactions,
         categories: categories,
         isLoading: false,
-        chartData: chartData,
       );
     } catch (e) {
       _state = _state.copyWith(isLoading: false, error: e.toString());
@@ -206,13 +227,6 @@ class TransactionNotifier extends ChangeNotifier {
         limit: _pageSize,
       );
 
-      final allTransactions = await _transactionService.getTransactions(
-        userId: userId,
-        startDate: _state.startDate,
-        endDate: _state.endDate,
-      );
-
-
       final more = snapshot.docs
           .map((doc) => FinancialTransaction.fromFirestore(doc))
           .toList();
@@ -230,20 +244,9 @@ class TransactionNotifier extends ChangeNotifier {
       final updated = List<FinancialTransaction>.from(_state.transactions)
         ..addAll(more);
 
-      // recompute chartData across all loaded transactions
-      final Map<String, double> chartData = {};
-      for (final transaction in allTransactions) {
-        if (transaction.category == 'INVESTMENT' ||
-            transaction.category == 'INVESTMENT_REDEMPTION' ||
-            transaction.amount > 0) continue;
-        chartData[transaction.category] =
-            (chartData[transaction.category] ?? 0) + transaction.amount.abs();
-      }
-
+  
       _state = _state.copyWith(
-        allTransactions: allTransactions,
         transactions: updated,
-        chartData: chartData,
       );
     } catch (e) {
       _state = _state.copyWith(error: e.toString());
@@ -323,6 +326,7 @@ class TransactionNotifier extends ChangeNotifier {
       _state = _state.copyWith(
         startDate: newRange.start,
         endDate: newRange.end,
+        filteredDate: true,
       );
       await fetchTransactions(userId);
     }
