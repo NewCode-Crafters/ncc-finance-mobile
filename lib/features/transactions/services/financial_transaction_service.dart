@@ -12,10 +12,7 @@ class FinancialTransactionService {
     FirebaseFirestore? firestore,
     BalanceService? balanceService,
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
-       _balanceService = balanceService ?? BalanceService() {
-    // Desabilita o cache local do Firestore para forçar erro de conexão offline
-    _firestore.settings = const Settings(persistenceEnabled: false);
-  }
+       _balanceService = balanceService ?? BalanceService();
 
 
   Future<DocumentReference> createTransaction({
