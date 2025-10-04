@@ -81,23 +81,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // Tab 0: Dashboard principal
       RefreshIndicator(
         onRefresh: _refreshData,
-        child: Column(
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
           children: [
-            // Header fixo (não rola)
-            Container(
-              color: AppColors.surfaceDefault,
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Bem-vindo de volta', style: titleMediumNeutral),
-                  Text(
-                    profileState.userProfile?.name ?? 'Usuário',
-                    style: headlineMedium,
-                  ),
-                  Text(dateFormatter.format(DateTime.now()), style: bodySmall),
-                  const SizedBox(height: 6),
-                  Card(
+            Text('Bem-vindo de volta', style: titleMediumNeutral),
+            Text(
+              profileState.userProfile?.name ?? 'Usuário',
+              style: headlineMedium,
+            ),
+            Text(dateFormatter.format(DateTime.now()), style: bodySmall),
+            const SizedBox(height: 6),
+            Card(
               elevation: 1,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -168,7 +162,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                               ),
                             ),
-
                           const SizedBox(width: 12),
                           SizedBox(
                             width: 96,
@@ -184,39 +177,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-                  const SizedBox(height: 6),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ActionCard(
-                        icon: Icons.swap_horiz,
-                        label: 'Fazer uma\ntransação',
-                        onTap: () {
-                          Navigator.of(
-                            context,
-                          ).pushNamed(CreateTransactionScreen.routeName);
-                        },
-                      ),
-                      ActionCard(
-                        icon: Icons.bar_chart,
-                        label: 'Fazer um\ninvestimento',
-                        onTap: () {
-                          Navigator.of(
-                            context,
-                          ).pushNamed(CreateInvestmentScreen.routeName);
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ActionCard(
+                  icon: Icons.swap_horiz,
+                  label: 'Fazer uma\ntransação',
+                  onTap: () {
+                    Navigator.of(
+                      context,
+                    ).pushNamed(CreateTransactionScreen.routeName);
+                  },
+                ),
+                ActionCard(
+                  icon: Icons.bar_chart,
+                  label: 'Fazer um\ninvestimento',
+                  onTap: () {
+                    Navigator.of(
+                      context,
+                    ).pushNamed(CreateInvestmentScreen.routeName);
+                  },
+                ),
+              ],
             ),
-            // Área de transações que rola
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: TransactionsScreen(),
-              ),
+            const SizedBox(height: 8),
+            // Seção de transações com altura limitada
+            SizedBox(
+              height: 400, // Altura fixa para a lista de transações
+              child: TransactionsScreen(),
             ),
           ],
         ),
