@@ -86,6 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       RefreshIndicator(
         onRefresh: _refreshData,
         child: ListView(
+          physics: const ClampingScrollPhysics(), // Impede o "bounce" que causa o scroll excessivo
           padding: const EdgeInsets.all(16.0),
           children: [
             Text('Bem-vindo de volta', style: titleMediumNeutral),
