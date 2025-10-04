@@ -1,3 +1,4 @@
+import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/features/transactions/models/financial_transaction.dart';
@@ -51,14 +52,8 @@ class TransactionListItem extends StatelessWidget {
             final message = transaction.category == 'INVESTMENT_REDEMPTION'
                 ? 'Transações de resgate de investimento não podem ser editadas ou excluídas.'
                 : 'Transações de investimento são somente para visualização.';
-            
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(message),
-                duration: const Duration(seconds: 3),
-                backgroundColor: AppColors.brandSecondary,
-              ),
-            );
+
+            showAppSnackBar(context, message, AppMessageType.info);
           } else {
             showModalBottomSheet(
               context: context,
@@ -93,10 +88,7 @@ class TransactionListItem extends StatelessWidget {
           title: Row(
             children: [
               Expanded(
-                child: Text(
-                  categoryLabel,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                child: Text(categoryLabel, overflow: TextOverflow.ellipsis),
               ),
               if (isReadOnly) ...[
                 const SizedBox(width: 4),
