@@ -226,7 +226,7 @@ void main() {
 
       expect(captured.first['amount'], 5000.0);
       expect(captured.first['category'], 'INVESTMENT_REDEMPTION');
-      expect(captured.first['description'], 'Redemption of Old Investment');
+      expect(captured.first['description'], 'Resgate de Old Investment');
     },
   );
 }
