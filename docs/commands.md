@@ -92,11 +92,3 @@ _Docs_
 ```sh
 keytool -list -v -keystore android/sorterncc.keystore -alias sorterncc
 ```
-
-# Quest List Temp
-
-## Phase 2: Advanced Features
-
-◻️ 8. Upload a Receipt to Storage & Link to Transaction
-◻️ 9. Filter Transactions by Date and Category
-◻️ 10. Paginate Transactions for Infinite Scroll
