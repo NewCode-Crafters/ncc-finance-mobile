@@ -145,7 +145,7 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
           children: [
             const SizedBox(height: 32),
             DropdownButtonFormField<String>(
-              value: _selectedType,
+              initialValue: _selectedType,
               hint: const Text(
                 'Selecione o tipo de investimento',
                 style: TextStyle(color: AppColors.textSubtle),

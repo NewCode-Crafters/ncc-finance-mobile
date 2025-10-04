@@ -5,8 +5,8 @@ import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:bytebank/features/transactions/screens/edit_transaction_screen.dart';
 import 'package:bytebank/features/transactions/widgets/transaction_list_item.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 class TransactionsScreen extends StatefulWidget {
   static const String routeName = '/transactions';
@@ -18,27 +18,49 @@ class TransactionsScreen extends StatefulWidget {
 
 class _TransactionsScreenState extends State<TransactionsScreen> {
   final _searchController = TextEditingController();
+  Timer? _searchDebounce;
   late final TransactionNotifier _transactionNotifier;
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
 
     _transactionNotifier = context.read<TransactionNotifier>();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
 
     _searchController.addListener(() {
-      context.read<TransactionNotifier>().updateSearchText(
-        _searchController.text,
-      );
+      final text = _searchController.text;
+      // debounce search input
+      _searchDebounce?.cancel();
+      _searchDebounce = Timer(const Duration(milliseconds: 1500), () {
+        final notifier = context.read<TransactionNotifier>();
+        // avoid triggering a fetch if the search text didn't actually change
+        if (notifier.state.searchText == text) return;
+        notifier.updateSearchText(text);
+        final userId = FirebaseAuth.instance.currentUser?.uid;
+        if (userId != null) Future.microtask(() => notifier.fetchFirstPage(userId));
+        if (_scrollController.hasClients) {
+          try {
+            _scrollController.jumpTo(0);
+          } catch (_) {}
+        }
+      });
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) => _fetchData());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.microtask(() => _fetchData());
+    });
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+  _searchDebounce?.cancel();
+  _searchController.dispose();
     _transactionNotifier.resetFilters();
-
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -46,7 +68,27 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
       await context.read<TransactionNotifier>().fetchTransactions(userId);
+      final total = context.read<TransactionNotifier>().visibleTransactions.length;
     }
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    try {
+      final notifier = context.read<TransactionNotifier>();
+  if (notifier.isFetchingMore) return;
+  if (!notifier.hasMore) return;
+  final pos = _scrollController.position;
+      if (pos.atEdge && pos.pixels != 0) {
+        final userId = FirebaseAuth.instance.currentUser?.uid;
+        if (userId != null) Future.microtask(() => notifier.fetchNextPage(userId));
+        return;
+      }
+      if (pos.extentAfter < 300) {
+        final userId = FirebaseAuth.instance.currentUser?.uid;
+        if (userId != null) Future.microtask(() => notifier.fetchNextPage(userId));
+      }
+    } catch (_) {}
   }
 
   Future<void> _showDeleteConfirmation(
@@ -92,116 +134,131 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     final state = notifier.state;
     final userId = FirebaseAuth.instance.currentUser!.uid;
 
+    final transactions = notifier.visibleTransactions;
+    final int total = transactions.length;
+
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _fetchData,
         child: state.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : notifier.state.transactions.isEmpty
-            ? const Center(
-                child: Column(
-                  //mainAxisAlignment: MainAxisAlignment.center,
+            ? const Center(child: CircularProgressIndicator())
+            : notifier.state.transactions.isEmpty && _searchController.text.isEmpty
+                ? const Center(
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.receipt_long,
+                          size: 80,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Você não possui transações.',
+                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                        ),
+                        Text(
+                          'Suas transações e investimentos aparecem aqui.',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  )
+                : Column(
                     children: [
-                      Icon(
-                        Icons.receipt_long,
-                        size: 80,
-                        color: Colors.grey,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  flex: 4,
+                                  child: TextField(
+                                    controller: _searchController,
+                                    cursorColor: AppColors.textSubtle,
+                                    decoration: const InputDecoration(
+                                      hintText: 'Pesquise uma transação',
+                                      prefixIcon: Icon(Icons.search),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                                        borderSide: BorderSide(
+                                          color: AppColors.lightGreenColor,
+                                          width: 2.0,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: AppColors.lightGreenColor,
+                                          width: 2.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded (
+                                  flex: 1,
+                                  child: IconButton (
+                                    icon: const Icon(
+                                      Icons.calendar_today, 
+                                      size: 30, 
+                                      color: AppColors.lightGreenColor,
+                                    ),
+                                    onPressed: () =>
+                                      notifier.updateDateRange(context, userId),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Você não possui transações.',
-                        style: TextStyle(fontSize: 18, color: Colors.grey),
-                      ),
-                      Text(
-                        'Suas transações e investimentos aparecem aqui.',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                )
-              : 
-        Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
                       Expanded(
-                        flex: 4,
-                        child: TextField(
-                          controller: _searchController,
-                          cursorColor: AppColors.textSubtle,
-                          decoration: const InputDecoration(
-                            hintText: 'Pesquise uma transação',
-                            prefixIcon: Icon(Icons.search),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                              borderSide: BorderSide(
-                                color: AppColors.lightGreenColor, // Set your desired border color for the enabled state
-                                width: 2.0,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: AppColors.lightGreenColor, // Set your desired border color for the focused state
-                                width: 2.0,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded (
-                        flex: 1,
-                        child: IconButton (
-                          icon: const Icon(
-                            Icons.calendar_today, 
-                            size: 30, 
-                            color: AppColors.lightGreenColor,
-                          ),
-                          onPressed: () =>
-                            notifier.updateDateRange(context, userId),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                      itemCount: notifier.visibleTransactions.length,
-                      itemBuilder: (context, index) {
-                        final transaction = notifier.visibleTransactions[index];
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: total + ((notifier.isFetchingMore && notifier.hasMore) ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index >= total) {
+                              // show footer loader only when there are more pages
+                              if (notifier.isFetchingMore && notifier.hasMore) {
+                                return const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                                  child: Center(child: CircularProgressIndicator()),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            }
 
-                        final bool isInvestmentTransaction =
-                            transaction.category == 'INVESTMENT' ||
-                            transaction.category == 'INVESTMENT_REDEMPTION';
+                            if (index == total - 1 && !notifier.isFetchingMore && notifier.hasMore) {
+                              Future.microtask(() => notifier.fetchNextPage(userId));
+                            }
 
-                        return TransactionListItem(
-                          transaction: transaction,
-                          categoryLabel: notifier.getCategoryLabel(
-                            transaction.category,
-                          ),
-                          onDelete: () =>
-                              _showDeleteConfirmation(context, transaction.id),
-                          onEdit: () {
-                            Navigator.of(context).pushNamed(
-                              EditTransactionScreen.routeName,
-                              arguments: transaction,
+                            final transaction = transactions[index];
+                            final bool isInvestmentTransaction =
+                                transaction.category == 'INVESTMENT' ||
+                                transaction.category == 'INVESTMENT_REDEMPTION';
+
+                            return TransactionListItem(
+                              transaction: transaction,
+                              categoryLabel: notifier.getCategoryLabel(
+                                transaction.category,
+                              ),
+                              onDelete: () => _showDeleteConfirmation(context, transaction.id),
+                              onEdit: () {
+                                Navigator.of(context).pushNamed(
+                                  EditTransactionScreen.routeName,
+                                  arguments: transaction,
+                                );
+                              },
+                              isReadOnly: isInvestmentTransaction,
                             );
                           },
-                          isReadOnly: isInvestmentTransaction,
-                        );
-                      },
-                    ),
-
-            ),
-          ],
-        ),
+                        ),
+                      ),
+                    ],
+                  ),
       ),
     );
   }
 }
+
