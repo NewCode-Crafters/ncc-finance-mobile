@@ -1,3 +1,4 @@
+import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/custom_text_field.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
@@ -53,8 +54,10 @@ class _UpdateAccountScreenState extends State<UpdateAccountScreen> {
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
+        showAppSnackBar(
+          context,
+          'Perfil atualizado com sucesso!',
+          AppMessageType.success,
         );
         Navigator.of(context).pop();
       }
