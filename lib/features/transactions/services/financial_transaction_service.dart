@@ -91,7 +91,9 @@ class FinancialTransactionService {
       }
 
       final snapshot = await query.get();
-
+      if (snapshot.docs.isEmpty) {
+        throw TransactionException('Nenhuma transação encontrada ou sem conexão.');
+      }
       return snapshot.docs
           .map((doc) => FinancialTransaction.fromFirestore(doc))
           .toList();
@@ -155,7 +157,11 @@ class FinancialTransactionService {
 
       if (startAfterDoc != null) query = query.startAfterDocument(startAfterDoc);
       query = query.limit(limit);
+      
       final snapshot = await query.get();
+      if (snapshot.docs.isEmpty) {
+        throw TransactionException('Nenhuma transação encontrada ou sem conexão.');
+      }
       return snapshot;
     } catch (e) {
       throw TransactionException('Falha ao buscar transações paginadas.');
