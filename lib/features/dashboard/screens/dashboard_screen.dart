@@ -98,74 +98,92 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Text(dateFormatter.format(DateTime.now()), style: bodySmall),
                   const SizedBox(height: 6),
                   Card(
-                    elevation: 1,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: AppColors.cardSaldoGradient,
-                        borderRadius: BorderRadius.circular(12),
+              elevation: 1,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: AppColors.cardSaldoGradient,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text('Saldo', style: titleMediumNeutral),
+                          IconButton(
+                            icon: Icon(
+                              _isBalanceVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isBalanceVisible = !_isBalanceVisible;
+                              });
+                            },
+                            style: IconButton.styleFrom(
+                              foregroundColor: AppColors.darkPurpleColor,
+                            ),
+                          ),
+                        ],
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text('Saldo', style: titleMediumNeutral),
-                                IconButton(
-                                  icon: Icon(
-                                    _isBalanceVisible
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _isBalanceVisible = !_isBalanceVisible;
-                                    });
-                                  },
-                                  style: IconButton.styleFrom(
-                                    foregroundColor: AppColors.darkPurpleColor,
-                                  ),
+                      const Divider(
+                        color: AppColors.darkPurpleColor,
+                        thickness: 1,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          if (balanceState.isLoading)
+                            const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          else
+                            Expanded(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  _isBalanceVisible
+                                      ? currencyFormatter.format(
+                                          balanceState.totalBalance,
+                                        )
+                                      : 'R\$ **,**',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineLarge!
+                                      .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.neutral100,
+                                      ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ],
+                              ),
                             ),
-                            const Divider(
-                              color: AppColors.darkPurpleColor,
-                              thickness: 1,
+
+                          const SizedBox(width: 12),
+                          SizedBox(
+                            width: 96,
+                            child: Image.asset(
+                              AppAssets.card,
+                              fit: BoxFit.contain,
                             ),
-                            const SizedBox(height: 4),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                if (balanceState.isLoading)
-                                  const CircularProgressIndicator()
-                                else
-                                  Flexible(
-                                    child: Text(
-                                      _isBalanceVisible
-                                          ? currencyFormatter.format(
-                                              balanceState.totalBalance,
-                                            )
-                                          : 'R\$ **,**',
-                                      style: Theme.of(context).textTheme.headlineLarge!
-                                          .copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.neutral100,
-                                          ),
-                                    ),
-                                  ),
-                                const SizedBox(width: 8),
-                                Image(image: const AssetImage(AppAssets.card)),
-                              ],
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
+                ),
+              ),
+            ),
                   const SizedBox(height: 6),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
