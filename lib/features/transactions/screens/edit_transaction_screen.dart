@@ -116,7 +116,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             DropdownButtonFormField<String>(
-              initialValue: _selectedCategoryId,
+              value: _selectedCategoryId,
               hint: const Text('Selecione uma categoria'),
               decoration: const InputDecoration(
                 enabledBorder: OutlineInputBorder(

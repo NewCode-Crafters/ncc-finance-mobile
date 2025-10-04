@@ -43,11 +43,11 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
   }
 
   Future<void> _handleCreateInvestment() async {
-  final amountText = _amountController.text
-    .replaceAll('R\$ ', '')
-    .replaceAll('.', '')
-    .replaceAll(',', '.');
-  final amount = double.tryParse(amountText);
+    final amountText = _amountController.text
+        .replaceAll('R\$ ', '')
+        .replaceAll('.', '')
+        .replaceAll(',', '.');
+    final amount = double.tryParse(amountText);
 
     if (_selectedType == null || amount == null || amount <= 0) {
       showAppSnackBar(
@@ -145,7 +145,7 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
           children: [
             const SizedBox(height: 32),
             DropdownButtonFormField<String>(
-              initialValue: _selectedType,
+              value: _selectedType,
               hint: const Text(
                 'Selecione o tipo de investimento',
                 style: TextStyle(color: AppColors.textSubtle),
