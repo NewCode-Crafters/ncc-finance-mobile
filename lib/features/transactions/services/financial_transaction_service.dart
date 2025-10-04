@@ -51,7 +51,7 @@ class FinancialTransactionService {
         stackTrace: stackTrace,
         name: 'FinancialTransactionService',
       );
-      throw TransactionException('Failed to create transaction.');
+      throw TransactionException('Falha ao criar transação.');
     }
   }
 
@@ -91,12 +91,80 @@ class FinancialTransactionService {
       }
 
       final snapshot = await query.get();
-
+      if (snapshot.docs.isEmpty) {
+        throw TransactionException('Nenhuma transação encontrada ou sem conexão.');
+      }
       return snapshot.docs
           .map((doc) => FinancialTransaction.fromFirestore(doc))
           .toList();
     } catch (e) {
-      throw TransactionException('Failed to fetch transactions.');
+      throw TransactionException('Falha ao buscar transações.');
+    }
+  }
+
+  /// Paginated fetch: returns a QuerySnapshot for a page of transactions
+  /// - [startAfterDoc] can be provided to continue from the last fetched document
+  /// - [limit] controls page size
+  Future<QuerySnapshot> getTransactionsPage({
+    required String userId,
+    DateTime? startDate,
+    DateTime? endDate,
+    DocumentSnapshot? startAfterDoc,
+    required int limit,
+    String? searchText,
+  }) async {
+    try {
+      Query query;
+
+      if (searchText != null && searchText.trim().isNotEmpty) {
+        final trimmed = searchText.trim();
+        final end = '$trimmed\uf8ff';
+        query = _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('transactions')
+            .orderBy('description')
+            .where('description', isGreaterThanOrEqualTo: trimmed)
+            .where('description', isLessThanOrEqualTo: end);
+      } else {
+        query = _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('transactions')
+            .orderBy('date', descending: true);
+
+        if (startDate != null) {
+          query = query.where(
+            'date',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),
+          );
+        }
+        if (endDate != null) {
+          final inclusiveEndDate = DateTime(
+            endDate.year,
+            endDate.month,
+            endDate.day,
+            23,
+            59,
+            59,
+          );
+          query = query.where(
+            'date',
+            isLessThanOrEqualTo: Timestamp.fromDate(inclusiveEndDate),
+          );
+        }
+      }
+
+      if (startAfterDoc != null) query = query.startAfterDocument(startAfterDoc);
+      query = query.limit(limit);
+      
+      final snapshot = await query.get();
+      if (snapshot.docs.isEmpty) {
+        throw TransactionException('Nenhuma transação encontrada ou sem conexão.');
+      }
+      return snapshot;
+    } catch (e) {
+      throw TransactionException('Falha ao buscar transações paginadas.');
     }
   }
 
@@ -132,7 +200,7 @@ class FinancialTransactionService {
         await batch.commit();
       }
     } catch (e) {
-      throw TransactionException('Failed to delete transaction.');
+      throw TransactionException('Falha ao excluir transação.');
     }
   }
 
@@ -149,7 +217,7 @@ class FinancialTransactionService {
           .doc(transactionId)
           .update(updateData);
     } catch (e) {
-      throw TransactionException('Failed to update transaction.');
+      throw TransactionException('Falha ao atualizar transação.');
     }
   }
 }

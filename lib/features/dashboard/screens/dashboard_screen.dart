@@ -136,24 +136,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       const SizedBox(height: 8),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           if (balanceState.isLoading)
-                            const CircularProgressIndicator()
+                            const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
                           else
-                            Text(
-                              _isBalanceVisible
-                                  ? currencyFormatter.format(
-                                      balanceState.totalBalance,
-                                    )
-                                  : 'R\$ **,**',
-                              style: Theme.of(context).textTheme.headlineLarge!
-                                  .copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.neutral100,
-                                  ),
+                            Expanded(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  _isBalanceVisible
+                                      ? currencyFormatter.format(
+                                          balanceState.totalBalance,
+                                        )
+                                      : 'R\$ **,**',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineLarge!
+                                      .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.neutral100,
+                                      ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
                             ),
-                          Image(image: const AssetImage(AppAssets.card)),
+
+                          const SizedBox(width: 12),
+                          SizedBox(
+                            width: 96,
+                            child: Image.asset(
+                              AppAssets.card,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
                         ],
                       ),
                     ],
