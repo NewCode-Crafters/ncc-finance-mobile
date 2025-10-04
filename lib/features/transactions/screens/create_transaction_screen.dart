@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import 'dart:math' as math;
 import 'package:file_picker/file_picker.dart';
@@ -65,8 +66,22 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
           AppMessageType.warning,
         ),
       );
-
       return;
+    }
+
+    if (_selectedType == TransactionType.expense) {
+      final currentBalance = context.read<BalanceNotifier>().state.totalBalance;
+      final transactionAmount = _amountController.numberValue;
+
+      if (transactionAmount > currentBalance) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildAppSnackBar(
+            'Saldo insuficiente! Você tem R\$ ${NumberFormat.currency(locale: 'pt_BR', symbol: '').format(currentBalance)} disponível.',
+            AppMessageType.error,
+          ),
+        );
+        return;
+      }
     }
 
     setState(() {
