@@ -1,3 +1,4 @@
+import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -62,18 +63,22 @@ class _AuthGateState extends State<AuthGate> {
       // Schedule the SnackBar to be shown after the current build cycle.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ScaffoldMessenger.of(
+          showAppSnackBar(
             context,
-          ).showSnackBar(SnackBar(content: Text(errorMessage)));
+            errorMessage,
+            AppMessageType.error,
+          );
         }
       });
     } else if (successMessage != null) {
       _authNotifier.clearMessages();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ScaffoldMessenger.of(
+          showAppSnackBar(
             context,
-          ).showSnackBar(SnackBar(content: Text(successMessage)));
+            successMessage,
+            AppMessageType.success,
+          );
         }
       });
     }
@@ -84,9 +89,11 @@ class _AuthGateState extends State<AuthGate> {
     if (errorMessage != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ScaffoldMessenger.of(
+          showAppSnackBar(
             context,
-          ).showSnackBar(SnackBar(content: Text(errorMessage)));
+            errorMessage,
+            AppMessageType.error,
+          );
         }
       });
     }
@@ -99,8 +106,10 @@ class _AuthGateState extends State<AuthGate> {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+          showAppSnackBar(
+            context,
+            errorMessage,
+            AppMessageType.error,
           );
         }
       });
@@ -124,11 +133,10 @@ class _AuthGateState extends State<AuthGate> {
   void _showSnackBar(String message, {bool isError = false}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: isError ? Colors.red : Colors.green[600],
-          ),
+        showAppSnackBar(
+          context,
+          message,
+          isError ? AppMessageType.error : AppMessageType.success,
         );
       }
     });
@@ -156,8 +164,8 @@ class _AuthGateState extends State<AuthGate> {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
                 context.read<ProfileNotifier>().fetchUserProfile(
-                  userId: user.uid,
-                );
+                      userId: user.uid,
+                    );
                 context.read<BalanceNotifier>().fetchBalances(userId: user.uid);
               }
             });

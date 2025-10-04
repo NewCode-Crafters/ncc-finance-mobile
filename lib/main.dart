@@ -89,6 +89,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Bytebank',
         theme: appTheme,
         localizationsDelegates: [
