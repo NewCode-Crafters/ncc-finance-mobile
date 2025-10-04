@@ -1,4 +1,5 @@
 import 'package:bytebank/features/transactions/screens/expense_control_screen.dart';
+import 'package:bytebank/features/transactions/screens/view_transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
@@ -111,6 +112,7 @@ class MyApp extends StatelessWidget {
           CreateInvestmentScreen.routeName: (context) =>
               const CreateInvestmentScreen(),
           TransactionsScreen.routeName: (context) => const TransactionsScreen(),
+          ViewTransactionScreen.routeName: (context) => const ViewTransactionScreen(),
           CreateTransactionScreen.routeName: (context) =>
               const CreateTransactionScreen(),
           ExpenseControlScreen.routeName: (context) =>
