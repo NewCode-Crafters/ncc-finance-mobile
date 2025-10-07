@@ -31,7 +31,7 @@ A Flutter mobile application for personal finance management. Bytebank (package 
 Prefer to test the app directly on your device or emulator? We make it easy for evaluators and reviewers:
 
 - Latest APK: a ready-to-install Android APK is available under the repository folder `app-artifacts/`. Use that APK to quickly install the app on physical devices or emulators.
-- ⚠️ Sensitive config files: for convenience during evaluation the repo also includes the platform Firebase config files (`android/app/google-services.json` and `ios/Runner/GoogleService-Info.plist`). These are provided only to make local testing straightforward for evaluators. After the evaluation period finishes these keys/files will be invalidated, turned private and replaced with fresh credentials.
+- ⚠️ Sensitive config files: for convenience during evaluation the config files (`android/app/google-services.json` and `ios/Runner/GoogleService-Info.plist`) were sent together with the core code in the delivery system at FIAP Platform. These are provided only to make local testing straightforward for evaluators. After the evaluation period finishes these keys/files will be invalidated, turned private and replaced with fresh credentials.
 
 Quick install / run examples:
 
