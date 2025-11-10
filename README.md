@@ -102,7 +102,7 @@ These steps get the app running locally.
 
 Prerequisites
 
-- Flutter SDK (compatible with `sdk: ^3.8.1`). Install from https://docs.flutter.dev/get-started/install
+- Flutter SDK 3.35.7 or later (compatible with `sdk: ^3.35.7`). Install from https://docs.flutter.dev/get-started/install
 - Android Studio or Xcode for emulators/simulators
 - A Firebase project and platform config files (`google-services.json` for Android and `GoogleService-Info.plist` for iOS)
 
