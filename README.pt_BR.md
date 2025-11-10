@@ -139,15 +139,19 @@ flutter run -d <device-id>
 
 ## CI/CD
 
-O projeto usa **Codemagic** (https://codemagic.io) para integração e entrega contínua. Os pipelines validam PRs, constroem artefatos de homologação e geram builds de produção.
+O projeto usa **Codemagic** (https://codemagic.io) para integração e entrega contínua. Os pipelines estão definidos em `codemagic.yaml` para validar PRs, construir artefatos de homologação e gerar builds de produção.
+
+**Versão do Flutter:** Todos os workflows usam **Flutter 3.35.7** para garantir consistência entre builds, testes e flutter analyze.
 
 ### Visão geral dos pipelines
 
 | Workflow           | Gatilho                                                                  | Finalidade                                                                                                     |
 | ------------------ | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `DEV-WORKFLOW`     | Pull requests com prefixos `task/`, `fix/`, `enhancement/`              | Executa build/test para validar PRs antes da revisão.                                                          |
+| `DEV-WORKFLOW`     | Pull requests com prefixos `task/`, `fix/`, `enhancement/`              | Executa build/test para validar PRs antes da revisão. Roda `flutter analyze` e `flutter test` com Flutter 3.35.7. |
 | `HOMOLOG-WORKFLOW` | Pull requests da branch `dev`                                           | Gera artefatos (.apk) para QA/Homolog e distribui via Firebase App Distribution.                              |
-| `PROD-WORKFLOW`    | Pushes para `main` ou tags de release                                   | Cria builds de produção e inicia distribuição.                                                                |
+| `PROD-WORKFLOW`    | Pushes para `main` ou tags de release                                   | Cria builds de produção e inicia distribuição. Gera APK, AAB e IPA prontos para release.                      |
+
+Detalhes da configuração estão em `codemagic.yaml`. Para informações sobre upgrade e resolução de problemas, consulte `FLUTTER_UPGRADE_GUIDE.md`.
 
 ## Comandos disponíveis
 

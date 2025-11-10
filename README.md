@@ -144,15 +144,19 @@ flutter run -d <device-id>
 
 ## CI/CD
 
-The project uses Codemagic (https://codemagic.io) for CI/CD. Pipelines are defined to validate PRs, build homologation (staging) artifacts, and produce production builds for release.
+The project uses Codemagic (https://codemagic.io) for CI/CD. Pipelines are defined in `codemagic.yaml` to validate PRs, build homologation (staging) artifacts, and produce production builds for release.
+
+**Flutter Version:** All workflows use **Flutter 3.35.7** to ensure consistency across builds, tests, and flutter analyze.
 
 Pipeline overview
 
 | Workflow           | Trigger                                                                   | Purpose                                                                                                                                                        |
 | ------------------ | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DEV-WORKFLOW`     | Pull requests from branches with prefixes `task/`, `fix/`, `enhancement/` | Run build/test steps to validate PRs before review.                                                                                                            |
+| `DEV-WORKFLOW`     | Pull requests from branches with prefixes `task/`, `fix/`, `enhancement/` | Run build/test steps to validate PRs before review. Executes `flutter analyze` and `flutter test` with Flutter 3.35.7.                                        |
 | `HOMOLOG-WORKFLOW` | Pull requests from the `dev` branch                                       | Build staging artifacts for QA/Homolog. The workflow creates artifacts (like .apk ) and distributes in the Firebase App Distribution to the team test features |
-| `PROD-WORKFLOW`    | Pushes to `main` or release tags                                          | Build production artifacts and trigger distribution.                                                                                                           |
+| `PROD-WORKFLOW`    | Pushes to `main` or release tags                                          | Build production artifacts and trigger distribution. Creates release-ready APK, AAB, and IPA files.                                                            |
+
+Configuration details are in `codemagic.yaml`. For upgrade information and troubleshooting, see `FLUTTER_UPGRADE_GUIDE.md`.
 
 ## Available commands
 
