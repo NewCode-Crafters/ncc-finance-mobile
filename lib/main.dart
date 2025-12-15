@@ -21,7 +21,6 @@ import 'package:bytebank/features/authentication/screens/login_screen.dart';
 import 'package:bytebank/features/authentication/screens/register_screen.dart';
 import 'package:bytebank/features/authentication/screens/update_account_screen.dart';
 import 'package:bytebank/features/authentication/services/auth_service.dart';
-import 'package:bytebank/features/authentication/services/firebase_auth_service.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/dashboard/screens/dashboard_screen.dart';
 import 'package:bytebank/features/dashboard/services/balance_service.dart';
@@ -35,10 +34,12 @@ import 'package:bytebank/features/profile/services/profile_service.dart';
 import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.dart';
 import 'package:bytebank/firebase_options.dart';
 import 'package:bytebank/theme/theme.dart';
+import 'core/di/injection_container.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await initializeDependencies();
   await initializeDateFormatting('pt_BR', '');
 
   runApp(const MyApp());
@@ -49,49 +50,44 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // We wrap our app in a MultiProvider to make our services and notifiers
-    // available to the entire widget tree.
+    // We wrap our app in Provider wrappers, but the instances come from GetIt.
+    // Keep using Provider/ChangeNotifierProvider for widget bindings, but
+    // obtain the actual instances from the service locator `sl`.
     return MultiProvider(
       providers: [
         // --- Authentication ---
-        Provider<AuthService>(create: (_) => FirebaseAuthService()),
-        ChangeNotifierProvider<AuthNotifier>(
-          create: (context) => AuthNotifier(context.read<AuthService>()),
-        ),
+        Provider<AuthService>(create: (_) => sl<AuthService>()),
+        ChangeNotifierProvider<AuthNotifier>(create: (_) => sl<AuthNotifier>()),
         // --- Profile ---
-        Provider<ProfileService>(create: (_) => ProfileService()),
+        Provider<ProfileService>(create: (_) => sl<ProfileService>()),
         ChangeNotifierProvider<ProfileNotifier>(
-          create: (context) => ProfileNotifier(context.read<ProfileService>()),
+          create: (_) => sl<ProfileNotifier>(),
         ),
         // --- Balance ---
-        Provider<BalanceService>(create: (_) => BalanceService()),
+        Provider<BalanceService>(create: (_) => sl<BalanceService>()),
         ChangeNotifierProvider<BalanceNotifier>(
-          create: (context) => BalanceNotifier(context.read<BalanceService>()),
+          create: (_) => sl<BalanceNotifier>(),
         ),
         // --- Investments ---
-        Provider<InvestmentService>(create: (_) => InvestmentService()),
+        Provider<InvestmentService>(create: (_) => sl<InvestmentService>()),
         ChangeNotifierProvider<InvestmentNotifier>(
-          create: (context) =>
-              InvestmentNotifier(context.read<InvestmentService>()),
+          create: (_) => sl<InvestmentNotifier>(),
         ),
         // --- Transactions ---
-        Provider<MetadataService>(create: (_) => MetadataService()),
+        Provider<MetadataService>(create: (_) => sl<MetadataService>()),
         Provider<FinancialTransactionService>(
-          create: (_) => FinancialTransactionService(),
+          create: (_) => sl<FinancialTransactionService>(),
         ),
         // --- Chart Animation ---
         ChangeNotifierProvider<ChartAnimationNotifier>(
-          create: (_) => ChartAnimationNotifier(),
+          create: (_) => sl<ChartAnimationNotifier>(),
         ),
         ChangeNotifierProvider<TransactionNotifier>(
-          create: (context) => TransactionNotifier(
-            context.read<FinancialTransactionService>(),
-            context.read<MetadataService>(),
-          ),
+          create: (_) => sl<TransactionNotifier>(),
         ),
         // Local attachments selection for transaction creation
         ChangeNotifierProvider<TransactionAttachmentsNotifier>(
-          create: (_) => TransactionAttachmentsNotifier(),
+          create: (_) => sl<TransactionAttachmentsNotifier>(),
         ),
       ],
       child: MaterialApp(
