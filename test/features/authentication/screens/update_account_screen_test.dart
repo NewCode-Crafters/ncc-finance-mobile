@@ -51,7 +51,7 @@ void main() {
   ) async {
     await pumpUpdateAccountScreen(tester);
 
-    expect(find.byKey(const Key("update_account_name_field")), findsOneWidget);
+    expect(find.byKey(const Key('update_account_name_field')), findsOneWidget);
   });
 
   testWidgets('Update account screen should display an email text field', (
@@ -59,7 +59,7 @@ void main() {
   ) async {
     await pumpUpdateAccountScreen(tester);
 
-    expect(find.byKey(const Key("update_account_email_field")), findsOneWidget);
+    expect(find.byKey(const Key('update_account_email_field')), findsOneWidget);
   });
 
   testWidgets(
@@ -68,7 +68,7 @@ void main() {
       await pumpUpdateAccountScreen(tester);
 
       expect(
-        find.widgetWithText(PrimaryButton, "Salvar Alterações"),
+        find.widgetWithText(PrimaryButton, 'Salvar Alterações'),
         findsOneWidget,
       );
     },

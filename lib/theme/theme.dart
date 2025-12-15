@@ -53,7 +53,6 @@ class AppColors {
   static const chartYellow = Color(0xFFFFDF4D);
   static const chartOrange = Color(0xFFF29C4B);
   static const chartGrayGreen = Color(0xFFC5F09D);
-
 }
 
 class AppTypography {
@@ -105,7 +104,7 @@ class AppSpacing {
 ThemeData appTheme = ThemeData(
   fontFamily: AppTypography.fontBase,
   scaffoldBackgroundColor: AppColors.surfaceDefault,
-  textTheme: TextTheme(
+  textTheme: const TextTheme(
     bodyLarge: TextStyle(
       color: AppColors.neutral100,
       fontSize: AppTypography.fontSizeSM,
@@ -127,7 +126,7 @@ ThemeData appTheme = ThemeData(
     ),
     // Adicione outros estilos conforme necessário
   ),
-  colorScheme: ColorScheme(
+  colorScheme: const ColorScheme(
     primary: AppColors.brandPrimary,
     secondary: AppColors.brandSecondary,
     surface: AppColors.surfaceDefault,
@@ -141,7 +140,7 @@ ThemeData appTheme = ThemeData(
   buttonTheme: ButtonThemeData(
     buttonColor: AppColors.buttonTertiary,
     hoverColor: AppColors.buttonTertiaryHover,
-    colorScheme: ColorScheme(
+    colorScheme: const ColorScheme(
       brightness: Brightness.light,
       primary: AppColors.buttonPrimary,
       onPrimary: AppColors.buttonPrimary,
@@ -160,7 +159,7 @@ ThemeData appTheme = ThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: AppColors.buttonTertiary,
       foregroundColor: Colors.white,
-      textStyle: TextStyle(
+      textStyle: const TextStyle(
         fontSize: AppTypography.fontSizeSM,
         fontWeight: AppTypography.fontWeightSemiBold,
       ),
@@ -173,7 +172,7 @@ ThemeData appTheme = ThemeData(
       ),
     ),
   ),
-  appBarTheme: AppBarTheme(
+  appBarTheme: const AppBarTheme(
     backgroundColor: AppColors.surfaceDefault,
     elevation: 0,
     iconTheme: IconThemeData(color: AppColors.neutral100),

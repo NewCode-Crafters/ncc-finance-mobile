@@ -36,7 +36,7 @@ class ProfileService {
       final user = _firebaseAuth.currentUser;
 
       if (user == null) {
-        throw Exception("No authenticated user found.");
+        throw Exception('No authenticated user found.');
       }
 
       final imageFile = await _imagePicker.pickImage(source: source);

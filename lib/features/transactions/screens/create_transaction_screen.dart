@@ -282,7 +282,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
                       final f = files[i];
                       return Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.insert_drive_file_outlined,
                             color: AppColors.lightGreenColor,
                           ),

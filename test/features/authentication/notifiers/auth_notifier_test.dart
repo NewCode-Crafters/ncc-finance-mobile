@@ -17,8 +17,8 @@ void main() {
     authNotifier = AuthNotifier(mockAuthService);
   });
 
-  group("AuthNotifier", () {
-    test("initial state must be correct (not loading, not error)", () {
+  group('AuthNotifier', () {
+    test('initial state must be correct (not loading, not error)', () {
       final notifier = AuthNotifier(mockAuthService);
 
       expect(notifier.state.isLoading, isFalse);
@@ -36,7 +36,7 @@ void main() {
     });
 
     test(
-      "login fails with wrong password and state is updated with error message",
+      'login fails with wrong password and state is updated with error message',
       () async {
         when(
           mockAuthService.login(any, any),
@@ -46,7 +46,7 @@ void main() {
 
         expect(
           authNotifier.state.errorMessage,
-          "Credenciais inválidas. Por favor, tente novamente.",
+          'Credenciais inválidas. Por favor, tente novamente.',
         );
         expect(authNotifier.state.isAuthenticated, isFalse);
         expect(authNotifier.state.isLoading, isFalse);
@@ -54,7 +54,7 @@ void main() {
     );
 
     test(
-      "login fails with user not found and state is updated with error message",
+      'login fails with user not found and state is updated with error message',
       () async {
         when(
           mockAuthService.login(any, any),
@@ -64,7 +64,7 @@ void main() {
 
         expect(
           authNotifier.state.errorMessage,
-          "Usuário não encontrado. Por favor, verifique o e-mail ou cadastre-se.",
+          'Usuário não encontrado. Por favor, verifique o e-mail ou cadastre-se.',
         );
         expect(authNotifier.state.isAuthenticated, isFalse);
         expect(authNotifier.state.isLoading, isFalse);
@@ -78,7 +78,10 @@ void main() {
 
         await authNotifier.login(invalidEmail, 'password');
 
-        expect(authNotifier.state.errorMessage, "Por favor, insira um e-mail válido.");
+        expect(
+          authNotifier.state.errorMessage,
+          'Por favor, insira um e-mail válido.',
+        );
         expect(authNotifier.state.isLoading, isFalse);
 
         verifyNever(mockAuthService.login(any, any));
@@ -105,25 +108,22 @@ void main() {
       expect(authNotifier.state.errorMessage, isNull);
     });
 
-    test(
-      'sendPasswordResetEmail succeeds and sets a success message ',
-      () async {
-        when(
-          mockAuthService.sendPasswordResetEmail(email: anyNamed('email')),
-        ).thenAnswer((_) async {});
+    test('sendPasswordResetEmail succeeds and sets a success message ', () async {
+      when(
+        mockAuthService.sendPasswordResetEmail(email: anyNamed('email')),
+      ).thenAnswer((_) async {});
 
-        await authNotifier.sendPasswordResetEmail(email: 'test@test.com');
+      await authNotifier.sendPasswordResetEmail(email: 'test@test.com');
 
-        expect(
-          authNotifier.state.successMessage,
-          'E-mail de redefinição de senha enviado. Por favor, verifique sua caixa de entrada.',
-        );
-        expect(authNotifier.state.isLoading, isFalse);
-        expect(authNotifier.state.errorMessage, isNull);
-      },
-    );
+      expect(
+        authNotifier.state.successMessage,
+        'E-mail de redefinição de senha enviado. Por favor, verifique sua caixa de entrada.',
+      );
+      expect(authNotifier.state.isLoading, isFalse);
+      expect(authNotifier.state.errorMessage, isNull);
+    });
 
-    test("logout succeeds and clears authentication state", () async {
+    test('logout succeeds and clears authentication state', () async {
       when(mockAuthService.logout()).thenAnswer((_) async {});
 
       await authNotifier.logout();

@@ -46,7 +46,7 @@ void main() {
     expect(logoFinder, findsOneWidget);
   });
 
-  testWidgets("Login screen should display an email text field", (
+  testWidgets('Login screen should display an email text field', (
     WidgetTester tester,
   ) async {
     await createLoginScreen(tester);
@@ -56,7 +56,7 @@ void main() {
     expect(emailFieldFinder, findsOneWidget);
   });
 
-  testWidgets("Login screen should display a password text field", (
+  testWidgets('Login screen should display a password text field', (
     WidgetTester tester,
   ) async {
     await createLoginScreen(tester);
@@ -83,7 +83,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await createLoginScreen(tester);
-    expect(find.text("Esqueci a senha?"), findsOneWidget);
+    expect(find.text('Esqueci a senha?'), findsOneWidget);
   });
 
   testWidgets("Login screen should display a 'Cadastre-se' link", (
@@ -91,7 +91,7 @@ void main() {
   ) async {
     await createLoginScreen(tester);
 
-    expect(find.text("Cadastre-se"), findsOneWidget);
+    expect(find.text('Cadastre-se'), findsOneWidget);
   });
 
   testWidgets("Tapping 'Cadastre-se' link navigates to RegisterScreen", (
@@ -99,7 +99,7 @@ void main() {
   ) async {
     await createLoginScreen(tester);
 
-    final signUpLinkFinder = find.text("Cadastre-se");
+    final signUpLinkFinder = find.text('Cadastre-se');
     expect(signUpLinkFinder, findsOneWidget);
 
     await tester.tap(signUpLinkFinder);

@@ -48,21 +48,23 @@ class FirebaseAuthService implements AuthService {
       final user = userCredential.user;
 
       if (user == null) {
-        throw Exception('Falha na criação do usuário, por favor, tente novamente mais tarde.');
+        throw Exception(
+          'Falha na criação do usuário, por favor, tente novamente mais tarde.',
+        );
       }
 
-      final userDocRef = _firestore.collection("users").doc(user.uid);
+      final userDocRef = _firestore.collection('users').doc(user.uid);
 
       await userDocRef.set({
-        "name": name,
-        "email": email,
-        "createdAt": FieldValue.serverTimestamp(),
+        'name': name,
+        'email': email,
+        'createdAt': FieldValue.serverTimestamp(),
       });
 
-      await userDocRef.collection("balances").add({
-        "accountType": "CHECKING_ACCOUNT",
-        "amount": 0.0,
-        "currency": "BRL",
+      await userDocRef.collection('balances').add({
+        'accountType': 'CHECKING_ACCOUNT',
+        'amount': 0.0,
+        'currency': 'BRL',
       });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -103,7 +105,7 @@ class FirebaseAuthService implements AuthService {
       final user = _firebaseAuth.currentUser;
 
       if (user == null) {
-        throw Exception("Nenhum usuário autenticado encontrado.");
+        throw Exception('Nenhum usuário autenticado encontrado.');
       }
 
       await _firestore.collection('users').doc(user.uid).update({
@@ -119,7 +121,9 @@ class FirebaseAuthService implements AuthService {
     try {
       final user = _firebaseAuth.currentUser;
       if (user == null) {
-        throw Exception("Não é possível atualizar o nome de um usuário não autenticado.");
+        throw Exception(
+          'Não é possível atualizar o nome de um usuário não autenticado.',
+        );
       }
       await _firestore.collection('users').doc(user.uid).update({
         'name': newName,

@@ -31,7 +31,7 @@ class ActionCard extends StatelessWidget {
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.neutral500,
                   fontWeight: AppTypography.fontWeightBold,
                 ),

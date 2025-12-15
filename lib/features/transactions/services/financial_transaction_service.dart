@@ -14,7 +14,6 @@ class FinancialTransactionService {
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
        _balanceService = balanceService ?? BalanceService();
 
-
   Future<DocumentReference> createTransaction({
     required String userId,
     required Map<String, dynamic> data,
@@ -153,9 +152,10 @@ class FinancialTransactionService {
         }
       }
 
-      if (startAfterDoc != null) query = query.startAfterDocument(startAfterDoc);
+      if (startAfterDoc != null)
+        query = query.startAfterDocument(startAfterDoc);
       query = query.limit(limit);
-      
+
       final snapshot = await query.get();
       return snapshot;
     } catch (e) {

@@ -372,7 +372,7 @@ class _EditAttachmentsSectionState extends State<EditAttachmentsSection> {
                   .map(
                     (f) => Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.insert_drive_file_outlined,
                           color: AppColors.lightGreenColor,
                         ),

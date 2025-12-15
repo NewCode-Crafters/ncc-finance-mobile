@@ -71,7 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final compact = height < 700 || keyboardOpen;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Criar Conta")),
+      appBar: AppBar(title: const Text('Criar Conta')),
       body: Stack(
         children: [
           SafeArea(
@@ -141,14 +141,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         // hide decorative image on compact screens so content fits
                         if (!compact)
-                          Padding(
-                            padding: const EdgeInsets.all(0),
+                          const Padding(
+                            padding: EdgeInsets.all(0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Image(
-                                  image: const AssetImage(AppAssets.register),
-                                ),
+                                Image(image: AssetImage(AppAssets.register)),
                               ],
                             ),
                           ),
@@ -171,7 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           TextField(
-            key: const Key("register_name_field"),
+            key: const Key('register_name_field'),
             cursorColor: AppColors.brandTertiary,
             style: const TextStyle(color: AppColors.brandTertiary),
             decoration: const InputDecoration(
@@ -199,7 +197,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           SizedBox(height: compact ? 10 : 16),
           TextField(
-            key: const Key("register_email_field"),
+            key: const Key('register_email_field'),
             cursorColor: AppColors.brandTertiary,
             style: const TextStyle(color: AppColors.brandTertiary),
             decoration: const InputDecoration(
@@ -227,7 +225,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           SizedBox(height: compact ? 10 : 16),
           TextField(
-            key: const Key("register_password_field"),
+            key: const Key('register_password_field'),
             cursorColor: AppColors.brandTertiary,
             style: const TextStyle(color: AppColors.brandTertiary),
             decoration: const InputDecoration(
@@ -258,7 +256,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           isLoading
               ? const CircularProgressIndicator()
               : PrimaryButton(
-                  text: "Criar conta",
+                  text: 'Criar conta',
                   onPressed: isLoading ? null : _handleSignUp,
                 ),
           SizedBox(height: compact ? 12 : 16),
@@ -267,7 +265,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Navigator.of(context).pop();
             },
             child: const Text(
-              "Já tem uma conta? Acesse",
+              'Já tem uma conta? Acesse',
               style: TextStyle(
                 color: AppColors.brandTertiary,
                 fontWeight: FontWeight.w800,

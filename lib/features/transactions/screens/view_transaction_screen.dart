@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:bytebank/theme/theme.dart';
 
-
 class ViewTransactionScreen extends StatefulWidget {
   static const String routeName = '/view-transaction';
   const ViewTransactionScreen({super.key});
@@ -39,7 +38,8 @@ class _ViewTransactionScreenState extends State<ViewTransactionScreen> {
         if (notifier.state.searchText == text) return;
         notifier.updateSearchText(text);
         final userId = FirebaseAuth.instance.currentUser?.uid;
-        if (userId != null) Future.microtask(() => notifier.fetchFirstPage(userId));
+        if (userId != null)
+          Future.microtask(() => notifier.fetchFirstPage(userId));
         if (_scrollController.hasClients) {
           try {
             _scrollController.jumpTo(0);
@@ -78,12 +78,14 @@ class _ViewTransactionScreenState extends State<ViewTransactionScreen> {
       final pos = _scrollController.position;
       if (pos.atEdge && pos.pixels != 0) {
         final userId = FirebaseAuth.instance.currentUser?.uid;
-        if (userId != null) Future.microtask(() => notifier.fetchNextPage(userId));
+        if (userId != null)
+          Future.microtask(() => notifier.fetchNextPage(userId));
         return;
       }
       if (pos.extentAfter < 300) {
         final userId = FirebaseAuth.instance.currentUser?.uid;
-        if (userId != null) Future.microtask(() => notifier.fetchNextPage(userId));
+        if (userId != null)
+          Future.microtask(() => notifier.fetchNextPage(userId));
       }
     } catch (_) {}
   }
@@ -106,11 +108,17 @@ class _ViewTransactionScreenState extends State<ViewTransactionScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar', style: TextStyle(color: AppColors.brandSecondary),),
+            child: const Text(
+              'Cancelar',
+              style: TextStyle(color: AppColors.brandSecondary),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Confirmar', style: TextStyle(color: AppColors.brandSecondary),),
+            child: const Text(
+              'Confirmar',
+              style: TextStyle(color: AppColors.brandSecondary),
+            ),
           ),
         ],
       ),
@@ -141,215 +149,246 @@ class _ViewTransactionScreenState extends State<ViewTransactionScreen> {
         onRefresh: _fetchData,
         child: state.isLoading
             ? const Center(child: CircularProgressIndicator())
-            : notifier.state.allTransactions.isEmpty && _searchController.text.isEmpty
-                ? notifier.state.filteredDate == false ?
-                const Center(
+            : notifier.state.allTransactions.isEmpty &&
+                  _searchController.text.isEmpty
+            ? notifier.state.filteredDate == false
+                  ? const Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.receipt_long,
+                            size: 80,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            'Você não possui transações.',
+                            style: TextStyle(fontSize: 18, color: Colors.grey),
+                          ),
+                          Text(
+                            'Suas transações e investimentos aparecem aqui.',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    flex: 4,
+                                    child: TextField(
+                                      controller: _searchController,
+                                      cursorColor: AppColors.textSubtle,
+                                      decoration: const InputDecoration(
+                                        hintText: 'Pesquise uma transação',
+                                        prefixIcon: Icon(Icons.search),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(10),
+                                          ),
+                                          borderSide: BorderSide(
+                                            color: AppColors.lightGreenColor,
+                                            width: 2.0,
+                                          ),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: AppColors.lightGreenColor,
+                                            width: 2.0,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: IconButton(
+                                      icon: const Icon(
+                                        Icons.calendar_today,
+                                        size: 30,
+                                        color: AppColors.lightGreenColor,
+                                      ),
+                                      onPressed: () => notifier.updateDateRange(
+                                        context,
+                                        userId,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Expanded(
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.receipt_long,
+                                size: 80,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                'Você não possui transações.',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              Text(
+                                'Suas transações e investimentos aparecem aqui.',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+            : Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        Icon(
-                          Icons.receipt_long,
-                          size: 80,
-                          color: Colors.grey,
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Você não possui transações.',
-                          style: TextStyle(fontSize: 18, color: Colors.grey),
-                        ),
-                        Text(
-                          'Suas transações e investimentos aparecem aqui.',
-                          style: TextStyle(color: Colors.grey),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              flex: 4,
+                              child: TextField(
+                                controller: _searchController,
+                                cursorColor: AppColors.textSubtle,
+                                decoration: const InputDecoration(
+                                  hintText: 'Pesquise uma transação',
+                                  prefixIcon: Icon(Icons.search),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                    borderSide: BorderSide(
+                                      color: AppColors.lightGreenColor,
+                                      width: 2.0,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: AppColors.lightGreenColor,
+                                      width: 2.0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.calendar_today,
+                                  size: 30,
+                                  color: AppColors.lightGreenColor,
+                                ),
+                                onPressed: () =>
+                                    notifier.updateDateRange(context, userId),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ):
-                Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  flex: 4,
-                                  child: TextField(
-                                    controller: _searchController,
-                                    cursorColor: AppColors.textSubtle,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Pesquise uma transação',
-                                      prefixIcon: Icon(Icons.search),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                                        borderSide: BorderSide(
-                                          color: AppColors.lightGreenColor,
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: AppColors.lightGreenColor,
-                                          width: 2.0,
-                                        ),
-                                      ),
+                  ),
+                  total > 0
+                      ? Expanded(
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            itemCount:
+                                total +
+                                ((notifier.isFetchingMore && notifier.hasMore)
+                                    ? 1
+                                    : 0),
+                            itemBuilder: (context, index) {
+                              if (index >= total) {
+                                // show footer loader only when there are more pages
+                                if (notifier.isFetchingMore &&
+                                    notifier.hasMore) {
+                                  return const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 12.0,
                                     ),
-                                  ),
-                                ),
-                                Expanded (
-                                  flex: 1,
-                                  child: IconButton (
-                                    icon: const Icon(
-                                      Icons.calendar_today, 
-                                      size: 30, 
-                                      color: AppColors.lightGreenColor,
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
                                     ),
-                                    onPressed: () =>
-                                      notifier.updateDateRange(context, userId),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                        children: [
-                          Icon(
-                            Icons.receipt_long,
-                            size: 80,
-                            color: Colors.grey,
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'Você não possui transações.',
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          ),
-                          Text(
-                            'Suas transações e investimentos aparecem aqui.',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    )                      
-                    ],
-                  )    
-                : Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  flex: 4,
-                                  child: TextField(
-                                    controller: _searchController,
-                                    cursorColor: AppColors.textSubtle,
-                                    decoration: const InputDecoration(
-                                      hintText: 'Pesquise uma transação',
-                                      prefixIcon: Icon(Icons.search),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                                        borderSide: BorderSide(
-                                          color: AppColors.lightGreenColor,
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: AppColors.lightGreenColor,
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded (
-                                  flex: 1,
-                                  child: IconButton (
-                                    icon: const Icon(
-                                      Icons.calendar_today, 
-                                      size: 30, 
-                                      color: AppColors.lightGreenColor,
-                                    ),
-                                    onPressed: () =>
-                                      notifier.updateDateRange(context, userId),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      total > 0?
-                      Expanded(
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          itemCount: total + ((notifier.isFetchingMore && notifier.hasMore) ? 1 : 0),
-                          itemBuilder: (context, index) {
-                            if (index >= total) {
-                              // show footer loader only when there are more pages
-                              if (notifier.isFetchingMore && notifier.hasMore) {
-                                return const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 12.0),
-                                  child: Center(child: CircularProgressIndicator()),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              }
+
+                              if (index == total - 1 &&
+                                  !notifier.isFetchingMore &&
+                                  notifier.hasMore) {
+                                Future.microtask(
+                                  () => notifier.fetchNextPage(userId),
                                 );
                               }
-                              return const SizedBox.shrink();
-                            }
 
-                            if (index == total - 1 && !notifier.isFetchingMore && notifier.hasMore) {
-                              Future.microtask(() => notifier.fetchNextPage(userId));
-                            }
+                              final transaction = transactions[index];
+                              final bool isInvestmentTransaction =
+                                  transaction.category == 'INVESTMENT' ||
+                                  transaction.category ==
+                                      'INVESTMENT_REDEMPTION';
 
-                            final transaction = transactions[index];
-                            final bool isInvestmentTransaction =
-                                transaction.category == 'INVESTMENT' ||
-                                transaction.category == 'INVESTMENT_REDEMPTION';
-
-                            return TransactionListItem(
-                              transaction: transaction,
-                              categoryLabel: notifier.getCategoryLabel(
-                                transaction.category,
+                              return TransactionListItem(
+                                transaction: transaction,
+                                categoryLabel: notifier.getCategoryLabel(
+                                  transaction.category,
+                                ),
+                                onDelete: () => _showDeleteConfirmation(
+                                  context,
+                                  transaction.id,
+                                ),
+                                onEdit: () {
+                                  Navigator.of(context).pushNamed(
+                                    EditTransactionScreen.routeName,
+                                    arguments: transaction,
+                                  );
+                                },
+                                isReadOnly: isInvestmentTransaction,
+                              );
+                            },
+                          ),
+                        )
+                      : const Expanded(
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.receipt_long,
+                                size: 80,
+                                color: Colors.grey,
                               ),
-                              onDelete: () => _showDeleteConfirmation(context, transaction.id),
-                              onEdit: () {
-                                Navigator.of(context).pushNamed(
-                                  EditTransactionScreen.routeName,
-                                  arguments: transaction,
-                                );
-                              },
-                              isReadOnly: isInvestmentTransaction,
-                            );
-                          },
+                              SizedBox(height: 16),
+                              Text(
+                                'Você não possui transações.',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              Text(
+                                'Suas transações e investimentos aparecem aqui.',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
                         ),
-                      ): Expanded(
-                        child: Column(
-                        children: [
-                          Icon(
-                            Icons.receipt_long,
-                            size: 80,
-                            color: Colors.grey,
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'Você não possui transações.',
-                            style: TextStyle(fontSize: 18, color: Colors.grey),
-                          ),
-                          Text(
-                            'Suas transações e investimentos aparecem aqui.',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    )                      
-
-                    ],
-                  ),
+                ],
+              ),
       ),
     );
   }

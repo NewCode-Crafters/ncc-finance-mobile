@@ -30,7 +30,8 @@ class TransactionState {
     this.filteredDate = false,
     this.searchText = '',
     this.chartData = const {},
-  }) : startDate = startDate ?? DateTime.now().subtract(const Duration(days: 30)),
+  }) : startDate =
+           startDate ?? DateTime.now().subtract(const Duration(days: 30)),
        endDate = endDate ?? DateTime.now();
 
   TransactionState copyWith({
@@ -150,14 +151,12 @@ class TransactionNotifier extends ChangeNotifier {
       chartData: chartData,
     );
     notifyListeners();
-
-
   }
 
   Future<void> fetchFirstPage(String userId) async {
     _state = _state.copyWith(isLoading: true);
-  _lastDocument = null;
-  _hasMore = true;
+    _lastDocument = null;
+    _hasMore = true;
     notifyListeners();
 
     try {
@@ -168,7 +167,6 @@ class TransactionNotifier extends ChangeNotifier {
         startAfterDoc: null,
         limit: _pageSize,
       );
-
 
       final categories = _state.categories.isEmpty
           ? await _metadataService.getTransactionCategories()
@@ -187,8 +185,6 @@ class TransactionNotifier extends ChangeNotifier {
         _hasMore = _lastDocument != null;
       }
 
-      
-
       _state = _state.copyWith(
         transactions: transactions,
         categories: categories,
@@ -206,7 +202,8 @@ class TransactionNotifier extends ChangeNotifier {
 
     // throttle rapid consecutive calls
     final now = DateTime.now();
-    if (_lastFetchMoreAt != null && now.difference(_lastFetchMoreAt!) < _fetchMoreThrottle) {
+    if (_lastFetchMoreAt != null &&
+        now.difference(_lastFetchMoreAt!) < _fetchMoreThrottle) {
       return;
     }
     _lastFetchMoreAt = now;
@@ -242,10 +239,7 @@ class TransactionNotifier extends ChangeNotifier {
       final updated = List<FinancialTransaction>.from(_state.transactions)
         ..addAll(more);
 
-  
-      _state = _state.copyWith(
-        transactions: updated,
-      );
+      _state = _state.copyWith(transactions: updated);
     } catch (e) {
       _state = _state.copyWith(error: e.toString());
     }
@@ -276,7 +270,7 @@ class TransactionNotifier extends ChangeNotifier {
       // Refresh the list after deletion
       await fetchTransactions(userId);
     } catch (e) {
-      _state = _state.copyWith(error: "Failed to delete transaction.");
+      _state = _state.copyWith(error: 'Failed to delete transaction.');
       notifyListeners();
     }
   }
@@ -305,15 +299,20 @@ class TransactionNotifier extends ChangeNotifier {
       lastDate: DateTime.now(),
       locale: const Locale('pt', 'BR'), // Use the locale
       builder: (BuildContext context, Widget? child) {
-      return Theme(
+        return Theme(
           data: ThemeData(
-            primaryColor: AppColors.brandTertiary, // Cor principal (botões e cabeçalho)
-            colorScheme: ColorScheme.dark(
-              primary: AppColors.brandTertiary, // Cor do botão "OK" e "CANCELAR"
+            primaryColor:
+                AppColors.brandTertiary, // Cor principal (botões e cabeçalho)
+            colorScheme: const ColorScheme.dark(
+              primary:
+                  AppColors.brandTertiary, // Cor do botão "OK" e "CANCELAR"
               onPrimary: Colors.white, // Cor do texto nos botões
               onSurface: Colors.white, // Cor do texto no calendário
-              secondary: AppColors.lightGreenColor
-            ), dialogTheme: DialogThemeData(backgroundColor: AppColors.surfaceDefault), // Cor de fundo do DatePicker
+              secondary: AppColors.lightGreenColor,
+            ),
+            dialogTheme: const DialogThemeData(
+              backgroundColor: AppColors.surfaceDefault,
+            ), // Cor de fundo do DatePicker
           ),
           child: child!,
         );
@@ -343,7 +342,7 @@ class TransactionNotifier extends ChangeNotifier {
       );
       await fetchTransactions(userId);
     } catch (e) {
-      _state = _state.copyWith(error: "Falha ao editar a transação.");
+      _state = _state.copyWith(error: 'Falha ao editar a transação.');
       notifyListeners();
     }
   }

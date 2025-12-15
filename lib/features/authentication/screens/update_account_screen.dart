@@ -79,7 +79,7 @@ class _UpdateAccountScreenState extends State<UpdateAccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Meu Cadastro")),
+      appBar: AppBar(title: const Text('Meu Cadastro')),
       body: Center(child: _buildUpdateForm(context)),
     );
   }
@@ -89,14 +89,14 @@ class _UpdateAccountScreenState extends State<UpdateAccountScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         CustomTextField(
-          key: Key("update_account_name_field"),
-          label: "Nome",
+          key: const Key('update_account_name_field'),
+          label: 'Nome',
           controller: _nameController,
         ),
         const SizedBox(height: 24),
         CustomTextField(
-          key: Key("update_account_email_field"),
-          label: "Email",
+          key: const Key('update_account_email_field'),
+          label: 'Email',
           readOnly: true,
           controller: _emailController,
         ),
@@ -105,7 +105,7 @@ class _UpdateAccountScreenState extends State<UpdateAccountScreen> {
           const CircularProgressIndicator()
         else
           PrimaryButton(
-            text: "Salvar Alterações",
+            text: 'Salvar Alterações',
             onPressed: _handleUpdateProfile,
           ),
       ],

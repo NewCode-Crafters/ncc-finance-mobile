@@ -215,7 +215,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 8),
             // Seção de transações com altura limitada
-            SizedBox(
+            const SizedBox(
               height: 400, // Altura fixa para a lista de transações
               child: TransactionsScreen(),
             ),

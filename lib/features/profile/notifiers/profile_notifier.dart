@@ -58,7 +58,7 @@ class ProfileNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  setStateForTest(ProfileState newState) {
+  void setStateForTest(ProfileState newState) {
     _state = newState;
   }
 

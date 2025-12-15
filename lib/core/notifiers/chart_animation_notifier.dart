@@ -13,7 +13,7 @@ class ChartAnimationNotifier extends ChangeNotifier {
     _currentTabIndex = tabIndex;
     _shouldAnimateCharts = true;
     notifyListeners();
-    
+
     // Após a animação do gráfico, mantém visível
     Future.delayed(const Duration(milliseconds: 1200), () {
       _shouldAnimateCharts = false;

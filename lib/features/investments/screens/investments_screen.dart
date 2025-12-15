@@ -91,7 +91,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         );
         await balanceNotifier.fetchBalances(userId: userId);
         await transactionNotifier.fetchTransactions(userId);
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -119,7 +119,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     final investmentState = context.watch<InvestmentNotifier>().state;
 
     return Scaffold(
-      appBar: MainAppBar(title: 'Investimentos'),
+      appBar: const MainAppBar(title: 'Investimentos'),
       body: investmentState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
@@ -128,7 +128,9 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                 padding: const EdgeInsets.all(16.0),
                 children: [
                   _buildChart(investmentState),
-                  investmentState.chartData.isEmpty ? Container() : const SizedBox(height: 24),
+                  investmentState.chartData.isEmpty
+                      ? Container()
+                      : const SizedBox(height: 24),
                   _buildSummaryCards(investmentState),
                   const SizedBox(height: 24),
                   _buildInvestmentList(investmentState, _colors),
@@ -149,10 +151,9 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     ];
 
     final chartData = state.chartData.entries.toList();
-    if(state.chartData.isEmpty) {
-      return const Center(
-      );
-    }else{
+    if (state.chartData.isEmpty) {
+      return const Center();
+    } else {
       return SizedBox(
         height: 150,
         child: Row(
@@ -161,11 +162,14 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
               flex: 3,
               child: Consumer<ChartAnimationNotifier>(
                 builder: (context, chartNotifier, child) {
-                  final shouldAnimate = chartNotifier.shouldAnimateCharts && 
-                                      chartNotifier.currentTabIndex == 2; // Investments tab index
-                  final isVisible = chartNotifier.chartsVisible && 
-                                   chartNotifier.currentTabIndex == 2;
-                  
+                  final shouldAnimate =
+                      chartNotifier.shouldAnimateCharts &&
+                      chartNotifier.currentTabIndex ==
+                          2; // Investments tab index
+                  final isVisible =
+                      chartNotifier.chartsVisible &&
+                      chartNotifier.currentTabIndex == 2;
+
                   if (shouldAnimate) {
                     return TweenAnimationBuilder<double>(
                       duration: const Duration(milliseconds: 1200),
@@ -226,11 +230,11 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     ),
                     title: Text(
                       entry.key.replaceAll('_', ' ').toLowerCase(),
-                      textHeightBehavior: TextHeightBehavior(
+                      textHeightBehavior: const TextHeightBehavior(
                         applyHeightToFirstAscent: false,
                       ),
                     ),
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16.0,
                       vertical: 0.0,
                     ),
@@ -260,13 +264,13 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.savings,
                           size: 28,
                           color: AppColors.darkPurpleColor,
                         ),
                         const SizedBox(height: 4),
-                        Text(
+                        const Text(
                           'Renda Fixa',
                           style: TextStyle(
                             color: AppColors.neutral500,
@@ -276,7 +280,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                         ),
                         Text(
                           'R\$ ${state.totalFixedIncome.toStringAsFixed(2)}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: AppColors.neutral500,
                             fontWeight: AppTypography.fontWeightBold,
                             fontSize: 16.0,
@@ -290,13 +294,13 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.show_chart,
                           size: 28,
                           color: AppColors.darkPurpleColor,
                         ),
                         const SizedBox(height: 4),
-                        Text(
+                        const Text(
                           'Renda Variável',
                           style: TextStyle(
                             color: AppColors.neutral500,
@@ -306,7 +310,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                         ),
                         Text(
                           'R\$ ${state.totalVariableIncome.toStringAsFixed(2)}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: AppColors.neutral500,
                             fontWeight: AppTypography.fontWeightBold,
                             fontSize: 16.0,

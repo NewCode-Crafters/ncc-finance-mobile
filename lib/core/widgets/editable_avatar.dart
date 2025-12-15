@@ -23,7 +23,7 @@ class EditableAvatar extends StatelessWidget {
           radius: radius,
           backgroundImage: photoUrl != null ? NetworkImage(photoUrl!) : null,
           backgroundColor: photoUrl == null
-              ? ColorHelper.getColorFromString(userId ?? "")
+              ? ColorHelper.getColorFromString(userId ?? '')
               : null,
           child: photoUrl == null
               ? const Icon(Icons.person, size: 50, color: Colors.white)

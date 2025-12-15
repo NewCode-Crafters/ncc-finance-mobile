@@ -63,22 +63,14 @@ class _AuthGateState extends State<AuthGate> {
       // Schedule the SnackBar to be shown after the current build cycle.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          showAppSnackBar(
-            context,
-            errorMessage,
-            AppMessageType.error,
-          );
+          showAppSnackBar(context, errorMessage, AppMessageType.error);
         }
       });
     } else if (successMessage != null) {
       _authNotifier.clearMessages();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          showAppSnackBar(
-            context,
-            successMessage,
-            AppMessageType.success,
-          );
+          showAppSnackBar(context, successMessage, AppMessageType.success);
         }
       });
     }
@@ -89,11 +81,7 @@ class _AuthGateState extends State<AuthGate> {
     if (errorMessage != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          showAppSnackBar(
-            context,
-            errorMessage,
-            AppMessageType.error,
-          );
+          showAppSnackBar(context, errorMessage, AppMessageType.error);
         }
       });
     }
@@ -106,11 +94,7 @@ class _AuthGateState extends State<AuthGate> {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          showAppSnackBar(
-            context,
-            errorMessage,
-            AppMessageType.error,
-          );
+          showAppSnackBar(context, errorMessage, AppMessageType.error);
         }
       });
     }
@@ -164,8 +148,8 @@ class _AuthGateState extends State<AuthGate> {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
                 context.read<ProfileNotifier>().fetchUserProfile(
-                      userId: user.uid,
-                    );
+                  userId: user.uid,
+                );
                 context.read<BalanceNotifier>().fetchBalances(userId: user.uid);
               }
             });

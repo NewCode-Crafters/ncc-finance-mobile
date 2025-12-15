@@ -50,7 +50,7 @@ void main() {
     );
   }
 
-  group("MyProfileScreen", () {
+  group('MyProfileScreen', () {
     testWidgets('should display user name from notifier', (
       WidgetTester tester,
     ) async {

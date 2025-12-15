@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _navigateToNextScreen() {
     // Wait for the animation to complete, then navigate
-    Future.delayed(Duration(milliseconds: 3000), () {
+    Future.delayed(const Duration(milliseconds: 3000), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const AuthGate()),

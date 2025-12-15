@@ -15,7 +15,11 @@ class NavBar extends StatelessWidget {
       color: Colors.transparent,
       elevation: 0.0,
       child: Padding(
-        padding: EdgeInsets.only(left: 16, right: 16, bottom: Platform.isAndroid ? 10 : 0),
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          bottom: Platform.isAndroid ? 10 : 0,
+        ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(25),
           child: Container(

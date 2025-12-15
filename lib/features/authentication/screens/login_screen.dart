@@ -60,17 +60,17 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          SafeArea(
+          const SafeArea(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const SizedBox(height: 75),
+                SizedBox(height: 75),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image(image: const AssetImage(AppAssets.byteBankLogo)),
-                    const SizedBox(width: 8),
-                    Image(image: const AssetImage(AppAssets.byteBankName)),
+                    Image(image: AssetImage(AppAssets.byteBankLogo)),
+                    SizedBox(width: 8),
+                    Image(image: AssetImage(AppAssets.byteBankName)),
                   ],
                 ),
               ],
@@ -128,12 +128,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       // hide or shrink the decorative image on compact screens
                       if (!compact)
-                        Padding(
-                          padding: const EdgeInsets.all(0),
+                        const Padding(
+                          padding: EdgeInsets.all(0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Image(image: const AssetImage(AppAssets.login)),
+                              Image(image: AssetImage(AppAssets.login)),
                             ],
                           ),
                         ),
@@ -154,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         SizedBox(height: compact ? 12 : 40),
         TextField(
-          key: Key('login_email_field'),
+          key: const Key('login_email_field'),
           cursorColor: AppColors.brandTertiary,
           style: const TextStyle(color: AppColors.brandTertiary),
           decoration: const InputDecoration(
@@ -213,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: TextButton(
             onPressed: _handleForgotPassword,
             child: const Text(
-              "Esqueci a senha?",
+              'Esqueci a senha?',
               style: TextStyle(
                 color: AppColors.brandTertiary,
                 fontWeight: FontWeight.w800,
@@ -235,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.of(context).pushNamed(RegisterScreen.routeName);
           },
           child: const Text(
-            "Cadastre-se",
+            'Cadastre-se',
             style: TextStyle(
               color: AppColors.brandTertiary,
               fontWeight: FontWeight.w800,

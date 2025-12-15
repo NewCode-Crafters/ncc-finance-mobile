@@ -40,29 +40,29 @@ void main() {
   ) async {
     await createRegisterScreen(tester);
 
-    expect(find.text("Crie uma nova conta"), findsOneWidget);
+    expect(find.text('Crie uma nova conta'), findsOneWidget);
   });
 
-  testWidgets("Register Screen should display a name field", (
+  testWidgets('Register Screen should display a name field', (
     WidgetTester tester,
   ) async {
     await createRegisterScreen(tester);
-    expect(find.byKey(const Key("register_name_field")), findsOneWidget);
+    expect(find.byKey(const Key('register_name_field')), findsOneWidget);
   });
 
-  testWidgets("Register Screen should display an email field", (
+  testWidgets('Register Screen should display an email field', (
     WidgetTester tester,
   ) async {
     await createRegisterScreen(tester);
-    expect(find.byKey(const Key("register_email_field")), findsOneWidget);
+    expect(find.byKey(const Key('register_email_field')), findsOneWidget);
   });
 
-  testWidgets("Register Screen should display a password field", (
+  testWidgets('Register Screen should display a password field', (
     WidgetTester tester,
   ) async {
     await createRegisterScreen(tester);
     final passwordFieldFinder = find.byKey(
-      const Key("register_password_field"),
+      const Key('register_password_field'),
     );
     final textField = tester.widget<TextField>(passwordFieldFinder);
 
@@ -73,6 +73,6 @@ void main() {
     WidgetTester tester,
   ) async {
     await createRegisterScreen(tester);
-    expect(find.widgetWithText(PrimaryButton, "Criar conta"), findsOneWidget);
+    expect(find.widgetWithText(PrimaryButton, 'Criar conta'), findsOneWidget);
   });
 }

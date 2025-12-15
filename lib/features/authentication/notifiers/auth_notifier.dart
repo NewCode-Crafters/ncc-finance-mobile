@@ -100,7 +100,7 @@ class AuthNotifier extends ChangeNotifier {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
-        errorMessage: "Credenciais inválidas. Por favor, tente novamente.",
+        errorMessage: 'Credenciais inválidas. Por favor, tente novamente.',
       );
       notifyListeners();
       return false;
@@ -108,7 +108,8 @@ class AuthNotifier extends ChangeNotifier {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
-        errorMessage: "Usuário não encontrado. Por favor, verifique o e-mail ou cadastre-se.",
+        errorMessage:
+            'Usuário não encontrado. Por favor, verifique o e-mail ou cadastre-se.',
       );
       notifyListeners();
       return false;
@@ -126,7 +127,8 @@ class AuthNotifier extends ChangeNotifier {
       _state = _state.copyWith(
         isLoading: false,
         isAuthenticated: false,
-        errorMessage: 'A senha é muito fraca. Por favor, escolha uma mais forte.',
+        errorMessage:
+            'A senha é muito fraca. Por favor, escolha uma mais forte.',
       );
       notifyListeners();
       return false;
@@ -154,7 +156,8 @@ class AuthNotifier extends ChangeNotifier {
       await _authService.sendPasswordResetEmail(email: email);
       _state = _state.copyWith(
         isLoading: false,
-        successMessage: 'E-mail de redefinição de senha enviado. Por favor, verifique sua caixa de entrada.',
+        successMessage:
+            'E-mail de redefinição de senha enviado. Por favor, verifique sua caixa de entrada.',
       );
     } catch (e) {
       _state = _state.copyWith(

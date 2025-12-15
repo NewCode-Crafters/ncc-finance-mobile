@@ -73,11 +73,11 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
 
     try {
       if (userId == null) {
-        throw Exception("Usuário não encontrado.");
+        throw Exception('Usuário não encontrado.');
       }
 
       if (balances.isEmpty) {
-        throw Exception("Usuário sem saldo.");
+        throw Exception('Usuário sem saldo.');
       }
 
       final balanceId = balances.first.id;

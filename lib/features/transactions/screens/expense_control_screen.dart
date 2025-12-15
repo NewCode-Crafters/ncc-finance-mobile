@@ -42,7 +42,7 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     final transactionState = context.watch<TransactionNotifier>().state;
 
     return Scaffold(
-      appBar: MainAppBar(title: 'Controle de Despesas'),
+      appBar: const MainAppBar(title: 'Controle de Despesas'),
       body: transactionState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
@@ -51,7 +51,9 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
                 padding: const EdgeInsets.all(16.0),
                 children: [
                   _buildChart(transactionState),
-                  transactionState.chartData.isEmpty ? Container() : const SizedBox(height: 24),
+                  transactionState.chartData.isEmpty
+                      ? Container()
+                      : const SizedBox(height: 24),
                   _buildTransactionList(transactionState),
                 ],
               ),
@@ -74,10 +76,9 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     ];
 
     final chartData = state.chartData.entries.toList();
-    if(state.chartData.isEmpty) {
-      return const Center(
-      );
-    }else{
+    if (state.chartData.isEmpty) {
+      return const Center();
+    } else {
       return SizedBox(
         height: 150,
         child: Row(
@@ -86,11 +87,13 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
               flex: 3,
               child: Consumer<ChartAnimationNotifier>(
                 builder: (context, chartNotifier, child) {
-                  final shouldAnimate = chartNotifier.shouldAnimateCharts && 
-                                      chartNotifier.currentTabIndex == 1; // Expense tab index
-                  final isVisible = chartNotifier.chartsVisible && 
-                                   chartNotifier.currentTabIndex == 1;
-                  
+                  final shouldAnimate =
+                      chartNotifier.shouldAnimateCharts &&
+                      chartNotifier.currentTabIndex == 1; // Expense tab index
+                  final isVisible =
+                      chartNotifier.chartsVisible &&
+                      chartNotifier.currentTabIndex == 1;
+
                   if (shouldAnimate) {
                     return TweenAnimationBuilder<double>(
                       duration: const Duration(milliseconds: 1200),
@@ -150,9 +153,12 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
                       .read<TransactionNotifier>()
                       .getCategoryLabel(entry.key);
                   final iconData = getIconForCategory(entry.key);
-                  
+
                   return ListTile(
-                    leading: Icon(iconData, color: colors[index % colors.length]),
+                    leading: Icon(
+                      iconData,
+                      color: colors[index % colors.length],
+                    ),
                     title: Text(label),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16.0,
@@ -175,11 +181,7 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.receipt_long,
-              size: 80,
-              color: Colors.grey,
-            ),
+            Icon(Icons.receipt_long, size: 80, color: Colors.grey),
             SizedBox(height: 16),
             Text(
               'Você não possui despesas',
@@ -210,11 +212,7 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.receipt_long,
-              size: 80,
-              color: Colors.grey,
-            ),
+            Icon(Icons.receipt_long, size: 80, color: Colors.grey),
             SizedBox(height: 16),
             Text(
               'Você não possui despesas',
