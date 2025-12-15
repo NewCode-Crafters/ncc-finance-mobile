@@ -17,6 +17,7 @@ class FinancialTransaction {
     this.description,
   });
 
+  //TODO: missing migrate this
   factory FinancialTransaction.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 
