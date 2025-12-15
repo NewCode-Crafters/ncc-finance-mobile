@@ -54,6 +54,7 @@ dependencies:
   url_launcher: ^6.3.2
   mime: ^2.0.0
   path: ^1.9.1
+  get_it: ^7.6.0
 
 dev_dependencies:
   flutter_test:
