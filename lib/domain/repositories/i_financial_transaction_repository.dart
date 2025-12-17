@@ -1,4 +1,5 @@
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Repository interface (port) for financial-transaction-related operations.
 ///
@@ -8,8 +9,9 @@ abstract class IFinancialTransactionRepository {
   ///
   /// Returns the created [FinancialTransactionEntity] including any generated id.
   Future<FinancialTransactionEntity> createTransaction(
-    FinancialTransactionEntity transaction,
-  );
+    FinancialTransactionEntity transaction, {
+    WriteBatch? batch,
+  });
 
   /// Update an existing transaction.
   ///
@@ -38,5 +40,7 @@ abstract class IFinancialTransactionRepository {
     int limit = 50,
     String? startAfterId,
     String? balanceId,
+    DateTime? startDate,
+    DateTime? endDate,
   });
 }
