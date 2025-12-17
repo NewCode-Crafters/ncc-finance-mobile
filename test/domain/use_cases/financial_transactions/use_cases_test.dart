@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
 import 'package:bytebank/domain/use_cases/financial_transactions/create_financial_transaction_use_case.dart';
@@ -11,8 +12,9 @@ class _FakeRepo implements IFinancialTransactionRepository {
 
   @override
   Future<FinancialTransactionEntity> createTransaction(
-    FinancialTransactionEntity transaction,
-  ) async {
+    FinancialTransactionEntity transaction, {
+    WriteBatch? batch,
+  }) async {
     _store[transaction.id] = transaction;
     return transaction;
   }
@@ -34,6 +36,8 @@ class _FakeRepo implements IFinancialTransactionRepository {
     int limit = 50,
     String? startAfterId,
     String? balanceId,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     return _store.values.toList();
   }
