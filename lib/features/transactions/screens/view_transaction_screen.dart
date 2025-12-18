@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/transactions/screens/edit_transaction_screen.dart';
-import 'package:bytebank/features/transactions/widgets/transaction_list_item.dart';
+import 'package:bytebank/presentation/widgets/transactions/transaction_list_item.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

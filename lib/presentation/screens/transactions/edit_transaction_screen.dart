@@ -8,7 +8,7 @@ import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:bytebank/features/transactions/widgets/edit_attachments_section.dart';
+import 'package:bytebank/presentation/widgets/transactions/edit_attachments_section.dart';
 
 class EditTransactionScreen extends StatefulWidget {
   static const String routeName = '/edit-transaction';
