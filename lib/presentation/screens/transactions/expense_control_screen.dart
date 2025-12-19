@@ -11,6 +11,7 @@ import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
 import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
 import 'package:bytebank/features/dashboard/widgets/action_card.dart';
+import 'package:bytebank/presentation/screens/transactions/view_transactions_by_category_screen.dart';
 
 class ExpenseControlScreen extends StatefulWidget {
   static const String routeName = '/expense-control';
@@ -239,7 +240,16 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
             return ActionCard(
               icon: iconData,
               label: '$label\nR\$ ${(value * -1).toStringAsFixed(2)}',
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ViewTransactionsByCategoryScreen(
+                      categoryId: entry.key,
+                      categoryLabel: label,
+                    ),
+                  ),
+                );
+              },
             );
           },
         ),
