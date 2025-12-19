@@ -2,7 +2,7 @@ import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:bytebank/application/notifiers/transaction_notifier.dart';
+import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
 import 'package:bytebank/presentation/screens/transactions/edit_transaction_screen.dart';
 import 'package:bytebank/presentation/widgets/transactions/transaction_list_item.dart';
 import 'package:provider/provider.dart';
@@ -19,14 +19,14 @@ class TransactionsScreen extends StatefulWidget {
 class _TransactionsScreenState extends State<TransactionsScreen> {
   final _searchController = TextEditingController();
   Timer? _searchDebounce;
-  late final TransactionNotifier _transactionNotifier;
+  late final app_notifier.TransactionNotifier _transactionNotifier;
   late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
 
-    _transactionNotifier = context.read<TransactionNotifier>();
+    _transactionNotifier = context.read<app_notifier.TransactionNotifier>();
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
 
@@ -34,7 +34,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       final text = _searchController.text;
       _searchDebounce?.cancel();
       _searchDebounce = Timer(const Duration(milliseconds: 1500), () {
-        final notifier = context.read<TransactionNotifier>();
+        final notifier = context.read<app_notifier.TransactionNotifier>();
         if (notifier.state.searchText == text) return;
         notifier.updateSearchText(text);
         final userId = FirebaseAuth.instance.currentUser?.uid;
@@ -66,14 +66,14 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   Future<void> _fetchData() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
-      await context.read<TransactionNotifier>().fetchTransactions(userId);
+      await context.read<app_notifier.TransactionNotifier>().fetchTransactions(userId);
     }
   }
 
   void _onScroll() {
     if (!_scrollController.hasClients) return;
     try {
-      final notifier = context.read<TransactionNotifier>();
+      final notifier = context.read<app_notifier.TransactionNotifier>();
       if (notifier.isFetchingMore) return;
       if (!notifier.hasMore) return;
       final pos = _scrollController.position;
@@ -95,7 +95,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     BuildContext context,
     String transactionId,
   ) async {
-    final notifier = context.read<TransactionNotifier>();
+    final notifier = context.read<app_notifier.TransactionNotifier>();
     final balanceNotifier = context.read<BalanceNotifier>();
     final userId = FirebaseAuth.instance.currentUser!.uid;
 
@@ -136,7 +136,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final notifier = context.watch<TransactionNotifier>();
+    final notifier = context.watch<app_notifier.TransactionNotifier>();
     final state = notifier.state;
     final userId = FirebaseAuth.instance.currentUser!.uid;
 

@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
 import 'package:provider/provider.dart';
 
-import 'package:bytebank/application/notifiers/transaction_notifier.dart';
+import 'package:bytebank/application/notifiers/transaction_notifier.dart'
+    as app_notifier;
 import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
 import 'package:bytebank/features/dashboard/widgets/action_card.dart';
 
@@ -38,7 +39,9 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final transactionState = context.watch<TransactionNotifier>().state;
+    final transactionState = context
+        .watch<app_notifier.TransactionNotifier>()
+        .state;
 
     return Scaffold(
       appBar: const MainAppBar(title: 'Controle de Despesas'),
@@ -60,7 +63,7 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     );
   }
 
-  Widget _buildChart(TransactionState state) {
+  Widget _buildChart(app_notifier.TransactionState state) {
     final colors = [
       AppColors.chartDarkGreen,
       AppColors.chartGreen,
@@ -143,7 +146,7 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
               itemBuilder: (context, index) {
                 final entry = chartData[index];
                 final label = context
-                    .read<TransactionNotifier>()
+                    .read<app_notifier.TransactionNotifier>()
                     .getCategoryLabel(entry.key);
                 final iconData = getIconForCategory(entry.key);
                 return ListTile(
@@ -163,7 +166,7 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     );
   }
 
-  Widget _buildTransactionList(TransactionState transactionState) {
+  Widget _buildTransactionList(app_notifier.TransactionState transactionState) {
     if (transactionState.allTransactions.isEmpty) {
       return const Center(
         child: Column(
@@ -228,9 +231,9 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
           itemCount: entries.length,
           itemBuilder: (context, index) {
             final entry = entries[index];
-            final label = context.read<TransactionNotifier>().getCategoryLabel(
-              entry.key,
-            );
+            final label = context
+                .read<app_notifier.TransactionNotifier>()
+                .getCategoryLabel(entry.key);
             final iconData = getIconForCategory(entry.key);
             final value = entry.value;
             return ActionCard(

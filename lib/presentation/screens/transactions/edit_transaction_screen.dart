@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
 import 'package:bytebank/features/transactions/models/financial_transaction.dart';
-import 'package:bytebank/application/notifiers/transaction_notifier.dart';
+import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
 import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:intl/intl.dart';
@@ -31,7 +31,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
   @override
   void initState() {
     super.initState();
-    final notifier = context.read<TransactionNotifier>();
+    final notifier = context.read<app_notifier.TransactionNotifier>();
 
     _descriptionController = TextEditingController(
       text: widget.transaction.description,
@@ -65,7 +65,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
     });
 
     try {
-      final notifier = context.read<TransactionNotifier>();
+      final notifier = context.read<app_notifier.TransactionNotifier>();
       final userId = FirebaseAuth.instance.currentUser!.uid;
 
       await notifier.editTransaction(
@@ -97,7 +97,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final notifier = context.watch<TransactionNotifier>();
+    final notifier = context.watch<app_notifier.TransactionNotifier>();
     final isIncome = widget.transaction.amount > 0;
 
     final categories = isIncome

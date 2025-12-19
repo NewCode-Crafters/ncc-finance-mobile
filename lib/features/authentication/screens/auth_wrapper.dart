@@ -7,7 +7,7 @@ import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/dashboard/screens/dashboard_screen.dart';
-import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
+import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
 import 'package:provider/provider.dart';
 
 /// AuthGate is responsible for routing based on the user's authentication state
@@ -23,7 +23,7 @@ class _AuthGateState extends State<AuthGate> {
   late AuthNotifier _authNotifier;
   late ProfileNotifier _profileNotifier;
   late InvestmentNotifier _investmentNotifier;
-  late TransactionNotifier _transactionNotifier;
+  late app_notifier.TransactionNotifier _transactionNotifier;
   String? _lastUserId;
 
   @override
@@ -32,7 +32,7 @@ class _AuthGateState extends State<AuthGate> {
     _authNotifier = context.read<AuthNotifier>();
     _profileNotifier = context.read<ProfileNotifier>();
     _investmentNotifier = context.read<InvestmentNotifier>();
-    _transactionNotifier = context.read<TransactionNotifier>();
+    _transactionNotifier = context.read<app_notifier.TransactionNotifier>();
 
     // Listen for changes in AuthNotifier's state to display messages
     _authNotifier.addListener(_onAuthMessageChanged);

@@ -6,6 +6,7 @@ import 'package:bytebank/domain/repositories/i_financial_transaction_repository.
 import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseTransactionRepository implements IFinancialTransactionRepository {
   FirebaseTransactionRepository({
@@ -21,13 +22,20 @@ class FirebaseTransactionRepository implements IFinancialTransactionRepository {
   final String? _currentUserId;
 
   String _requireUserId() {
-    if (_currentUserId == null || _currentUserId!.isEmpty) {
+    // Prefer an injected currentUserId (useful for tests). If not provided,
+    // attempt to read the currently authenticated user from FirebaseAuth.
+    if (_currentUserId != null && _currentUserId!.isNotEmpty) {
+      return _currentUserId!;
+    }
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null || uid.isEmpty) {
       throw const FinancialTransactionRepositoryException(
         'User id is required to access transactions.',
       );
     }
 
-    return _currentUserId!;
+    return uid;
   }
 
   @override

@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
 import 'package:bytebank/features/investments/widgets/investment_list_item.dart';
-import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
+import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
 import 'package:provider/provider.dart';
 
 class InvestmentsScreen extends StatefulWidget {
@@ -82,7 +82,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
       final userId = FirebaseAuth.instance.currentUser!.uid;
       final investmentNotifier = context.read<InvestmentNotifier>();
       final balanceNotifier = context.read<BalanceNotifier>();
-      final transactionNotifier = context.read<TransactionNotifier>();
+      final transactionNotifier = context.read<app_notifier.TransactionNotifier>();
 
       try {
         await investmentNotifier.deleteInvestment(

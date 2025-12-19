@@ -1,5 +1,5 @@
 import 'package:bytebank/core/widgets/app_snackbar.dart';
-import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
+import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +65,7 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
     final investmentService = context.read<InvestmentService>();
     final investmentNotifier = context.read<InvestmentNotifier>();
     final balanceNotifier = context.read<BalanceNotifier>();
-    final transactionNotifier = context.read<TransactionNotifier>();
+    final transactionNotifier = context.read<app_notifier.TransactionNotifier>();
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     final userId = FirebaseAuth.instance.currentUser?.uid;

@@ -9,12 +9,20 @@ import 'package:bytebank/features/dashboard/services/balance_service.dart';
 import 'package:bytebank/features/investments/services/investment_service.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
+import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
+import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
+import 'package:bytebank/domain/use_cases/transactions/get_transactions_use_case.dart';
+import 'package:bytebank/domain/use_cases/transactions/create_transaction_use_case.dart';
+import 'package:bytebank/domain/use_cases/transactions/update_transaction_use_case.dart';
+import 'package:bytebank/domain/use_cases/transactions/delete_transaction_use_case.dart';
+import 'package:bytebank/application/notifiers/transaction_notifier.dart'
+    as app_notifier;
 
 import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
-import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
 
@@ -45,6 +53,37 @@ Future<void> initializeDependencies() async {
     () => FinancialTransactionService(),
   );
 
+  // -- Transaction infrastructure
+  sl.registerLazySingleton<FirebaseTransactionDataSource>(
+    () => FirebaseTransactionDataSource(firestore: sl<FirebaseFirestore>()),
+  );
+
+  sl.registerLazySingleton<FirebaseTransactionRepository>(
+    () => FirebaseTransactionRepository(
+      dataSource: sl<FirebaseTransactionDataSource>(),
+      mapper: sl<FinancialTransactionMapper>(),
+      currentUserId: null,
+    ),
+  );
+
+  sl.registerLazySingleton<FinancialTransactionMapper>(
+    () => const FinancialTransactionMapper(),
+  );
+
+  // -- Domain use-cases for transactions
+  sl.registerLazySingleton<GetTransactionsUseCase>(
+    () => GetTransactionsUseCase(sl<FirebaseTransactionRepository>()),
+  );
+  sl.registerLazySingleton<CreateTransactionUseCase>(
+    () => CreateTransactionUseCase(sl<FirebaseTransactionRepository>()),
+  );
+  sl.registerLazySingleton<UpdateTransactionUseCase>(
+    () => UpdateTransactionUseCase(sl<FirebaseTransactionRepository>()),
+  );
+  sl.registerLazySingleton<DeleteTransactionUseCase>(
+    () => DeleteTransactionUseCase(sl<FirebaseTransactionRepository>()),
+  );
+
   // -- Notifiers (factories so each consumer gets a fresh instance)
   sl.registerFactory<AuthNotifier>(() => AuthNotifier(sl<AuthService>()));
   sl.registerFactory<ProfileNotifier>(
@@ -57,12 +96,17 @@ Future<void> initializeDependencies() async {
     () => InvestmentNotifier(sl<InvestmentService>()),
   );
   sl.registerFactory<ChartAnimationNotifier>(() => ChartAnimationNotifier());
-  sl.registerFactory<TransactionNotifier>(
-    () => TransactionNotifier(
-      sl<FinancialTransactionService>(),
-      sl<MetadataService>(),
+
+  sl.registerFactory<app_notifier.TransactionNotifier>(
+    () => app_notifier.TransactionNotifier(
+      getUseCase: sl<GetTransactionsUseCase>(),
+      createUseCase: sl<CreateTransactionUseCase>(),
+      updateUseCase: sl<UpdateTransactionUseCase>(),
+      deleteUseCase: sl<DeleteTransactionUseCase>(),
+      metadataService: sl<MetadataService>(),
     ),
   );
+
   sl.registerFactory<TransactionAttachmentsNotifier>(
     () => TransactionAttachmentsNotifier(),
   );

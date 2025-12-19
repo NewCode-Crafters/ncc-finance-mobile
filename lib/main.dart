@@ -1,16 +1,16 @@
-import 'package:bytebank/features/transactions/screens/expense_control_screen.dart';
+import 'package:bytebank/presentation/screens/transactions/expense_control_screen.dart';
 import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
-import 'package:bytebank/features/transactions/screens/view_transaction_screen.dart';
+import 'package:bytebank/presentation/screens/transactions/view_transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/features/splash/screens/splash_screen.dart';
 import 'package:bytebank/features/transactions/models/financial_transaction.dart';
-import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
+import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
 import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
-import 'package:bytebank/features/transactions/screens/create_transaction_screen.dart';
-import 'package:bytebank/features/transactions/screens/edit_transaction_screen.dart';
-import 'package:bytebank/features/transactions/screens/transactions_screen.dart';
+import 'package:bytebank/presentation/screens/transactions/create_transaction_screen.dart';
+import 'package:bytebank/presentation/screens/transactions/edit_transaction_screen.dart';
+import 'package:bytebank/presentation/screens/transactions/transactions_screen.dart';
 import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -82,8 +82,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<ChartAnimationNotifier>(
           create: (_) => sl<ChartAnimationNotifier>(),
         ),
-        ChangeNotifierProvider<TransactionNotifier>(
-          create: (_) => sl<TransactionNotifier>(),
+        ChangeNotifierProvider<app_notifier.TransactionNotifier>(
+          create: (_) => sl<app_notifier.TransactionNotifier>(),
         ),
         // Local attachments selection for transaction creation
         ChangeNotifierProvider<TransactionAttachmentsNotifier>(

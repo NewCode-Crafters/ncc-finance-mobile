@@ -1,5 +1,6 @@
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CreateTransactionUseCase {
   final IFinancialTransactionRepository repository;
@@ -7,9 +8,12 @@ class CreateTransactionUseCase {
   CreateTransactionUseCase(this.repository);
 
   Future<FinancialTransactionEntity> call(
-    FinancialTransactionEntity transaction,
-  ) async {
+    FinancialTransactionEntity transaction, {
+    WriteBatch? batch,
+  }) async {
     // Business rules could be applied here (validation, normalization, etc.)
-    return repository.createTransaction(transaction);
+    // Forward optional Firestore batch to repository so balance updates can be
+    // included in the same atomic write when needed.
+    return repository.createTransaction(transaction, batch: batch);
   }
 }
