@@ -1,5 +1,6 @@
 import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:bytebank/theme/theme.dart';
+import 'package:bytebank/presentation/screens/transactions/view_transaction_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/features/transactions/models/financial_transaction.dart';
 import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
@@ -44,7 +45,7 @@ class TransactionListItem extends StatelessWidget {
 
     final tileContent = Card(
       margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      child: InkWell(
+        child: InkWell(
         onLongPress: () {
           if (isReadOnly) {
             final message = transaction.category == 'INVESTMENT_REDEMPTION'
@@ -61,6 +62,18 @@ class TransactionListItem extends StatelessWidget {
                   child: Wrap(
                     children: <Widget>[
                       ListTile(
+                        leading: const Icon(Icons.visibility),
+                        title: const Text('Visualizar Transação'),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => ViewTransactionDetailScreen(transaction: transaction),
+                            ),
+                          );
+                        },
+                      ),
+                      ListTile(
                         leading: const Icon(Icons.edit),
                         title: const Text('Editar Transação'),
                         onTap: () {
@@ -76,6 +89,8 @@ class TransactionListItem extends StatelessWidget {
                           onDelete();
                         },
                       ),
+                      
+
                     ],
                   ),
                 ),
