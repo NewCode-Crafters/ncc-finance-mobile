@@ -1,5 +1,7 @@
 import 'package:bytebank/core/constants/app_assets.dart';
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/application/notifiers/balance_notifier.dart'
+    as app_balance;
+import 'package:bytebank/core/di/injection_container.dart' as di;
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,7 +44,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Capture the navigator before the async call to avoid using BuildContext
     // across an async gap.
     final navigator = Navigator.of(context);
-    final balanceNotifier = context.read<BalanceNotifier>();
+    final balanceNotifier = context.read<app_balance.BalanceNotifier>();
     final profileNotifier = context.read<ProfileNotifier>();
 
     final bool success = await _authNotifier.signUp(

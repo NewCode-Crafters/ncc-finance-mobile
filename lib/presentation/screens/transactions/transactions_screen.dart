@@ -1,8 +1,10 @@
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
+import 'package:bytebank/application/notifiers/balance_notifier.dart'
+    as app_balance;
+import 'package:bytebank/application/notifiers/transaction_notifier.dart'
+    as app_notifier;
 import 'package:bytebank/presentation/screens/transactions/edit_transaction_screen.dart';
 import 'package:bytebank/presentation/widgets/transactions/transaction_list_item.dart';
 import 'package:provider/provider.dart';
@@ -66,7 +68,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   Future<void> _fetchData() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
-      await context.read<app_notifier.TransactionNotifier>().fetchTransactions(userId);
+      await context.read<app_notifier.TransactionNotifier>().fetchTransactions(
+        userId,
+      );
     }
   }
 
@@ -96,7 +100,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     String transactionId,
   ) async {
     final notifier = context.read<app_notifier.TransactionNotifier>();
-    final balanceNotifier = context.read<BalanceNotifier>();
+    final balanceNotifier = context.read<app_balance.BalanceNotifier>();
     final userId = FirebaseAuth.instance.currentUser!.uid;
 
     final confirmed = await showDialog<bool>(

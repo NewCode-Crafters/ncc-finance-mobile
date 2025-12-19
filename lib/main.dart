@@ -6,7 +6,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/features/splash/screens/splash_screen.dart';
 import 'package:bytebank/features/transactions/models/financial_transaction.dart';
-import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
+import 'package:bytebank/application/notifiers/transaction_notifier.dart'
+    as app_notifier;
 import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/presentation/screens/transactions/create_transaction_screen.dart';
 import 'package:bytebank/presentation/screens/transactions/edit_transaction_screen.dart';
@@ -24,10 +25,9 @@ import 'package:bytebank/features/authentication/services/auth_service.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/dashboard/screens/dashboard_screen.dart';
 import 'package:bytebank/features/dashboard/services/balance_service.dart';
-import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
+import 'package:bytebank/application/notifiers/investment_notifier.dart';
 import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
 import 'package:bytebank/features/investments/screens/investments_screen.dart';
-import 'package:bytebank/features/investments/services/investment_service.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
 import 'package:bytebank/features/profile/services/profile_service.dart';
@@ -35,6 +35,8 @@ import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.
 import 'package:bytebank/firebase_options.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'core/di/injection_container.dart';
+import 'package:bytebank/application/notifiers/balance_notifier.dart'
+    as app_balance;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,8 +70,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<BalanceNotifier>(
           create: (_) => sl<BalanceNotifier>(),
         ),
+        // Application-layer BalanceNotifier
+        ChangeNotifierProvider<app_balance.BalanceNotifier>(
+          create: (_) => sl<app_balance.BalanceNotifier>(),
+        ),
         // --- Investments ---
-        Provider<InvestmentService>(create: (_) => sl<InvestmentService>()),
         ChangeNotifierProvider<InvestmentNotifier>(
           create: (_) => sl<InvestmentNotifier>(),
         ),

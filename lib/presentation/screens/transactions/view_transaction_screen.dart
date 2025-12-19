@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/application/notifiers/balance_notifier.dart'
+    as app_balance;
 import 'package:bytebank/presentation/screens/transactions/edit_transaction_screen.dart';
 import 'package:bytebank/presentation/widgets/transactions/transaction_list_item.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
+import 'package:bytebank/application/notifiers/transaction_notifier.dart'
+    as app_notifier;
 import 'package:bytebank/theme/theme.dart';
 
 class ViewTransactionScreen extends StatefulWidget {
@@ -32,7 +34,7 @@ class _ViewTransactionScreenState extends State<ViewTransactionScreen> {
       final text = _searchController.text;
       _searchDebounce?.cancel();
       _searchDebounce = Timer(const Duration(milliseconds: 1500), () {
-      final notifier = context.read<app_notifier.TransactionNotifier>();
+        final notifier = context.read<app_notifier.TransactionNotifier>();
         if (notifier.state.searchText == text) return;
         notifier.updateSearchText(text);
         final userId = FirebaseAuth.instance.currentUser?.uid;
@@ -63,7 +65,9 @@ class _ViewTransactionScreenState extends State<ViewTransactionScreen> {
   Future<void> _fetchData() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
-      await context.read<app_notifier.TransactionNotifier>().fetchTransactions(userId);
+      await context.read<app_notifier.TransactionNotifier>().fetchTransactions(
+        userId,
+      );
     }
   }
 
@@ -93,7 +97,7 @@ class _ViewTransactionScreenState extends State<ViewTransactionScreen> {
     String transactionId,
   ) async {
     final notifier = context.read<app_notifier.TransactionNotifier>();
-    final balanceNotifier = context.read<BalanceNotifier>();
+    final balanceNotifier = context.read<app_balance.BalanceNotifier>();
     final userId = FirebaseAuth.instance.currentUser!.uid;
 
     final confirmed = await showDialog<bool>(

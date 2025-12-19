@@ -1,13 +1,15 @@
 import 'package:bytebank/core/widgets/app_snackbar.dart';
-import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
+import 'package:bytebank/application/notifiers/transaction_notifier.dart'
+    as app_notifier;
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
+import 'package:bytebank/application/notifiers/balance_notifier.dart'
+    as app_balance;
+import 'package:bytebank/application/notifiers/investment_notifier.dart';
 import 'package:bytebank/features/investments/services/investment_exceptions.dart';
-import 'package:bytebank/features/investments/services/investment_service.dart';
+import 'package:bytebank/domain/entities/investment.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:provider/provider.dart';
 
@@ -62,14 +64,14 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
       _isLoading = true;
     });
 
-    final investmentService = context.read<InvestmentService>();
     final investmentNotifier = context.read<InvestmentNotifier>();
-    final balanceNotifier = context.read<BalanceNotifier>();
-    final transactionNotifier = context.read<app_notifier.TransactionNotifier>();
+    final balanceNotifier = context.read<app_balance.BalanceNotifier>();
+    final transactionNotifier = context
+        .read<app_notifier.TransactionNotifier>();
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     final userId = FirebaseAuth.instance.currentUser?.uid;
-    final balances = context.read<BalanceNotifier>().state.balances;
+    final balances = context.read<app_balance.BalanceNotifier>().state.balances;
 
     try {
       if (userId == null) {
@@ -95,9 +97,19 @@ class _CreateInvestmentScreenState extends State<CreateInvestmentScreen> {
         'balanceId': balanceId,
       };
 
-      await investmentService.createInvestment(
+      final inv = Investment(
+        id: '',
+        name: investmentData['name'] as String,
+        amount: investmentData['amount'] as double,
+        category: investmentData['category'] as String,
+        type: investmentData['type'] as String,
+        investedAt: investmentData['investedAt'] as DateTime,
+        balanceId: investmentData['balanceId'] as String,
+      );
+
+      await investmentNotifier.createInvestment(
         userId: userId,
-        data: investmentData,
+        investment: inv,
       );
 
       if (!mounted) return;

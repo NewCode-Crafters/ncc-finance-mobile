@@ -5,7 +5,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
 
-import 'package:bytebank/features/investments/models/investment.dart' as _i4;
+import 'package:bytebank/domain/entities/investment.dart' as _i4;
 import 'package:bytebank/features/investments/services/investment_service.dart'
     as _i2;
 import 'package:mockito/mockito.dart' as _i1;

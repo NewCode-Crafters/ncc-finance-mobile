@@ -14,7 +14,8 @@ import 'package:bytebank/features/transactions/services/transaction_attachment_s
 import 'package:bytebank/theme/theme.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/application/notifiers/balance_notifier.dart'
+    as app_balance;
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
 import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
@@ -71,7 +72,10 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
     }
 
     if (_selectedType == TransactionType.expense) {
-      final currentBalance = context.read<BalanceNotifier>().state.totalBalance;
+      final currentBalance = context
+          .read<app_balance.BalanceNotifier>()
+          .state
+          .totalBalance;
       final transactionAmount = _amountController.numberValue;
 
       if (transactionAmount > currentBalance) {
@@ -93,12 +97,17 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
 
     try {
       final transactionService = context.read<FinancialTransactionService>();
-      final balanceNotifier = context.read<BalanceNotifier>();
+      final balanceNotifier = context.read<app_balance.BalanceNotifier>();
       final transactionNotifier = context
           .read<app_notifier.TransactionNotifier>();
       final navigator = Navigator.of(context);
       final userId = FirebaseAuth.instance.currentUser!.uid;
-      final balanceId = context.read<BalanceNotifier>().state.balances.first.id;
+      final balanceId = context
+          .read<app_balance.BalanceNotifier>()
+          .state
+          .balances
+          .first
+          .id;
       final attachmentsNotifier = context
           .read<TransactionAttachmentsNotifier>();
 
