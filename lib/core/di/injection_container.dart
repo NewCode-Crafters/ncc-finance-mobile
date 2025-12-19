@@ -6,7 +6,6 @@ import 'package:bytebank/features/authentication/services/firebase_auth_service.
 import 'package:bytebank/features/authentication/services/auth_service.dart';
 import 'package:bytebank/features/profile/services/profile_service.dart';
 import 'package:bytebank/features/dashboard/services/balance_service.dart';
-import 'package:bytebank/features/investments/services/investment_service.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
@@ -24,11 +23,16 @@ import 'package:bytebank/domain/use_cases/transactions/update_transaction_use_ca
 import 'package:bytebank/domain/use_cases/transactions/delete_transaction_use_case.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
+import 'package:bytebank/infrastructure/repositories/firebase_investment_repository.dart';
+import 'package:bytebank/domain/use_cases/investments/get_investments_use_case.dart';
+import 'package:bytebank/domain/use_cases/investments/create_investment_use_case.dart';
+import 'package:bytebank/domain/use_cases/investments/delete_investment_use_case.dart';
+import 'package:bytebank/application/notifiers/investment_notifier.dart'
+    as app_investment;
 
 import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
 
@@ -53,7 +57,7 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<AuthService>(() => FirebaseAuthService());
   sl.registerLazySingleton<ProfileService>(() => ProfileService());
   sl.registerLazySingleton<BalanceService>(() => BalanceService());
-  sl.registerLazySingleton<InvestmentService>(() => InvestmentService());
+
   sl.registerLazySingleton<MetadataService>(() => MetadataService());
   sl.registerLazySingleton<FinancialTransactionService>(
     () => FinancialTransactionService(),
@@ -121,8 +125,29 @@ Future<void> initializeDependencies() async {
       sl<UpdateBalanceUseCase>(),
     ),
   );
-  sl.registerFactory<InvestmentNotifier>(
-    () => InvestmentNotifier(sl<InvestmentService>()),
+
+  sl.registerLazySingleton<FirebaseInvestmentRepository>(
+    () => FirebaseInvestmentRepository(firestore: sl<FirebaseFirestore>()),
+  );
+
+  sl.registerLazySingleton<GetInvestmentsUseCase>(
+    () => GetInvestmentsUseCase(repository: sl<FirebaseInvestmentRepository>()),
+  );
+  sl.registerLazySingleton<CreateInvestmentUseCase>(
+    () =>
+        CreateInvestmentUseCase(repository: sl<FirebaseInvestmentRepository>()),
+  );
+  sl.registerLazySingleton<DeleteInvestmentUseCase>(
+    () =>
+        DeleteInvestmentUseCase(repository: sl<FirebaseInvestmentRepository>()),
+  );
+
+  sl.registerFactory<app_investment.InvestmentNotifier>(
+    () => app_investment.InvestmentNotifier(
+      sl<GetInvestmentsUseCase>(),
+      sl<CreateInvestmentUseCase>(),
+      sl<DeleteInvestmentUseCase>(),
+    ),
   );
   sl.registerFactory<ChartAnimationNotifier>(() => ChartAnimationNotifier());
 

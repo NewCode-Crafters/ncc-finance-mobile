@@ -25,10 +25,9 @@ import 'package:bytebank/features/authentication/services/auth_service.dart';
 import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/features/dashboard/screens/dashboard_screen.dart';
 import 'package:bytebank/features/dashboard/services/balance_service.dart';
-import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
+import 'package:bytebank/application/notifiers/investment_notifier.dart';
 import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
 import 'package:bytebank/features/investments/screens/investments_screen.dart';
-import 'package:bytebank/features/investments/services/investment_service.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
 import 'package:bytebank/features/profile/services/profile_service.dart';
@@ -71,12 +70,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<BalanceNotifier>(
           create: (_) => sl<BalanceNotifier>(),
         ),
-        // Application-layer BalanceNotifier (hexagonal implementation)
+        // Application-layer BalanceNotifier
         ChangeNotifierProvider<app_balance.BalanceNotifier>(
           create: (_) => sl<app_balance.BalanceNotifier>(),
         ),
         // --- Investments ---
-        Provider<InvestmentService>(create: (_) => sl<InvestmentService>()),
         ChangeNotifierProvider<InvestmentNotifier>(
           create: (_) => sl<InvestmentNotifier>(),
         ),

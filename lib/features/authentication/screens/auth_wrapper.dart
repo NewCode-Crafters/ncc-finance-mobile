@@ -3,11 +3,9 @@ import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
-import 'package:bytebank/core/di/injection_container.dart' as di;
-import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
+import 'package:bytebank/application/notifiers/investment_notifier.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/dashboard/screens/dashboard_screen.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'

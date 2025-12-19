@@ -1,20 +1,72 @@
-import 'package:bytebank/features/investments/models/investment.dart';
-import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
-import 'package:bytebank/features/investments/services/investment_service.dart';
+import 'package:bytebank/domain/entities/investment.dart';
+import 'package:bytebank/application/notifiers/investment_notifier.dart';
+import 'package:bytebank/domain/use_cases/investments/get_investments_use_case.dart';
+import 'package:bytebank/domain/use_cases/investments/create_investment_use_case.dart';
+import 'package:bytebank/domain/use_cases/investments/delete_investment_use_case.dart';
+import 'package:bytebank/domain/repositories/investment_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 
-import 'investment_notifier_test.mocks.dart';
+class FakeInvestmentRepository implements IInvestmentRepository {
+  final List<Investment> Function() provider;
+  FakeInvestmentRepository(this.provider);
 
-@GenerateMocks([InvestmentService])
+  @override
+  Future<Investment> createInvestment({
+    required String userId,
+    required Investment investment,
+  }) async {
+    // return the investment with an assigned id
+    return investment.copyWith(id: 'created-id');
+  }
+
+  @override
+  Future<void> deleteInvestment({
+    required String userId,
+    required String investmentId,
+  }) async {
+    return;
+  }
+
+  @override
+  Future<Investment> getInvestmentById({
+    required String userId,
+    required String investmentId,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Investment>> getInvestments({required String userId}) async {
+    return provider();
+  }
+
+  @override
+  Future<Investment> updateInvestment({
+    required String userId,
+    required Investment investment,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<List<Investment>> listenInvestments({required String userId}) {
+    return Stream.value(provider());
+  }
+}
+
 void main() {
-  late MockInvestmentService mockInvestmentService;
+  late GetInvestmentsUseCase fakeGet;
+  late CreateInvestmentUseCase fakeCreate;
+  late DeleteInvestmentUseCase fakeDelete;
   late InvestmentNotifier investmentNotifier;
 
   setUp(() {
-    mockInvestmentService = MockInvestmentService();
-    investmentNotifier = InvestmentNotifier(mockInvestmentService);
+    // default provider returns empty list
+    final fakeRepo = FakeInvestmentRepository(() => []);
+    fakeGet = GetInvestmentsUseCase(repository: fakeRepo);
+    fakeCreate = CreateInvestmentUseCase(repository: fakeRepo);
+    fakeDelete = DeleteInvestmentUseCase(repository: fakeRepo);
+    investmentNotifier = InvestmentNotifier(fakeGet, fakeCreate, fakeDelete);
   });
 
   test(
@@ -32,9 +84,11 @@ void main() {
         ),
       ];
 
-      when(
-        mockInvestmentService.getInvestments(userId: anyNamed('userId')),
-      ).thenAnswer((_) async => fakeInvestments);
+      final fakeRepo = FakeInvestmentRepository(() => fakeInvestments);
+      fakeGet = GetInvestmentsUseCase(repository: fakeRepo);
+      fakeCreate = CreateInvestmentUseCase(repository: fakeRepo);
+      fakeDelete = DeleteInvestmentUseCase(repository: fakeRepo);
+      investmentNotifier = InvestmentNotifier(fakeGet, fakeCreate, fakeDelete);
 
       await investmentNotifier.fetchInvestments(userId: 'test_user');
 
@@ -44,9 +98,11 @@ void main() {
   );
 
   test('fetchInvestments should handle no investments case', () async {
-    when(
-      mockInvestmentService.getInvestments(userId: anyNamed('userId')),
-    ).thenAnswer((_) async => []);
+    final fakeRepo = FakeInvestmentRepository(() => []);
+    fakeGet = GetInvestmentsUseCase(repository: fakeRepo);
+    fakeCreate = CreateInvestmentUseCase(repository: fakeRepo);
+    fakeDelete = DeleteInvestmentUseCase(repository: fakeRepo);
+    investmentNotifier = InvestmentNotifier(fakeGet, fakeCreate, fakeDelete);
 
     await investmentNotifier.fetchInvestments(userId: 'test_user');
 
@@ -85,9 +141,11 @@ void main() {
       ),
     ];
 
-    when(
-      mockInvestmentService.getInvestments(userId: anyNamed('userId')),
-    ).thenAnswer((_) async => fakeInvestments);
+    final fakeRepo = FakeInvestmentRepository(() => fakeInvestments);
+    fakeGet = GetInvestmentsUseCase(repository: fakeRepo);
+    fakeCreate = CreateInvestmentUseCase(repository: fakeRepo);
+    fakeDelete = DeleteInvestmentUseCase(repository: fakeRepo);
+    investmentNotifier = InvestmentNotifier(fakeGet, fakeCreate, fakeDelete);
 
     await investmentNotifier.fetchInvestments(userId: 'test_user');
 
@@ -130,9 +188,11 @@ void main() {
         ),
       ];
 
-      when(
-        mockInvestmentService.getInvestments(userId: anyNamed('userId')),
-      ).thenAnswer((_) async => fakeInvestments);
+      final fakeRepo2 = FakeInvestmentRepository(() => fakeInvestments);
+      fakeGet = GetInvestmentsUseCase(repository: fakeRepo2);
+      fakeCreate = CreateInvestmentUseCase(repository: fakeRepo2);
+      fakeDelete = DeleteInvestmentUseCase(repository: fakeRepo2);
+      investmentNotifier = InvestmentNotifier(fakeGet, fakeCreate, fakeDelete);
 
       await investmentNotifier.fetchInvestments(userId: 'test_user');
 

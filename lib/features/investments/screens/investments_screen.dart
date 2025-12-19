@@ -7,8 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
-    as app_balance;
-import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
+  as app_balance;
+import 'package:bytebank/application/notifiers/investment_notifier.dart';
 import 'package:bytebank/features/investments/widgets/investment_list_item.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
