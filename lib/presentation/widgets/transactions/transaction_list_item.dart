@@ -106,7 +106,7 @@ class TransactionListItem extends StatelessWidget {
 
             showAppSnackBar(context, message, AppMessageType.info);
           } else {
-            final message = 'Clique longo para visualizar, editar ou excluir esta transação, ou você pode deslizar para esquerda para editar ou para direita para excluir.';
+            final message = 'Clique longo para visualizar, editar ou excluir esta transação, ou você pode deslizar para direita para editar ou para esquerda para excluir.';
 
             showAppSnackBar(context, message, AppMessageType.info);
           }

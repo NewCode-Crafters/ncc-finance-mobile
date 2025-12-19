@@ -1,3 +1,4 @@
+import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/domain/entities/investment.dart';
 import 'package:intl/intl.dart';
@@ -69,6 +70,11 @@ class InvestmentListItem extends StatelessWidget {
                 ),
               ),
             );
+          },
+          onTap: () {
+            final message = 'Clique longo para resgatar este investimento, ou você pode deslizar para esquerda para resgatar.';
+
+            showAppSnackBar(context, message, AppMessageType.info);
           },
           child: ListTile(
             leading: Container(width: 10, height: 40, color: indicatorColor),
