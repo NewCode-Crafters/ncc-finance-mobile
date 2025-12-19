@@ -98,6 +98,19 @@ class TransactionListItem extends StatelessWidget {
             );
           }
         },
+        onTap: () {
+          if (isReadOnly) {
+             final message = transaction.category == 'INVESTMENT_REDEMPTION'
+                ? 'Transações de resgate de investimento não podem ser editadas ou excluídas.'
+                : 'Transações de investimento são somente para visualização.';
+
+            showAppSnackBar(context, message, AppMessageType.info);
+          } else {
+            final message = 'Clique longo para visualizar, editar ou excluir esta transação, ou você pode deslizar para esquerda para editar ou para direita para excluir.';
+
+            showAppSnackBar(context, message, AppMessageType.info);
+          }
+        },
         child: ListTile(
           leading: CircleAvatar(
             backgroundColor: AppColors.neutral500,
