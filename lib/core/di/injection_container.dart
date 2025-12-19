@@ -12,6 +12,12 @@ import 'package:bytebank/features/transactions/services/financial_transaction_se
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
 import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_balance_repository.dart';
+import 'package:bytebank/infrastructure/mappers/balance_mapper.dart';
+import 'package:bytebank/domain/use_cases/balances/get_balances_use_case.dart';
+import 'package:bytebank/domain/use_cases/balances/update_balance_use_case.dart';
+import 'package:bytebank/application/notifiers/balance_notifier.dart'
+    as app_balance;
 import 'package:bytebank/domain/use_cases/transactions/get_transactions_use_case.dart';
 import 'package:bytebank/domain/use_cases/transactions/create_transaction_use_case.dart';
 import 'package:bytebank/domain/use_cases/transactions/update_transaction_use_case.dart';
@@ -70,6 +76,9 @@ Future<void> initializeDependencies() async {
     () => const FinancialTransactionMapper(),
   );
 
+  // -- Balance infrastructure & mappers
+  sl.registerLazySingleton<BalanceMapper>(() => BalanceMapper());
+
   // -- Domain use-cases for transactions
   sl.registerLazySingleton<GetTransactionsUseCase>(
     () => GetTransactionsUseCase(sl<FirebaseTransactionRepository>()),
@@ -89,8 +98,28 @@ Future<void> initializeDependencies() async {
   sl.registerFactory<ProfileNotifier>(
     () => ProfileNotifier(sl<ProfileService>()),
   );
+  // Legacy feature BalanceNotifier (keeps existing feature while migration proceeds)
   sl.registerFactory<BalanceNotifier>(
     () => BalanceNotifier(sl<BalanceService>()),
+  );
+
+  // Application-layer BalanceNotifier backed by domain use-cases
+  sl.registerLazySingleton<FirebaseBalanceRepository>(
+    () => FirebaseBalanceRepository(firestore: sl<FirebaseFirestore>()),
+  );
+
+  sl.registerLazySingleton<GetBalancesUseCase>(
+    () => GetBalancesUseCase(sl<FirebaseBalanceRepository>()),
+  );
+  sl.registerLazySingleton<UpdateBalanceUseCase>(
+    () => UpdateBalanceUseCase(sl<FirebaseBalanceRepository>()),
+  );
+
+  sl.registerLazySingleton<app_balance.BalanceNotifier>(
+    () => app_balance.BalanceNotifier(
+      sl<GetBalancesUseCase>(),
+      sl<UpdateBalanceUseCase>(),
+    ),
   );
   sl.registerFactory<InvestmentNotifier>(
     () => InvestmentNotifier(sl<InvestmentService>()),

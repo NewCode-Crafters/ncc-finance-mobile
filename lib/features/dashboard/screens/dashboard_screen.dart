@@ -15,7 +15,9 @@ import 'package:bytebank/features/dashboard/widgets/action_card.dart';
 import 'package:bytebank/presentation/screens/transactions/transactions_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:bytebank/core/widgets/main_app_bar.dart';
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/application/notifiers/balance_notifier.dart'
+  as app_balance;
+import 'package:bytebank/core/di/injection_container.dart' as di;
 import 'package:bytebank/features/investments/screens/investments_screen.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:provider/provider.dart';
@@ -52,14 +54,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _refreshData() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null && mounted) {
-      await context.read<BalanceNotifier>().fetchBalances(userId: userId);
+        await context.read<app_balance.BalanceNotifier>().fetchBalances(
+          userId: userId,
+        );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final profileState = context.watch<ProfileNotifier>().state;
-    final balanceState = context.watch<BalanceNotifier>().state;
+    final balanceState = context.watch<app_balance.BalanceNotifier>().state;
 
     // Reusable text theme
     final textTheme = Theme.of(context).textTheme;

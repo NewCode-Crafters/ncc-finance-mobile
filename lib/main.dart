@@ -6,7 +6,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/features/splash/screens/splash_screen.dart';
 import 'package:bytebank/features/transactions/models/financial_transaction.dart';
-import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
+import 'package:bytebank/application/notifiers/transaction_notifier.dart'
+    as app_notifier;
 import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/presentation/screens/transactions/create_transaction_screen.dart';
 import 'package:bytebank/presentation/screens/transactions/edit_transaction_screen.dart';
@@ -35,6 +36,8 @@ import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.
 import 'package:bytebank/firebase_options.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'core/di/injection_container.dart';
+import 'package:bytebank/application/notifiers/balance_notifier.dart'
+    as app_balance;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,6 +70,10 @@ class MyApp extends StatelessWidget {
         Provider<BalanceService>(create: (_) => sl<BalanceService>()),
         ChangeNotifierProvider<BalanceNotifier>(
           create: (_) => sl<BalanceNotifier>(),
+        ),
+        // Application-layer BalanceNotifier (hexagonal implementation)
+        ChangeNotifierProvider<app_balance.BalanceNotifier>(
+          create: (_) => sl<app_balance.BalanceNotifier>(),
         ),
         // --- Investments ---
         Provider<InvestmentService>(create: (_) => sl<InvestmentService>()),
