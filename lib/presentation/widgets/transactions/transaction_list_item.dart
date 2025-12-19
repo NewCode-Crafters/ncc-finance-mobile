@@ -55,25 +55,30 @@ class TransactionListItem extends StatelessWidget {
           } else {
             showModalBottomSheet(
               context: context,
-              builder: (context) => Wrap(
-                children: <Widget>[
-                  ListTile(
-                    leading: const Icon(Icons.edit),
-                    title: const Text('Editar Transação'),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      onEdit();
-                    },
+              builder: (context) => SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Wrap(
+                    children: <Widget>[
+                      ListTile(
+                        leading: const Icon(Icons.edit),
+                        title: const Text('Editar Transação'),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          onEdit();
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.delete),
+                        title: const Text('Excluir Transação'),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          onDelete();
+                        },
+                      ),
+                    ],
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.delete),
-                    title: const Text('Excluir Transação'),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      onDelete();
-                    },
-                  ),
-                ],
+                ),
               ),
             );
           }

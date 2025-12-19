@@ -47,15 +47,39 @@ class InvestmentListItem extends StatelessWidget {
         ),
       ),
       child: Card(
-        child: ListTile(
-          leading: Container(width: 10, height: 40, color: indicatorColor),
-          title: Text(investment.name),
-          subtitle: Text(
-            DateFormat('dd/MM/yyyy').format(investment.investedAt),
-          ),
-          trailing: Text(
-            currencyFormatter.format(investment.amount),
-            style: const TextStyle(fontWeight: FontWeight.bold),
+        child: InkWell(
+          onLongPress: () async {
+            showModalBottomSheet(
+              context: context,
+              builder: (context) => SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Wrap(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.account_balance_wallet),
+                        title: const Text('Resgatar investimento'),
+                        onTap: () async {
+                          Navigator.of(context).pop();
+                          await onConfirmDelete();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+          child: ListTile(
+            leading: Container(width: 10, height: 40, color: indicatorColor),
+            title: Text(investment.name),
+            subtitle: Text(
+              DateFormat('dd/MM/yyyy').format(investment.investedAt),
+            ),
+            trailing: Text(
+              currencyFormatter.format(investment.amount),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ),
       ),
