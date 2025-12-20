@@ -1,19 +1,21 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:bytebank/features/dashboard/services/balance_service.dart';
+import 'package:bytebank/domain/repositories/balance_repository.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_balance_repository.dart';
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/infrastructure/dtos/financial_transaction_dto.dart';
 import 'package:bytebank/features/transactions/services/oldfinancial_transaction_exceptions.dart';
 
 class FinancialTransactionService {
   final FirebaseFirestore _firestore;
-  final BalanceService _balanceService;
+  final IBalanceRepository _balanceRepository;
 
   FinancialTransactionService({
     FirebaseFirestore? firestore,
-    BalanceService? balanceService,
+    IBalanceRepository? balanceRepository,
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
-       _balanceService = balanceService ?? BalanceService();
+       _balanceRepository =
+           balanceRepository ?? FirebaseBalanceRepository(firestore: firestore);
 
   Future<DocumentReference> createTransaction({
     required String userId,
@@ -33,10 +35,10 @@ class FinancialTransactionService {
       transactionData['date'] = Timestamp.fromDate(data['date']);
       writeBatch.set(transactionRef, transactionData);
 
-      await _balanceService.updateBalanceOnTransaction(
+      await _balanceRepository.updateBalanceByDelta(
         userId: userId,
         balanceId: data['balanceId'],
-        transactionAmount: data['amount'],
+        delta: data['amount'],
         batch: batch,
       );
 
@@ -186,10 +188,10 @@ class FinancialTransactionService {
         final amountToRevert = transactionData['amount'] as double;
         final balanceId = transactionData['balanceId'] as String;
 
-        await _balanceService.updateBalanceOnTransaction(
+        await _balanceRepository.updateBalanceByDelta(
           userId: userId,
           balanceId: balanceId,
-          transactionAmount: -amountToRevert,
+          delta: -amountToRevert,
           batch: batch,
         );
 

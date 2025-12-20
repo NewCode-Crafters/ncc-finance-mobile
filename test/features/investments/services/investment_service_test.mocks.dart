@@ -6,8 +6,7 @@
 import 'dart:async' as _i4;
 
 import 'package:bytebank/features/dashboard/models/balance.dart' as _i5;
-import 'package:bytebank/features/dashboard/services/balance_service.dart'
-    as _i3;
+import 'package:bytebank/domain/repositories/balance_repository.dart' as _i3;
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart'
     as _i7;
 import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart'

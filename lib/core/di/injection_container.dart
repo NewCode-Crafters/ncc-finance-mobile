@@ -9,7 +9,6 @@ import 'package:bytebank/domain/repositories/user_repository.dart';
 import 'package:bytebank/domain/use_cases/profile/get_user_profile_use_case.dart';
 import 'package:bytebank/domain/use_cases/profile/upload_profile_picture_use_case.dart';
 import 'package:bytebank/domain/use_cases/profile/pick_and_upload_profile_picture_use_case.dart';
-import 'package:bytebank/features/dashboard/services/balance_service.dart';
 import 'package:bytebank/domain/repositories/balance_repository.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
@@ -59,7 +58,6 @@ Future<void> initializeDependencies() async {
 
   // -- Services (lazy singletons)
   sl.registerLazySingleton<AuthService>(() => FirebaseAuthService());
-  sl.registerLazySingleton<BalanceService>(() => BalanceService());
 
   sl.registerLazySingleton<MetadataService>(() => MetadataService());
 

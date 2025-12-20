@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:bytebank/features/dashboard/services/balance_service.dart';
 import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
-import 'package:bytebank/infrastructure/dtos/financial_transaction_dto.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
 import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
@@ -268,8 +266,8 @@ void main() {
       );
 
       final updatedEntity = existing.copyWith(
-        description: updateData['description'] as String?,
-        category: updateData['category'] as String?,
+        description: updateData['description'],
+        category: updateData['category'],
       );
 
       await transactionService.updateTransaction(updatedEntity);
