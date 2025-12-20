@@ -190,14 +190,25 @@ class FirebaseInvestmentRepository implements IInvestmentRepository {
 
     return snapshot.docs.map((doc) {
       final data = doc.data();
+
+      final name = (data['name'] as String?) ?? '';
+      final amount = (data['amount'] as num?)?.toDouble() ?? 0.0;
+      final category = (data['category'] as String?) ?? '';
+      final type = (data['type'] as String?) ?? '';
+      final investedAtTs = data['investedAt'] as Timestamp?;
+      final investedAt = investedAtTs != null
+          ? investedAtTs.toDate()
+          : DateTime.fromMillisecondsSinceEpoch(0);
+      final balanceId = (data['balanceId'] as String?) ?? '';
+
       return Investment(
         id: doc.id,
-        name: data['name'] as String,
-        amount: (data['amount'] as num).toDouble(),
-        category: data['category'] as String,
-        type: data['type'] as String,
-        investedAt: (data['investedAt'] as Timestamp).toDate(),
-        balanceId: data['balanceId'] as String,
+        name: name,
+        amount: amount,
+        category: category,
+        type: type,
+        investedAt: investedAt,
+        balanceId: balanceId,
       );
     }).toList();
   }

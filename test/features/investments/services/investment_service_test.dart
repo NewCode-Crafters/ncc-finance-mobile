@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:bytebank/features/investments/services/investment_service.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_investment_repository.dart';
 import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/domain/entities/investment.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   late FakeFirebaseFirestore fakeFirestore;
-  late InvestmentService investmentService;
+  late FirebaseInvestmentRepository investmentService;
   late _FakeTransactionRepository fakeTransactionRepo;
 
   const userId = 'test_user_id';
@@ -16,7 +17,7 @@ void main() {
     fakeFirestore = FakeFirebaseFirestore();
     fakeTransactionRepo = _FakeTransactionRepository();
 
-    investmentService = InvestmentService(
+    investmentService = FirebaseInvestmentRepository(
       firestore: fakeFirestore,
       transactionService: fakeTransactionRepo,
     );
@@ -51,9 +52,19 @@ void main() {
           .doc('test_balance_id')
           .set({'amount': 10000.0});
 
+      final investment = Investment(
+        id: '',
+        name: investmentData['name'] as String,
+        amount: investmentData['amount'] as double,
+        category: investmentData['category'] as String,
+        type: investmentData['type'] as String,
+        investedAt: investmentData['investedAt'] as DateTime,
+        balanceId: investmentData['balanceId'] as String,
+      );
+
       await investmentService.createInvestment(
         userId: userId,
-        data: investmentData,
+        investment: investment,
       );
 
       final snapshot = await fakeFirestore
@@ -165,9 +176,19 @@ void main() {
           .doc('test_balance_id')
           .set({'amount': 10000.0});
 
+      final investment = Investment(
+        id: '',
+        name: investmentData['name'] as String,
+        amount: investmentData['amount'] as double,
+        category: investmentData['category'] as String,
+        type: investmentData['type'] as String,
+        investedAt: investmentData['investedAt'] as DateTime,
+        balanceId: investmentData['balanceId'] as String,
+      );
+
       await investmentService.createInvestment(
         userId: userId,
-        data: investmentData,
+        investment: investment,
       );
 
       final created =
