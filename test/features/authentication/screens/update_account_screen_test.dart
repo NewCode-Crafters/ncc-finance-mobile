@@ -2,28 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
 import 'package:bytebank/features/authentication/screens/update_account_screen.dart';
 import 'package:bytebank/features/authentication/services/auth_service.dart';
-import 'package:bytebank/features/profile/models/user_profile.dart';
+import 'package:bytebank/domain/entities/user_profile.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
-import 'package:bytebank/features/profile/services/profile_service.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
-import '../../profile/notifiers/profile_notifier_test.mocks.dart';
 import 'login_screen_test.mocks.dart';
+import '../../../helpers/profile/profile_notifier_test_helpers.dart';
 
-@GenerateMocks([ProfileService])
 void main() {
   late MockAuthService mockAuthService;
-  late MockProfileService mockProfileService;
   late ProfileNotifier profileNotifier;
   late UserProfile fakeUserProfile;
 
   setUp(() {
     mockAuthService = MockAuthService();
-    mockProfileService = MockProfileService();
-    profileNotifier = ProfileNotifier(mockProfileService);
+    profileNotifier = ProfileNotifier(
+      getUserProfile: FakeGetUserProfileUseCase(null),
+      pickAndUploadProfilePicture: FakePickAndUploadProfilePictureUseCase(null),
+    );
 
     fakeUserProfile = UserProfile(
       uid: 'user-123',

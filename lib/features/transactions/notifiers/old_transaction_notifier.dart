@@ -2,8 +2,8 @@ import 'package:bytebank/theme/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
-import 'package:bytebank/features/transactions/models/financial_transaction.dart';
-import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
+import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
 
 class TransactionState {
   final List<FinancialTransaction> transactions;
@@ -64,14 +64,14 @@ class TransactionState {
 }
 
 class TransactionNotifier extends ChangeNotifier {
-  final FinancialTransactionService _transactionService;
+  final IFinancialTransactionRepository _transactionRepository;
   final MetadataService _metadataService;
 
   TransactionState _state = TransactionState();
   TransactionState get state => _state;
 
   // Pagination state
-  DocumentSnapshot? _lastDocument;
+  String? _lastTransactionId;
   bool _isFetchingMore = false;
   final int _pageSize = 10;
   bool _hasMore = true;
@@ -79,7 +79,7 @@ class TransactionNotifier extends ChangeNotifier {
   DateTime? _lastFetchMoreAt;
   final Duration _fetchMoreThrottle = const Duration(milliseconds: 500);
 
-  TransactionNotifier(this._transactionService, this._metadataService);
+  TransactionNotifier(this._transactionRepository, this._metadataService);
 
   List<FinancialTransaction> get visibleTransactions {
     final query = _state.searchText.trim().toLowerCase();
@@ -128,8 +128,8 @@ class TransactionNotifier extends ChangeNotifier {
     _state = _state.copyWith(isLoading: true);
     notifyListeners();
 
-    final allTransactions = await _transactionService.getTransactions(
-      userId: userId,
+    final allTransactions = await _transactionRepository.getTransactions(
+      limit: 1000,
       startDate: DateTime.now().subtract(const Duration(days: 30)),
       endDate: DateTime.now(),
     );
@@ -155,34 +155,29 @@ class TransactionNotifier extends ChangeNotifier {
 
   Future<void> fetchFirstPage(String userId) async {
     _state = _state.copyWith(isLoading: true);
-    _lastDocument = null;
+    _lastTransactionId = null;
     _hasMore = true;
     notifyListeners();
 
     try {
-      final snapshot = await _transactionService.getTransactionsPage(
-        userId: userId,
-        startDate: _state.startDate,
-        endDate: _state.endDate,
-        startAfterDoc: null,
-        limit: _pageSize,
-      );
-
       final categories = _state.categories.isEmpty
           ? await _metadataService.getTransactionCategories()
           : _state.categories;
 
-      final transactions = snapshot.docs
-          .map((doc) => FinancialTransaction.fromFirestore(doc))
-          .toList();
+      final transactions = await _transactionRepository.getTransactions(
+        limit: _pageSize,
+        startDate: _state.startDate,
+        endDate: _state.endDate,
+      );
 
-      // save last doc for pagination — if fewer than pageSize results, no more pages
-      if (snapshot.docs.length < _pageSize) {
-        _lastDocument = null;
+      if (transactions.length < _pageSize) {
+        _lastTransactionId = null;
         _hasMore = false;
       } else {
-        _lastDocument = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
-        _hasMore = _lastDocument != null;
+        _lastTransactionId = transactions.isNotEmpty
+            ? transactions.last.id
+            : null;
+        _hasMore = _lastTransactionId != null;
       }
 
       _state = _state.copyWith(
@@ -207,35 +202,28 @@ class TransactionNotifier extends ChangeNotifier {
       return;
     }
     _lastFetchMoreAt = now;
-    // also guard when lastDocument is null
-    if (_lastDocument == null) return; // no more pages
+    // also guard when lastTransactionId is null
+    if (_lastTransactionId == null) return; // no more pages
 
     _isFetchingMore = true;
     notifyListeners();
 
     try {
-      final snapshot = await _transactionService.getTransactionsPage(
-        userId: userId,
+      final more = await _transactionRepository.getTransactions(
+        limit: _pageSize,
+        startAfterId: _lastTransactionId,
         startDate: _state.startDate,
         endDate: _state.endDate,
-        startAfterDoc: _lastDocument,
-        limit: _pageSize,
       );
 
-      final more = snapshot.docs
-          .map((doc) => FinancialTransaction.fromFirestore(doc))
-          .toList();
-
-      // update last doc — determine if there are more pages
-      if (snapshot.docs.length < _pageSize) {
-        _lastDocument = null;
+      if (more.length < _pageSize) {
+        _lastTransactionId = null;
         _hasMore = false;
       } else {
-        _lastDocument = snapshot.docs.isNotEmpty ? snapshot.docs.last : null;
-        _hasMore = _lastDocument != null;
+        _lastTransactionId = more.isNotEmpty ? more.last.id : null;
+        _hasMore = _lastTransactionId != null;
       }
 
-      // append
       final updated = List<FinancialTransaction>.from(_state.transactions)
         ..addAll(more);
 
@@ -257,10 +245,7 @@ class TransactionNotifier extends ChangeNotifier {
     required String transactionId,
   }) async {
     try {
-      await _transactionService.deleteTransaction(
-        userId: userId,
-        transactionId: transactionId,
-      );
+      await _transactionRepository.deleteTransaction(transactionId);
 
       _state = _state.copyWith(
         successMessage: 'Transação excluída com sucesso!',
@@ -335,11 +320,31 @@ class TransactionNotifier extends ChangeNotifier {
     required Map<String, dynamic> data,
   }) async {
     try {
-      await _transactionService.editTransaction(
-        userId: userId,
-        transactionId: transactionId,
-        updateData: data,
+      final existing = await _transactionRepository.getTransaction(
+        transactionId,
       );
+      if (existing == null) {
+        _state = _state.copyWith(error: 'Transação não encontrada.');
+        notifyListeners();
+        return;
+      }
+
+      DateTime? newDate;
+      if (data['date'] is Timestamp) {
+        newDate = (data['date'] as Timestamp).toDate();
+      } else if (data['date'] is DateTime) {
+        newDate = data['date'] as DateTime;
+      }
+
+      final updated = existing.copyWith(
+        amount: data['amount'] as double? ?? existing.amount,
+        balanceId: data['balanceId'] as String? ?? existing.balanceId,
+        category: data['category'] as String? ?? existing.category,
+        date: newDate ?? existing.date,
+        description: data['description'] as String? ?? existing.description,
+      );
+
+      await _transactionRepository.updateTransaction(updated);
       await fetchTransactions(userId);
     } catch (e) {
       _state = _state.copyWith(error: 'Falha ao editar a transação.');

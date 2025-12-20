@@ -2,11 +2,23 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_investment_repository.dart';
 import 'package:bytebank/domain/entities/investment.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
+import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
+import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
 
 void main() {
   test('create/get/delete investment flows', () async {
     final fakeFs = FakeFirebaseFirestore();
-    final repo = FirebaseInvestmentRepository(firestore: fakeFs);
+    final txRepo = FirebaseTransactionRepository(
+      dataSource: FirebaseTransactionDataSource(firestore: fakeFs),
+      mapper: const FinancialTransactionMapper(),
+      currentUserId: 'u1',
+    );
+
+    final repo = FirebaseInvestmentRepository(
+      firestore: fakeFs,
+      transactionService: txRepo,
+    );
 
     final investment = Investment(
       id: '',

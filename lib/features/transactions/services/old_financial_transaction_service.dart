@@ -1,7 +1,8 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bytebank/features/dashboard/services/balance_service.dart';
-import 'package:bytebank/features/transactions/models/financial_transaction.dart';
+import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/infrastructure/dtos/financial_transaction_dto.dart';
 import 'package:bytebank/features/transactions/services/financial_transaction_exceptions.dart';
 
 class FinancialTransactionService {
@@ -90,9 +91,9 @@ class FinancialTransactionService {
         );
       }
 
-      final snapshot = await query.get();
-      return snapshot.docs
-          .map((doc) => FinancialTransaction.fromFirestore(doc))
+        final snapshot = await query.get();
+        return snapshot.docs
+          .map((doc) => FinancialTransactionDTO.fromFirestore(doc).toDomain())
           .toList();
     } catch (e) {
       throw TransactionException('Falha ao buscar transações.');

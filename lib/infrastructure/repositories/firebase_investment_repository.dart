@@ -4,24 +4,31 @@ import 'dart:developer';
 import 'package:bytebank/domain/entities/investment.dart';
 import 'package:bytebank/domain/repositories/investment_repository.dart';
 import 'package:bytebank/features/investments/services/investment_exceptions.dart';
-import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
-import 'package:bytebank/features/dashboard/services/balance_service.dart';
+import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
+import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
+import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
+import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 
 class FirebaseInvestmentRepository implements IInvestmentRepository {
   final FirebaseFirestore _firestore;
-  final FinancialTransactionService _transactionService;
+  final IFinancialTransactionRepository _transactionService;
 
   FirebaseInvestmentRepository({
     FirebaseFirestore? firestore,
-    FinancialTransactionService? transactionService,
+    IFinancialTransactionRepository? transactionService,
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
        _transactionService =
            transactionService ??
-           FinancialTransactionService(
-             firestore: firestore ?? FirebaseFirestore.instance,
-             balanceService: BalanceService(
+           // If no repository provided, construct a default FirebaseTransactionRepository
+           // that uses the same firestore instance. This keeps backward compatibility
+           // for callers that don't inject the repository.
+           FirebaseTransactionRepository(
+             dataSource: FirebaseTransactionDataSource(
                firestore: firestore ?? FirebaseFirestore.instance,
              ),
+             mapper: const FinancialTransactionMapper(),
+             currentUserId: null,
            );
 
   @override
@@ -72,18 +79,16 @@ class FirebaseInvestmentRepository implements IInvestmentRepository {
 
       batch.set(investmentRef, investmentData);
 
-      await _transactionService.createTransaction(
-        userId: userId,
-        data: {
-          'amount': -investment.amount,
-          'balanceId': investment.balanceId,
-          'category': 'INVESTMENT',
-          'date': investment.investedAt,
-          'description': investment.name,
-          'investmentId': investmentRef.id,
-        },
-        batch: batch,
+      final tx = FinancialTransactionEntity(
+        id: '',
+        amount: -investment.amount,
+        balanceId: investment.balanceId,
+        category: 'INVESTMENT',
+        date: investment.investedAt,
+        description: investment.name,
       );
+
+      await _transactionService.createTransaction(tx, batch: batch);
 
       await batch.commit();
 
@@ -121,18 +126,16 @@ class FirebaseInvestmentRepository implements IInvestmentRepository {
       batch.delete(investmentRef);
 
       // Create redemption transaction
-      await _transactionService.createTransaction(
-        userId: userId,
-        data: {
-          'amount': investmentData['amount'],
-          'balanceId': investmentData['balanceId'],
-          'category': 'INVESTMENT_REDEMPTION',
-          'date': DateTime.now(),
-          'description': 'Resgate de ${investmentData['name']}',
-          'investmentId': investmentId,
-        },
-        batch: batch,
+      final redemptionTx = FinancialTransactionEntity(
+        id: '',
+        amount: investmentData['amount'],
+        balanceId: investmentData['balanceId'],
+        category: 'INVESTMENT_REDEMPTION',
+        date: DateTime.now(),
+        description: 'Resgate de ${investmentData['name']}',
       );
+
+      await _transactionService.createTransaction(redemptionTx, batch: batch);
 
       await batch.commit();
     } catch (e, stackTrace) {

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:bytebank/features/investments/models/investment.dart';
+import 'package:bytebank/domain/entities/investment.dart';
 import 'package:bytebank/features/investments/services/investment_exceptions.dart';
 import 'package:bytebank/features/investments/services/investment_service.dart';
 
@@ -51,6 +51,7 @@ class InvestmentNotifier extends ChangeNotifier {
 
   InvestmentNotifier(this._investmentService);
 
+  // ok
   Future<void> fetchInvestments({required String userId}) async {
     _state = InvestmentState(isLoading: true);
     notifyListeners();
@@ -98,6 +99,7 @@ class InvestmentNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ok
   Future<void> deleteInvestment({
     required String userId,
     required String investmentId,
@@ -117,6 +119,7 @@ class InvestmentNotifier extends ChangeNotifier {
     }
   }
 
+  // ok
   void clearError() {
     if (_state.errorMessage != null) {
       _state = _state.copyWith(errorMessage: null);

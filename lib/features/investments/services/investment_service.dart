@@ -1,20 +1,32 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:bytebank/features/investments/models/investment.dart';
+import 'package:bytebank/domain/entities/investment.dart';
 import 'package:bytebank/features/investments/services/investment_exceptions.dart';
-import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
+import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
+import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
+import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
 
 class InvestmentService {
   final FirebaseFirestore _firestore;
-  final FinancialTransactionService _transactionService;
+  final IFinancialTransactionRepository _transactionService;
 
   InvestmentService({
     FirebaseFirestore? firestore,
-    FinancialTransactionService? transactionService,
+    IFinancialTransactionRepository? transactionService,
   }) : _firestore = firestore ?? FirebaseFirestore.instance,
        _transactionService =
-           transactionService ?? FinancialTransactionService();
+           transactionService ??
+           FirebaseTransactionRepository(
+             dataSource: FirebaseTransactionDataSource(
+               firestore: firestore ?? FirebaseFirestore.instance,
+             ),
+             mapper: const FinancialTransactionMapper(),
+             currentUserId: null,
+           );
 
+  // ok
   Future<void> createInvestment({
     required String userId,
     required Map<String, dynamic> data,
@@ -55,18 +67,16 @@ class InvestmentService {
       investmentData['investedAt'] = Timestamp.fromDate(data['investedAt']);
       batch.set(investmentRef, investmentData);
 
-      await _transactionService.createTransaction(
-        userId: userId,
-        data: {
-          'amount': -data['amount'],
-          'balanceId': data['balanceId'],
-          'category': 'INVESTMENT',
-          'date': data['investedAt'],
-          'description': data['name'],
-          'investmentId': investmentRef.id,
-        },
-        batch: batch,
+      final txEntity = FinancialTransactionEntity(
+        id: '',
+        amount: -data['amount'],
+        balanceId: data['balanceId'],
+        category: 'INVESTMENT',
+        date: data['investedAt'],
+        description: data['name'],
       );
+
+      await _transactionService.createTransaction(txEntity, batch: batch);
 
       await batch.commit();
     } catch (e) {
@@ -77,6 +87,7 @@ class InvestmentService {
     }
   }
 
+  // ok
   Future<void> deleteInvestment({
     required String userId,
     required String investmentId,
@@ -101,18 +112,16 @@ class InvestmentService {
       batch.delete(investmentRef);
 
       // Create redemption transaction
-      await _transactionService.createTransaction(
-        userId: userId,
-        data: {
-          'amount': investmentData['amount'],
-          'balanceId': investmentData['balanceId'],
-          'category': 'INVESTMENT_REDEMPTION',
-          'date': DateTime.now(),
-          'description': 'Resgate de ${investmentData['name']}',
-          'investmentId': investmentId,
-        },
-        batch: batch,
+      final redemption = FinancialTransactionEntity(
+        id: '',
+        amount: investmentData['amount'],
+        balanceId: investmentData['balanceId'],
+        category: 'INVESTMENT_REDEMPTION',
+        date: DateTime.now(),
+        description: 'Resgate de ${investmentData['name']}',
       );
+
+      await _transactionService.createTransaction(redemption, batch: batch);
 
       await batch.commit();
     } catch (e, stackTrace) {
@@ -129,6 +138,7 @@ class InvestmentService {
     }
   }
 
+  // ok
   Future<List<Investment>> getInvestments({required String userId}) async {
     final snapshot = await _firestore
         .collection('users')
@@ -137,6 +147,17 @@ class InvestmentService {
         .orderBy('investedAt', descending: true)
         .get();
 
-    return snapshot.docs.map((doc) => Investment.fromFirestore(doc)).toList();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      return Investment(
+        id: doc.id,
+        name: data['name'] ?? '',
+        amount: (data['amount'] ?? 0.0).toDouble(),
+        category: data['category'] ?? '',
+        type: data['type'] ?? '',
+        investedAt: (data['investedAt'] as Timestamp).toDate(),
+        balanceId: data['balanceId'] ?? '',
+      );
+    }).toList();
   }
 }

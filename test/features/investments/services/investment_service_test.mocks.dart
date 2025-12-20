@@ -8,9 +8,9 @@ import 'dart:async' as _i4;
 import 'package:bytebank/features/dashboard/models/balance.dart' as _i5;
 import 'package:bytebank/features/dashboard/services/balance_service.dart'
     as _i3;
-import 'package:bytebank/features/transactions/models/financial_transaction.dart'
+import 'package:bytebank/domain/entities/financial_transaction_entity.dart'
     as _i7;
-import 'package:bytebank/features/transactions/services/financial_transaction_service.dart'
+import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart'
     as _i6;
 import 'package:cloud_firestore/cloud_firestore.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
@@ -91,89 +91,109 @@ class MockBalanceService extends _i1.Mock implements _i3.BalanceService {
           as _i4.Future<void>);
 }
 
-/// A class which mocks [FinancialTransactionService].
+/// A class which mocks [IFinancialTransactionRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockFinancialTransactionService extends _i1.Mock
-    implements _i6.FinancialTransactionService {
+    implements _i6.IFinancialTransactionRepository {
   MockFinancialTransactionService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i2.DocumentReference<Object?>> createTransaction({
-    required String? userId,
-    required Map<String, dynamic>? data,
+  _i4.Future<_i7.FinancialTransactionEntity> createTransaction(
+    _i7.FinancialTransactionEntity? transaction, {
     _i2.WriteBatch? batch,
   }) =>
       (super.noSuchMethod(
-            Invocation.method(#createTransaction, [], {
-              #userId: userId,
-              #data: data,
-              #batch: batch,
-            }),
-            returnValue: _i4.Future<_i2.DocumentReference<Object?>>.value(
-              _FakeDocumentReference_0<Object?>(
-                this,
-                Invocation.method(#createTransaction, [], {
-                  #userId: userId,
-                  #data: data,
-                  #batch: batch,
-                }),
+            Invocation.method(
+              #createTransaction,
+              [transaction],
+              {#batch: batch},
+            ),
+            returnValue: _i4.Future<_i7.FinancialTransactionEntity>.value(
+              _i7.FinancialTransactionEntity(
+                id: '',
+                amount: 0.0,
+                balanceId: '',
+                category: '',
+                date: DateTime.fromMillisecondsSinceEpoch(0),
               ),
             ),
           )
-          as _i4.Future<_i2.DocumentReference<Object?>>);
+          as _i4.Future<_i7.FinancialTransactionEntity>);
 
   @override
-  _i4.Future<List<_i7.FinancialTransaction>> getTransactions({
-    required String? userId,
+  _i4.Future<_i7.FinancialTransactionEntity> updateTransaction(
+    _i7.FinancialTransactionEntity? transaction,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateTransaction, [transaction]),
+            returnValue: _i4.Future<_i7.FinancialTransactionEntity>.value(
+              _i7.FinancialTransactionEntity(
+                id: '',
+                amount: 0.0,
+                balanceId: '',
+                category: '',
+                date: DateTime.fromMillisecondsSinceEpoch(0),
+              ),
+            ),
+          )
+          as _i4.Future<_i7.FinancialTransactionEntity>);
+
+  @override
+  _i4.Future<void> deleteTransaction(String? transactionId) =>
+      (super.noSuchMethod(
+            Invocation.method(#deleteTransaction, [transactionId]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Future<_i7.FinancialTransactionEntity?> getTransaction(
+    String? transactionId,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#getTransaction, [transactionId]),
+            returnValue: _i4.Future<_i7.FinancialTransactionEntity?>.value(
+              null,
+            ),
+          )
+          as _i4.Future<_i7.FinancialTransactionEntity?>);
+
+  @override
+  _i4.Stream<List<_i7.FinancialTransactionEntity>> watchTransactions({
+    String? balanceId,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#watchTransactions, [], {#balanceId: balanceId}),
+            returnValue:
+                _i4.Stream<List<_i7.FinancialTransactionEntity>>.empty(),
+          )
+          as _i4.Stream<List<_i7.FinancialTransactionEntity>>);
+
+  @override
+  _i4.Future<List<_i7.FinancialTransactionEntity>> getTransactions({
+    int? limit = 50,
+    String? startAfterId,
+    String? balanceId,
     DateTime? startDate,
     DateTime? endDate,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#getTransactions, [], {
-              #userId: userId,
+              #limit: limit,
+              #startAfterId: startAfterId,
+              #balanceId: balanceId,
               #startDate: startDate,
               #endDate: endDate,
             }),
-            returnValue: _i4.Future<List<_i7.FinancialTransaction>>.value(
-              <_i7.FinancialTransaction>[],
+            returnValue: _i4.Future<List<_i7.FinancialTransactionEntity>>.value(
+              <_i7.FinancialTransactionEntity>[],
             ),
           )
-          as _i4.Future<List<_i7.FinancialTransaction>>);
-
-  @override
-  _i4.Future<void> deleteTransaction({
-    required String? userId,
-    required String? transactionId,
-  }) =>
-      (super.noSuchMethod(
-            Invocation.method(#deleteTransaction, [], {
-              #userId: userId,
-              #transactionId: transactionId,
-            }),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
-          )
-          as _i4.Future<void>);
-
-  @override
-  _i4.Future<void> editTransaction({
-    required String? userId,
-    required String? transactionId,
-    required Map<String, dynamic>? updateData,
-  }) =>
-      (super.noSuchMethod(
-            Invocation.method(#editTransaction, [], {
-              #userId: userId,
-              #transactionId: transactionId,
-              #updateData: updateData,
-            }),
-            returnValue: _i4.Future<void>.value(),
-            returnValueForMissingStub: _i4.Future<void>.value(),
-          )
-          as _i4.Future<void>);
+          as _i4.Future<List<_i7.FinancialTransactionEntity>>);
 }
 
 /// A class which mocks [DocumentReference].

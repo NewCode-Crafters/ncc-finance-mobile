@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:bytebank/features/dashboard/models/balance.dart';
-import 'package:bytebank/features/dashboard/services/balance_service.dart';
+import 'package:bytebank/domain/entities/balance.dart';
+import 'package:bytebank/domain/repositories/balance_repository.dart';
 
 class BalanceState {
   final List<Balance> balances;
@@ -15,13 +15,14 @@ class BalanceState {
 }
 
 class BalanceNotifier extends ChangeNotifier {
-  final BalanceService _balanceService;
+  final IBalanceRepository _balanceService;
   BalanceState _state = BalanceState();
 
   BalanceState get state => _state;
 
   BalanceNotifier(this._balanceService);
 
+  // ok
   Future<void> fetchBalances({required String userId}) async {
     Future.microtask(() {
       _state = BalanceState(isLoading: true);

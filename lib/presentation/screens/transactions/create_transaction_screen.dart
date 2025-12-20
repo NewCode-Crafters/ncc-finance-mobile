@@ -18,8 +18,9 @@ import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
-import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
-import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
+import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
+import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/presentation/utils/transaction_helpers.dart';
 
 class CreateTransactionScreen extends StatefulWidget {
   static const String routeName = '/create-transaction';
@@ -96,7 +97,8 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
-      final transactionService = context.read<FinancialTransactionService>();
+        final transactionRepository =
+          context.read<IFinancialTransactionRepository>();
       final balanceNotifier = context.read<app_balance.BalanceNotifier>();
       final transactionNotifier = context
           .read<app_notifier.TransactionNotifier>();
@@ -115,16 +117,18 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
           ? _amountController.numberValue
           : -_amountController.numberValue;
 
-      final transactionRef = await transactionService.createTransaction(
-        userId: userId,
-        data: {
-          'amount': amount,
-          'balanceId': balanceId,
-          'category': _selectedCategory!.id,
-          'date': DateTime.now(),
-          'description': _descriptionController.text,
-        },
+      final txEntity = FinancialTransactionEntity(
+        id: '',
+        amount: amount,
+        balanceId: balanceId,
+        category: _selectedCategory!.id,
+        date: DateTime.now(),
+        description: _descriptionController.text.isEmpty
+            ? null
+            : _descriptionController.text,
       );
+
+      final created = await transactionRepository.createTransaction(txEntity);
 
       final filesToUpload = List<File>.from(attachmentsNotifier.selected);
 
@@ -132,7 +136,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
         try {
           await _attachService.uploadSingle(
             userId: userId,
-            transactionId: transactionRef.id,
+            transactionId: created.id,
             file: f,
           );
         } catch (e) {

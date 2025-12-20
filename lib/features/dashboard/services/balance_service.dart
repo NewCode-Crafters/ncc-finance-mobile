@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:bytebank/features/dashboard/models/balance.dart';
+import 'package:bytebank/domain/entities/balance.dart';
+import 'package:bytebank/infrastructure/dtos/balance_dto.dart';
+import 'package:bytebank/infrastructure/mappers/balance_mapper.dart';
 
 class BalanceService {
   final FirebaseFirestore _firestore;
@@ -15,7 +17,10 @@ class BalanceService {
           .collection('balances')
           .get();
 
-      return snapshot.docs.map((doc) => Balance.fromFirestore(doc)).toList();
+      return snapshot.docs
+          .map((doc) => BalanceDTO.fromFirestore(doc))
+          .map((dto) => BalanceMapper.toDomain(dto))
+          .toList();
     } catch (e) {
       throw Exception('Failed to fetch balances.');
     }

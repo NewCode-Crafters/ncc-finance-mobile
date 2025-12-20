@@ -17,7 +17,6 @@ import 'package:intl/intl.dart';
 import 'package:bytebank/core/widgets/main_app_bar.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
   as app_balance;
-import 'package:bytebank/core/di/injection_container.dart' as di;
 import 'package:bytebank/features/investments/screens/investments_screen.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:provider/provider.dart';

@@ -50,3 +50,8 @@ class FinancialTransactionEntity extends Equatable {
     description,
   ];
 }
+
+// Backwards-compatible alias: many files in the codebase still refer to
+// `FinancialTransaction`. Provide a type alias so those references continue
+// to work while the code migrates toward domain entities.
+typedef FinancialTransaction = FinancialTransactionEntity;

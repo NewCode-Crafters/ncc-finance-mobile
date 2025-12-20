@@ -5,9 +5,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
 
-import 'package:bytebank/features/dashboard/models/balance.dart' as _i4;
-import 'package:bytebank/features/dashboard/services/balance_service.dart'
-    as _i2;
+import 'package:bytebank/domain/entities/balance.dart' as _i4;
+import 'package:bytebank/domain/repositories/balance_repository.dart' as _i2;
 import 'package:cloud_firestore/cloud_firestore.dart' as _i5;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -29,7 +28,7 @@ import 'package:mockito/mockito.dart' as _i1;
 /// A class which mocks [BalanceService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockBalanceService extends _i1.Mock implements _i2.BalanceService {
+class MockBalanceService extends _i1.Mock implements _i2.IBalanceRepository {
   MockBalanceService() {
     _i1.throwOnMissingStub(this);
   }

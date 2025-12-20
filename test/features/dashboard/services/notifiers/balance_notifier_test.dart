@@ -1,20 +1,103 @@
-import 'package:bytebank/features/dashboard/models/balance.dart';
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:bytebank/features/dashboard/services/balance_service.dart';
+import 'package:bytebank/domain/entities/balance.dart';
+import 'package:bytebank/domain/repositories/balance_repository.dart';
+import 'package:bytebank/application/notifiers/balance_notifier.dart';
+import 'package:bytebank/domain/use_cases/balances/get_balances_use_case.dart';
+import 'package:bytebank/domain/use_cases/balances/update_balance_use_case.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 
-import 'balance_notifier_test.mocks.dart';
+// Use small fakes instead of Mockito-generated mocks to keep tests simple during migration.
+class _FakeGetBalancesUseCase extends GetBalancesUseCase {
+  List<Balance> Function({required String userId})? _handler;
 
-@GenerateMocks([BalanceService])
+  _FakeGetBalancesUseCase()
+    : super(
+        // Provide a dummy repository implementation for the base class
+        // This repository won't be called because we override `call`.
+        _DummyBalanceRepository(),
+      );
+
+  void whenCall(List<Balance> Function({required String userId}) handler) {
+    _handler = handler;
+  }
+
+  @override
+  Future<List<Balance>> call({required String userId}) async {
+    return _handler?.call(userId: userId) ?? [];
+  }
+}
+
+class _DummyBalanceRepository implements IBalanceRepository {
+  @override
+  Future<Balance> createBalance({
+    required String userId,
+    required Balance balance,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Balance> getBalanceById({
+    required String userId,
+    required String balanceId,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Balance>> getBalances({required String userId}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<List<Balance>> listenBalances({required String userId}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Balance> updateBalance({
+    required String userId,
+    required Balance balance,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updateBalanceByDelta({
+    required String userId,
+    required String balanceId,
+    required double delta,
+    Object? batch,
+  }) {
+    throw UnimplementedError();
+  }
+}
+
+class _FakeUpdateBalanceUseCase extends UpdateBalanceUseCase {
+  bool called = false;
+  _FakeUpdateBalanceUseCase() : super(_DummyBalanceRepository()) {
+    // Provide a dummy IBalanceRepository since UpdateBalanceUseCase expects one.
+  }
+
+  @override
+  Future<void> call({
+    required String userId,
+    required String balanceId,
+    required double delta,
+    Object? batch,
+  }) async {
+    called = true;
+  }
+}
+
 void main() {
-  late MockBalanceService mockBalanceService;
+  late _FakeGetBalancesUseCase mockGet;
+  late _FakeUpdateBalanceUseCase mockUpdate;
   late BalanceNotifier balanceNotifier;
 
   setUp(() {
-    mockBalanceService = MockBalanceService();
-    balanceNotifier = BalanceNotifier(mockBalanceService);
+    mockGet = _FakeGetBalancesUseCase();
+    mockUpdate = _FakeUpdateBalanceUseCase();
+    balanceNotifier = BalanceNotifier(mockGet, mockUpdate);
   });
 
   test(
@@ -23,22 +106,24 @@ void main() {
       final fakeBalances = [
         Balance(
           id: '1',
+          accountId: 'acc_1',
           accountType: 'CHECKING',
           amount: 1000.0,
           currency: 'BRL',
+          updatedAt: DateTime.now(),
         ),
         Balance(
           id: '2',
+          accountId: 'acc_2',
           accountType: 'SAVINGS',
           amount: 250.50,
           currency: 'BRL',
+          updatedAt: DateTime.now(),
         ),
       ];
 
-      // Tell the mock service to return our fake list when asked.
-      when(
-        mockBalanceService.getBalances(userId: anyNamed('userId')),
-      ).thenAnswer((_) async => fakeBalances);
+      // Configure fake to return the balances
+      mockGet.whenCall(({required String userId}) => fakeBalances);
 
       await balanceNotifier.fetchBalances(userId: 'test_user');
 
@@ -51,9 +136,7 @@ void main() {
   test(
     'fetchBalances should handle an empty list of balances correctly',
     () async {
-      when(
-        mockBalanceService.getBalances(userId: anyNamed('userId')),
-      ).thenAnswer((_) async => []);
+      mockGet.whenCall(({required String userId}) => []);
 
       await balanceNotifier.fetchBalances(userId: 'new_user');
 

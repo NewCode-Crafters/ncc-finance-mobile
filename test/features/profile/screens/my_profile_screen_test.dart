@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:bytebank/features/authentication/screens/update_account_screen.dart';
 import 'package:bytebank/features/authentication/services/auth_service.dart';
-import 'package:bytebank/features/profile/models/user_profile.dart';
+import 'package:bytebank/domain/entities/user_profile.dart';
 import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
-import 'package:bytebank/features/profile/services/profile_service.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
+
 import 'package:provider/provider.dart';
 
 import '../../authentication/screens/login_screen_test.mocks.dart';
-import '../notifiers/profile_notifier_test.mocks.dart';
+import '../../../helpers/profile/profile_notifier_test_helpers.dart';
 
-@GenerateMocks([ProfileService])
 void main() {
-  late MockProfileService mockProfileService;
   late ProfileNotifier profileNotifier;
   late MockAuthService mockAuthService;
 
   setUp(() {
-    mockProfileService = MockProfileService();
-    profileNotifier = ProfileNotifier(mockProfileService);
+    profileNotifier = ProfileNotifier(
+      getUserProfile: FakeGetUserProfileUseCase(null),
+      pickAndUploadProfilePicture: FakePickAndUploadProfilePictureUseCase(null),
+    );
     mockAuthService = MockAuthService();
 
     final fakeProfile = UserProfile(
