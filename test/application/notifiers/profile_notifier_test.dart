@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
+import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:bytebank/domain/entities/user_profile.dart' as domain;
 import 'package:bytebank/core/services/image_picker_service.dart';
 

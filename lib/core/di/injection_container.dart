@@ -36,7 +36,7 @@ import 'package:bytebank/application/notifiers/investment_notifier.dart'
     as app_investment;
 
 import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
-import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
+import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
 

@@ -6,7 +6,7 @@ import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
 import 'package:bytebank/application/notifiers/investment_notifier.dart';
-import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
+import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/dashboard/screens/dashboard_screen.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
