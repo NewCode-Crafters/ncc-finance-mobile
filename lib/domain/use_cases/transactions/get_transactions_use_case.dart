@@ -10,11 +10,15 @@ class GetTransactionsUseCase {
     int limit = 50,
     String? startAfterId,
     String? balanceId,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     return repository.getTransactions(
       limit: limit,
       startAfterId: startAfterId,
       balanceId: balanceId,
+      startDate: startDate,
+      endDate: endDate,
     );
   }
 }

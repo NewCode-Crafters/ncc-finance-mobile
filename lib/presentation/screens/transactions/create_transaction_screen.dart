@@ -18,7 +18,6 @@ import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
-import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/presentation/utils/transaction_helpers.dart';
 
@@ -97,8 +96,6 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
-        final transactionRepository =
-          context.read<IFinancialTransactionRepository>();
       final balanceNotifier = context.read<app_balance.BalanceNotifier>();
       final transactionNotifier = context
           .read<app_notifier.TransactionNotifier>();
@@ -117,7 +114,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
           ? _amountController.numberValue
           : -_amountController.numberValue;
 
-      final txEntity = FinancialTransactionEntity(
+      final tx = FinancialTransaction(
         id: '',
         amount: amount,
         balanceId: balanceId,
@@ -128,17 +125,23 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
             : _descriptionController.text,
       );
 
-      final created = await transactionRepository.createTransaction(txEntity);
+      await transactionNotifier.createTransaction(tx);
+
+      final created = transactionNotifier.state.transactions.isNotEmpty
+          ? transactionNotifier.state.transactions.first
+          : null;
 
       final filesToUpload = List<File>.from(attachmentsNotifier.selected);
 
       for (final f in filesToUpload) {
         try {
-          await _attachService.uploadSingle(
-            userId: userId,
-            transactionId: created.id,
-            file: f,
-          );
+          if (created != null && created.id.isNotEmpty) {
+            await _attachService.uploadSingle(
+              userId: userId,
+              transactionId: created.id,
+              file: f,
+            );
+          }
         } catch (e) {
           if (mounted) {
             scaffoldMessenger.showSnackBar(

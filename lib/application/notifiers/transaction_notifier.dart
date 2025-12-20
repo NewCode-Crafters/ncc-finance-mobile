@@ -161,7 +161,11 @@ class TransactionNotifier extends ChangeNotifier {
     _state = _state.copyWith(isLoading: true);
     notifyListeners();
 
-    final list = await _getUseCase.call(limit: 1000);
+    final list = await _getUseCase.call(
+      limit: 1000,
+      startDate: DateTime.now().subtract(const Duration(days: 30)),
+      endDate: DateTime.now(),
+    );
     final allTransactions = list.map(_fromEntity).toList();
 
     final Map<String, double> chartData = {};
@@ -190,7 +194,11 @@ class TransactionNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final list = await _getUseCase.call(limit: _pageSize);
+      final list = await _getUseCase.call(
+        limit: _pageSize,
+        startDate: _state.startDate,
+        endDate: _state.endDate,
+      );
 
       final categories = _state.categories.isEmpty
           ? await _metadataServiceGetCategoriesSafe()
@@ -244,6 +252,8 @@ class TransactionNotifier extends ChangeNotifier {
       final list = await _getUseCase.call(
         limit: _pageSize,
         startAfterId: _lastStartAfterId,
+        startDate: _state.startDate,
+        endDate: _state.endDate,
       );
       final more = list.map(_fromEntity).toList();
 
@@ -308,7 +318,11 @@ class TransactionNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final list = await _getUseCase.call(limit: limit);
+      final list = await _getUseCase.call(
+        limit: limit,
+        startDate: _state.startDate,
+        endDate: _state.endDate,
+      );
       final transactions = list.map(_fromEntity).toList();
       _state = _state.copyWith(transactions: transactions, isLoading: false);
     } catch (e) {

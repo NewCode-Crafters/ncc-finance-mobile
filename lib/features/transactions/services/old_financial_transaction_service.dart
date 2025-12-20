@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bytebank/features/dashboard/services/balance_service.dart';
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/infrastructure/dtos/financial_transaction_dto.dart';
-import 'package:bytebank/features/transactions/services/financial_transaction_exceptions.dart';
+import 'package:bytebank/features/transactions/services/oldfinancial_transaction_exceptions.dart';
 
 class FinancialTransactionService {
   final FirebaseFirestore _firestore;
@@ -91,8 +91,8 @@ class FinancialTransactionService {
         );
       }
 
-        final snapshot = await query.get();
-        return snapshot.docs
+      final snapshot = await query.get();
+      return snapshot.docs
           .map((doc) => FinancialTransactionDTO.fromFirestore(doc).toDomain())
           .toList();
     } catch (e) {
