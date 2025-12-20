@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:bytebank/domain/entities/investment.dart';
 import 'package:bytebank/domain/repositories/investment_repository.dart';
-import 'package:bytebank/features/investments/services/investment_exceptions.dart';
+import 'package:bytebank/domain/exceptions/investment_exception.dart';
 import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
 import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';

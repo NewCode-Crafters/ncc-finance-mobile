@@ -8,7 +8,7 @@ import 'package:bytebank/core/widgets/primary_button.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
 import 'package:bytebank/application/notifiers/investment_notifier.dart';
-import 'package:bytebank/features/investments/services/investment_exceptions.dart';
+import 'package:bytebank/domain/exceptions/investment_exception.dart';
 import 'package:bytebank/domain/entities/investment.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:provider/provider.dart';

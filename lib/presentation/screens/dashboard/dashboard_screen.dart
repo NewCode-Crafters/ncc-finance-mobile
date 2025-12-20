@@ -2,7 +2,7 @@ import 'package:bytebank/core/constants/app_assets.dart';
 import 'package:bytebank/core/widgets/nav_bar.dart';
 import 'package:bytebank/presentation/screens/transactions/expense_control_screen.dart';
 import 'package:bytebank/core/models/nav_model.dart';
-import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
+import 'package:bytebank/presentation/screens/investments/create_investment_screen.dart';
 import 'package:bytebank/presentation/screens/profile/my_profile_screen.dart';
 import 'package:bytebank/presentation/screens/transactions/create_transaction_screen.dart';
 import 'package:bytebank/core/widgets/animated_tab_switcher.dart';
@@ -17,7 +17,7 @@ import 'package:intl/intl.dart';
 import 'package:bytebank/core/widgets/main_app_bar.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
-import 'package:bytebank/features/investments/screens/investments_screen.dart';
+import 'package:bytebank/presentation/screens/investments/investments_screen.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:provider/provider.dart';
 

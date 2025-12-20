@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bytebank/domain/entities/investment.dart';
-import 'package:bytebank/features/investments/services/investment_exceptions.dart';
+import 'package:bytebank/domain/exceptions/investment_exception.dart';
 import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
