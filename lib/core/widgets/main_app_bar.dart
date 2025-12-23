@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/utils/color_helper.dart';
-import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
-import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
+import 'package:bytebank/application/notifiers/profile_notifier.dart';
+import 'package:bytebank/presentation/screens/profile/my_profile_screen.dart';
 import 'package:provider/provider.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {

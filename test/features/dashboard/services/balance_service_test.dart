@@ -1,15 +1,15 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:bytebank/features/dashboard/services/balance_service.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_balance_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   late FakeFirebaseFirestore fakeFirestore;
-  late BalanceService balanceService;
+  late FirebaseBalanceRepository balanceService;
   const userId = 'test_user_id';
 
   setUp(() {
     fakeFirestore = FakeFirebaseFirestore();
-    balanceService = BalanceService(firestore: fakeFirestore);
+    balanceService = FirebaseBalanceRepository(firestore: fakeFirestore);
   });
 
   test(
@@ -56,10 +56,10 @@ void main() {
             'currency': 'BRL',
           });
 
-      await balanceService.updateBalanceOnTransaction(
+      await balanceService.updateBalanceByDelta(
         userId: userId,
         balanceId: balanceDocRef.id,
-        transactionAmount: -50.0,
+        delta: -50.0,
       );
 
       final updatedBalanceDoc = await balanceDocRef.get();

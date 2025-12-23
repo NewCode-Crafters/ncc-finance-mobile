@@ -5,7 +5,7 @@ import 'package:bytebank/domain/entities/investment.dart';
 import 'package:bytebank/domain/use_cases/investments/get_investments_use_case.dart';
 import 'package:bytebank/domain/use_cases/investments/create_investment_use_case.dart';
 import 'package:bytebank/domain/use_cases/investments/delete_investment_use_case.dart';
-import 'package:bytebank/features/investments/services/investment_exceptions.dart';
+import 'package:bytebank/domain/exceptions/investment_exception.dart';
 
 class InvestmentState {
   final List<Investment> investments;

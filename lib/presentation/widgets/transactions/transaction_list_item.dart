@@ -2,8 +2,8 @@ import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:bytebank/presentation/screens/transactions/view_transaction_detail_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/features/transactions/models/financial_transaction.dart';
-import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
+import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/presentation/utils/transaction_helpers.dart';
 import 'package:intl/intl.dart';
 
 class TransactionListItem extends StatelessWidget {

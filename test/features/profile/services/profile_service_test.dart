@@ -1,6 +1,6 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
-import 'package:bytebank/features/profile/services/profile_service.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_user_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -10,7 +10,7 @@ class MockFirebaseStorage extends Mock implements FirebaseStorage {}
 
 void main() {
   late FakeFirebaseFirestore fakeFirestore;
-  late ProfileService profileService;
+  late FirebaseUserRepository profileService;
   late MockFirebaseStorage mockStorage;
   late MockFirebaseAuth mockAuth;
   const userId = 'test_user_id';
@@ -19,11 +19,7 @@ void main() {
     fakeFirestore = FakeFirebaseFirestore();
     mockStorage = MockFirebaseStorage();
     mockAuth = MockFirebaseAuth(mockUser: MockUser(uid: userId));
-    profileService = ProfileService(
-      firestore: fakeFirestore,
-      storage: mockStorage,
-      firebaseAuth: mockAuth,
-    );
+    profileService = FirebaseUserRepository(firestore: fakeFirestore);
   });
 
   test(

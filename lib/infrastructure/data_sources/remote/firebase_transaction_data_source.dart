@@ -89,6 +89,7 @@ class FirebaseTransactionDataSource {
       final writeBatch = batch ?? _firestore.batch();
 
       writeBatch.set(transactionRef, transaction.toFirestore());
+
       _updateBalance(
         batch: writeBatch,
         userId: userId,

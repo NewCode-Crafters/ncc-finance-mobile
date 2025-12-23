@@ -1,27 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:bytebank/features/dashboard/services/balance_service.dart';
-import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
+import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
+import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
+import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
+import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 
-import '../../dashboard/services/notifiers/balance_notifier_test.mocks.dart';
-
-@GenerateMocks([BalanceService])
 void main() {
   late FakeFirebaseFirestore fakeFirestore;
-  late MockBalanceService mockBalanceService;
-  late FinancialTransactionService transactionService;
+  late IFinancialTransactionRepository transactionService;
   const userId = 'test_user_id';
   late String balanceId;
 
   setUp(() async {
     fakeFirestore = FakeFirebaseFirestore();
-    mockBalanceService = MockBalanceService();
-    transactionService = FinancialTransactionService(
-      firestore: fakeFirestore,
-      balanceService: mockBalanceService,
+    // Provide a thin repository implementation that delegates to the
+    // FakeFirebaseFirestore and performs balance updates in the data source.
+    final dataSource = FirebaseTransactionDataSource(firestore: fakeFirestore);
+    transactionService = FirebaseTransactionRepository(
+      dataSource: dataSource,
+      mapper: const FinancialTransactionMapper(),
+      currentUserId: userId,
     );
 
     final balanceDoc = await fakeFirestore
@@ -37,16 +37,22 @@ void main() {
     () async {
       final transactionData = {
         'amount': -150.0,
-        'balanceId': 'test_balance_id',
+        'balanceId': balanceId,
         'category': 'SHOPPING',
         'date': DateTime.now(),
         'description': 'New headphones',
       };
 
-      await transactionService.createTransaction(
-        userId: userId,
-        data: transactionData,
+      final entity = FinancialTransactionEntity(
+        id: '',
+        amount: transactionData['amount'] as double,
+        balanceId: transactionData['balanceId'] as String,
+        category: transactionData['category'] as String,
+        date: transactionData['date'] as DateTime,
+        description: transactionData['description'] as String?,
       );
+
+      await transactionService.createTransaction(entity);
 
       final snapshot = await fakeFirestore
           .collection('users')
@@ -82,9 +88,7 @@ void main() {
         'date': Timestamp.fromDate(now.subtract(const Duration(days: 1))),
       });
 
-      final transactions = await transactionService.getTransactions(
-        userId: userId,
-      );
+      final transactions = await transactionService.getTransactions();
 
       expect(transactions.length, 3);
       // The first item in the list should be the one with the most recent date.
@@ -103,13 +107,10 @@ void main() {
           .add({
             'amount': -50.0,
             'date': Timestamp.now(),
-            'balanceId': 'test_balance_id',
+            'balanceId': balanceId,
           });
 
-      await transactionService.deleteTransaction(
-        userId: userId,
-        transactionId: docRef.id,
-      );
+      await transactionService.deleteTransaction(docRef.id);
 
       final snapshot = await docRef.get();
       expect(snapshot.exists, isFalse);
@@ -119,13 +120,12 @@ void main() {
   test(
     'createTransaction should call balanceService to update the balance',
     () async {
-      final mockBalanceService = MockBalanceService();
-
-      transactionService = FinancialTransactionService(
-        firestore: fakeFirestore,
-        balanceService: mockBalanceService,
+      // create repository pointing to fake firestore
+      transactionService = FirebaseTransactionRepository(
+        dataSource: FirebaseTransactionDataSource(firestore: fakeFirestore),
+        mapper: const FinancialTransactionMapper(),
+        currentUserId: userId,
       );
-
       // Define the transaction data
       final transactionData = {
         'amount': -150.0,
@@ -135,29 +135,35 @@ void main() {
         'description': 'New headphones',
       };
 
-      await transactionService.createTransaction(
-        userId: userId,
-        data: transactionData,
+      final entity = FinancialTransactionEntity(
+        id: '',
+        amount: transactionData['amount'] as double,
+        balanceId: transactionData['balanceId'] as String,
+        category: transactionData['category'] as String,
+        date: transactionData['date'] as DateTime,
       );
 
-      verify(
-        mockBalanceService.updateBalanceOnTransaction(
-          userId: userId,
-          balanceId: balanceId,
-          transactionAmount: -150.0,
-          batch: anyNamed('batch'),
-        ),
-      ).called(1);
+      await transactionService.createTransaction(entity);
+
+      final balanceSnap = await fakeFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('balances')
+          .doc(balanceId)
+          .get();
+
+      expect(balanceSnap.data()?['amount'], 850.0);
     },
   );
 
   test(
     'createTransaction should call balanceService with a POSITIVE amount for income',
     () async {
-      final mockBalanceService = MockBalanceService();
-      transactionService = FinancialTransactionService(
-        firestore: fakeFirestore,
-        balanceService: mockBalanceService,
+      // create repository pointing to fake firestore
+      transactionService = FirebaseTransactionRepository(
+        dataSource: FirebaseTransactionDataSource(firestore: fakeFirestore),
+        mapper: const FinancialTransactionMapper(),
+        currentUserId: userId,
       );
 
       final balanceDoc = await fakeFirestore
@@ -174,29 +180,35 @@ void main() {
         'date': DateTime.now(),
       };
 
-      await transactionService.createTransaction(
-        userId: userId,
-        data: transactionData,
+      final entity = FinancialTransactionEntity(
+        id: '',
+        amount: transactionData['amount'] as double,
+        balanceId: transactionData['balanceId'] as String,
+        category: transactionData['category'] as String,
+        date: transactionData['date'] as DateTime,
       );
 
-      verify(
-        mockBalanceService.updateBalanceOnTransaction(
-          userId: userId,
-          balanceId: balanceId,
-          transactionAmount: 500.0,
-          batch: anyNamed('batch'),
-        ),
-      ).called(1);
+      await transactionService.createTransaction(entity);
+
+      final balanceSnap = await fakeFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('balances')
+          .doc(balanceId)
+          .get();
+
+      expect(balanceSnap.data()?['amount'], 1500.0);
     },
   );
 
   test(
     'deleteTransaction should call balanceService to revert the balance',
     () async {
-      final mockBalanceService = MockBalanceService();
-      transactionService = FinancialTransactionService(
-        firestore: fakeFirestore,
-        balanceService: mockBalanceService,
+      // create repository pointing to fake firestore
+      transactionService = FirebaseTransactionRepository(
+        dataSource: FirebaseTransactionDataSource(firestore: fakeFirestore),
+        mapper: const FinancialTransactionMapper(),
+        currentUserId: userId,
       );
 
       final transactionAmount = -50.0;
@@ -210,19 +222,16 @@ void main() {
             'date': Timestamp.now(),
           });
 
-      await transactionService.deleteTransaction(
-        userId: userId,
-        transactionId: transactionDocRef.id,
-      );
+      await transactionService.deleteTransaction(transactionDocRef.id);
 
-      verify(
-        mockBalanceService.updateBalanceOnTransaction(
-          userId: userId,
-          balanceId: balanceId,
-          transactionAmount: -transactionAmount,
-          batch: anyNamed('batch'),
-        ),
-      ).called(1);
+      final balanceSnap = await fakeFirestore
+          .collection('users')
+          .doc(userId)
+          .collection('balances')
+          .doc(balanceId)
+          .get();
+
+      expect(balanceSnap.data()?['amount'], 1050.0);
     },
   );
 
@@ -245,11 +254,23 @@ void main() {
         'category': 'NEW_CATEGORY',
       };
 
-      await transactionService.editTransaction(
-        userId: userId,
-        transactionId: docRef.id,
-        updateData: updateData,
+      final doc = await docRef.get();
+      final d = doc.data()!;
+      final existing = FinancialTransactionEntity(
+        id: docRef.id,
+        amount: (d['amount'] as num).toDouble(),
+        balanceId: d['balanceId'] as String? ?? '',
+        category: d['category'] as String? ?? '',
+        date: (d['date'] as Timestamp).toDate(),
+        description: d['description'] as String?,
       );
+
+      final updatedEntity = existing.copyWith(
+        description: updateData['description'],
+        category: updateData['category'],
+      );
+
+      await transactionService.updateTransaction(updatedEntity);
 
       final updatedDoc = await docRef.get();
       expect(updatedDoc.data()?['description'], 'New shiny description');

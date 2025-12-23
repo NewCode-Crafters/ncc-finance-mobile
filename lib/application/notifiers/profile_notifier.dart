@@ -1,17 +1,19 @@
 import 'package:flutter/foundation.dart';
+
+import 'package:bytebank/domain/entities/user_profile.dart' as domain;
 import 'package:bytebank/core/services/image_picker_service.dart';
-import 'package:bytebank/features/profile/models/user_profile.dart';
-import 'package:bytebank/features/profile/services/profile_service.dart';
+import 'package:bytebank/domain/use_cases/profile/get_user_profile_use_case.dart';
+import 'package:bytebank/domain/use_cases/profile/pick_and_upload_profile_picture_use_case.dart';
 
 class ProfileState {
-  final UserProfile? userProfile;
+  final domain.UserProfile? userProfile;
   final bool isLoading;
   final String? errorMessage;
 
   ProfileState({this.userProfile, this.isLoading = false, this.errorMessage});
 
   ProfileState copyWith({
-    UserProfile? userProfile,
+    domain.UserProfile? userProfile,
     bool? isLoading,
     String? errorMessage,
   }) {
@@ -24,12 +26,18 @@ class ProfileState {
 }
 
 class ProfileNotifier extends ChangeNotifier {
-  final ProfileService _profileService;
+  final GetUserProfileUseCase _getUserProfile;
+  final PickAndUploadProfilePictureUseCase _pickAndUploadProfilePicture;
+
   ProfileState _state = ProfileState();
 
   ProfileState get state => _state;
 
-  ProfileNotifier(this._profileService);
+  ProfileNotifier({
+    required GetUserProfileUseCase getUserProfile,
+    required PickAndUploadProfilePictureUseCase pickAndUploadProfilePicture,
+  }) : _getUserProfile = getUserProfile,
+       _pickAndUploadProfilePicture = pickAndUploadProfilePicture;
 
   Future<void> fetchUserProfile({
     required String userId,
@@ -42,15 +50,14 @@ class ProfileNotifier extends ChangeNotifier {
       return;
     }
 
-    // Use Future.microtask to avoid "setState called during build" errors.
     Future.microtask(() {
       _state = ProfileState(isLoading: true, userProfile: _state.userProfile);
       notifyListeners();
     });
 
     try {
-      final profile = await _profileService.getUserProfile(userId: userId);
-      _state = ProfileState(userProfile: profile, isLoading: false);
+      final domainProfile = await _getUserProfile.call(userId: userId);
+      _state = ProfileState(userProfile: domainProfile, isLoading: false);
     } catch (e) {
       _state = ProfileState(isLoading: false, userProfile: _state.userProfile);
     }
@@ -58,6 +65,7 @@ class ProfileNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Helper used in tests
   void setStateForTest(ProfileState newState) {
     _state = newState;
   }
@@ -70,11 +78,11 @@ class ProfileNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final newPhotoUrl = await _profileService.pickAndUploadAvatar(
+      final newPhotoUrl = await _pickAndUploadProfilePicture.call(
         source: source,
       );
 
-      if (newPhotoUrl != null) {
+      if (newPhotoUrl != null && newPhotoUrl.isNotEmpty) {
         final updatedProfile = _state.userProfile?.copyWith(
           photoUrl: newPhotoUrl,
         );

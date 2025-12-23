@@ -9,9 +9,9 @@ import 'package:provider/provider.dart';
 
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
-import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
-import 'package:bytebank/features/dashboard/widgets/action_card.dart';
 import 'package:bytebank/presentation/screens/transactions/view_transactions_by_category_screen.dart';
+import 'package:bytebank/presentation/utils/transaction_helpers.dart';
+import 'package:bytebank/presentation/widgets/dashboard/action_card.dart';
 
 class ExpenseControlScreen extends StatefulWidget {
   static const String routeName = '/expense-control';

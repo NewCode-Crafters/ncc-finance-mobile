@@ -6,8 +6,7 @@
 import 'dart:async' as _i3;
 
 import 'package:bytebank/features/dashboard/models/balance.dart' as _i4;
-import 'package:bytebank/features/dashboard/services/balance_service.dart'
-    as _i2;
+import 'package:bytebank/domain/repositories/balance_repository.dart' as _i2;
 import 'package:cloud_firestore/cloud_firestore.dart' as _i5;
 import 'package:mockito/mockito.dart' as _i1;
 

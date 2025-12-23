@@ -2,8 +2,8 @@ import 'package:bytebank/core/constants/app_assets.dart';
 import 'package:bytebank/core/widgets/nav_bar.dart';
 import 'package:bytebank/presentation/screens/transactions/expense_control_screen.dart';
 import 'package:bytebank/core/models/nav_model.dart';
-import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
-import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
+import 'package:bytebank/presentation/screens/investments/create_investment_screen.dart';
+import 'package:bytebank/presentation/screens/profile/my_profile_screen.dart';
 import 'package:bytebank/presentation/screens/transactions/create_transaction_screen.dart';
 import 'package:bytebank/core/widgets/animated_tab_switcher.dart';
 import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
@@ -11,15 +11,14 @@ import 'package:bytebank/presentation/screens/transactions/view_transaction_scre
 import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/features/dashboard/widgets/action_card.dart';
+import 'package:bytebank/presentation/widgets/dashboard/action_card.dart';
 import 'package:bytebank/presentation/screens/transactions/transactions_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:bytebank/core/widgets/main_app_bar.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
-  as app_balance;
-import 'package:bytebank/core/di/injection_container.dart' as di;
-import 'package:bytebank/features/investments/screens/investments_screen.dart';
-import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
+    as app_balance;
+import 'package:bytebank/presentation/screens/investments/investments_screen.dart';
+import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:provider/provider.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -54,9 +53,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _refreshData() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null && mounted) {
-        await context.read<app_balance.BalanceNotifier>().fetchBalances(
-          userId: userId,
-        );
+      await context.read<app_balance.BalanceNotifier>().fetchBalances(
+        userId: userId,
+      );
     }
   }
 

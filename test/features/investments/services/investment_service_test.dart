@@ -1,42 +1,40 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:bytebank/features/dashboard/services/balance_service.dart';
-import 'package:bytebank/features/investments/services/investment_service.dart';
-import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_investment_repository.dart';
+import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
+import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/domain/entities/investment.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 
-import 'investment_service_test.mocks.dart';
-
-@GenerateMocks([BalanceService, FinancialTransactionService, DocumentReference])
 void main() {
   late FakeFirebaseFirestore fakeFirestore;
-  late InvestmentService investmentService;
-  late MockFinancialTransactionService mockTransactionService;
+  late FirebaseInvestmentRepository investmentService;
+  late _FakeTransactionRepository fakeTransactionRepo;
 
   const userId = 'test_user_id';
 
   setUp(() {
     fakeFirestore = FakeFirebaseFirestore();
-    mockTransactionService = MockFinancialTransactionService();
+    fakeTransactionRepo = _FakeTransactionRepository();
 
-    investmentService = InvestmentService(
+    investmentService = FirebaseInvestmentRepository(
       firestore: fakeFirestore,
-      transactionService: mockTransactionService,
+      transactionService: fakeTransactionRepo,
     );
   });
 
   test(
     'createInvestment should add a new document to the investments sub-collection',
     () async {
-      when(
-        mockTransactionService.createTransaction(
-          userId: anyNamed('userId'),
-          data: anyNamed('data'),
-          batch: anyNamed('batch'),
-        ),
-      ).thenAnswer((_) async => MockDocumentReference());
+      // Configure fake to return a created entity
+      fakeTransactionRepo.nextCreated = FinancialTransactionEntity(
+        id: 'created_tx',
+        amount: -5000.0,
+        balanceId: 'test_balance_id',
+        category: 'INVESTMENT',
+        date: DateTime.now(),
+        description: 'Tesouro Selic 2029',
+      );
 
       final investmentData = {
         'name': 'Tesouro Selic 2029',
@@ -54,9 +52,19 @@ void main() {
           .doc('test_balance_id')
           .set({'amount': 10000.0});
 
+      final investment = Investment(
+        id: '',
+        name: investmentData['name'] as String,
+        amount: investmentData['amount'] as double,
+        category: investmentData['category'] as String,
+        type: investmentData['type'] as String,
+        investedAt: investmentData['investedAt'] as DateTime,
+        balanceId: investmentData['balanceId'] as String,
+      );
+
       await investmentService.createInvestment(
         userId: userId,
-        data: investmentData,
+        investment: investment,
       );
 
       final snapshot = await fakeFirestore
@@ -73,13 +81,14 @@ void main() {
   test(
     'deleteInvestment should remove the document from the sub-collection',
     () async {
-      when(
-        mockTransactionService.createTransaction(
-          userId: anyNamed('userId'),
-          data: anyNamed('data'),
-          batch: anyNamed('batch'),
-        ),
-      ).thenAnswer((_) async => MockDocumentReference());
+      fakeTransactionRepo.nextCreated = FinancialTransactionEntity(
+        id: 'created_tx',
+        amount: -5000.0,
+        balanceId: 'test_balance_id',
+        category: 'INVESTMENT',
+        date: DateTime.now(),
+        description: 'Tesouro Selic 2029',
+      );
 
       final docRef = await fakeFirestore
           .collection('users')
@@ -142,13 +151,14 @@ void main() {
   test(
     'createInvestment should create a corresponding expense transaction',
     () async {
-      when(
-        mockTransactionService.createTransaction(
-          userId: anyNamed('userId'),
-          data: anyNamed('data'),
-          batch: anyNamed('batch'),
-        ),
-      ).thenAnswer((_) async => MockDocumentReference());
+      fakeTransactionRepo.nextCreated = FinancialTransactionEntity(
+        id: 'created_tx',
+        amount: -5000.0,
+        balanceId: 'test_balance_id',
+        category: 'INVESTMENT',
+        date: DateTime.now(),
+        description: 'Tesouro Selic 2029',
+      );
 
       final investmentData = {
         'name': 'Tesouro Selic 2029',
@@ -166,38 +176,42 @@ void main() {
           .doc('test_balance_id')
           .set({'amount': 10000.0});
 
-      await investmentService.createInvestment(
-        userId: userId,
-        data: investmentData,
+      final investment = Investment(
+        id: '',
+        name: investmentData['name'] as String,
+        amount: investmentData['amount'] as double,
+        category: investmentData['category'] as String,
+        type: investmentData['type'] as String,
+        investedAt: investmentData['investedAt'] as DateTime,
+        balanceId: investmentData['balanceId'] as String,
       );
 
-      final captured = verify(
-        mockTransactionService.createTransaction(
-          userId: userId,
-          data: captureAnyNamed('data'),
-          batch: anyNamed('batch'),
-        ),
-      ).captured;
+      await investmentService.createInvestment(
+        userId: userId,
+        investment: investment,
+      );
 
-      expect(
-        captured.first['amount'],
-        -5000.0,
-      ); // It must be a negative amount.
-      expect(captured.first['category'], 'INVESTMENT');
-      expect(captured.first['description'], 'Tesouro Selic 2029');
+      final created =
+          fakeTransactionRepo.lastCreatedTransaction!
+              as FinancialTransactionEntity;
+
+      expect(created.amount, -5000.0);
+      expect(created.category, 'INVESTMENT');
+      expect(created.description, 'Tesouro Selic 2029');
     },
   );
 
   test(
     'deleteInvestment should create a corresponding income transaction',
     () async {
-      when(
-        mockTransactionService.createTransaction(
-          userId: anyNamed('userId'),
-          data: anyNamed('data'),
-          batch: anyNamed('batch'),
-        ),
-      ).thenAnswer((_) async => MockDocumentReference());
+      fakeTransactionRepo.nextCreated = FinancialTransactionEntity(
+        id: 'created_tx',
+        amount: 5000.0,
+        balanceId: 'test_balance_id',
+        category: 'INVESTMENT_REDEMPTION',
+        date: DateTime.now(),
+        description: 'Resgate de Old Investment',
+      );
 
       final investmentAmount = 5000.0;
       final investmentDocRef = await fakeFirestore
@@ -216,17 +230,58 @@ void main() {
         investmentId: investmentDocRef.id,
       );
 
-      final captured = verify(
-        mockTransactionService.createTransaction(
-          userId: userId,
-          data: captureAnyNamed('data'),
-          batch: anyNamed('batch'),
-        ),
-      ).captured;
+      final created =
+          fakeTransactionRepo.lastCreatedTransaction!
+              as FinancialTransactionEntity;
 
-      expect(captured.first['amount'], 5000.0);
-      expect(captured.first['category'], 'INVESTMENT_REDEMPTION');
-      expect(captured.first['description'], 'Resgate de Old Investment');
+      expect(created.amount, 5000.0);
+      expect(created.category, 'INVESTMENT_REDEMPTION');
+      expect(created.description, 'Resgate de Old Investment');
     },
   );
+}
+
+class _FakeTransactionRepository implements IFinancialTransactionRepository {
+  FinancialTransactionEntity? nextCreated;
+  Object? lastBatch;
+  FinancialTransactionEntity? lastCreatedTransaction;
+
+  @override
+  Future<FinancialTransactionEntity> createTransaction(
+    FinancialTransactionEntity transaction, {
+    WriteBatch? batch,
+  }) async {
+    // Return the pre-configured entity or echo the input with a fake id
+    lastBatch = batch;
+    lastCreatedTransaction =
+        nextCreated ?? transaction.copyWith(id: 'fake_tx_id');
+    return lastCreatedTransaction!;
+  }
+
+  @override
+  Stream<List<FinancialTransactionEntity>> watchTransactions({
+    String? balanceId,
+  }) => Stream.value([]);
+
+  @override
+  Future<void> deleteTransaction(String transactionId) async {}
+
+  @override
+  Future<FinancialTransactionEntity?> getTransaction(
+    String transactionId,
+  ) async => null;
+
+  @override
+  Future<List<FinancialTransactionEntity>> getTransactions({
+    int limit = 50,
+    String? startAfterId,
+    String? balanceId,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async => [];
+
+  @override
+  Future<FinancialTransactionEntity> updateTransaction(
+    FinancialTransactionEntity transaction,
+  ) async => transaction;
 }

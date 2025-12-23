@@ -6,8 +6,8 @@
 import 'dart:async' as _i3;
 
 import 'package:bytebank/core/services/image_picker_service.dart' as _i5;
-import 'package:bytebank/features/profile/models/user_profile.dart' as _i4;
-import 'package:bytebank/features/profile/services/profile_service.dart' as _i2;
+import 'package:bytebank/domain/entities/user_profile.dart' as _i4;
+import 'package:bytebank/domain/repositories/user_repository.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -28,7 +28,7 @@ import 'package:mockito/mockito.dart' as _i1;
 /// A class which mocks [ProfileService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockProfileService extends _i1.Mock implements _i2.ProfileService {
+class MockProfileService extends _i1.Mock implements _i2.IUserRepository {
   MockProfileService() {
     _i1.throwOnMissingStub(this);
   }

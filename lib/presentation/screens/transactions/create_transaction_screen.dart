@@ -18,8 +18,8 @@ import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
-import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
-import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
+import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/presentation/utils/transaction_helpers.dart';
 
 class CreateTransactionScreen extends StatefulWidget {
   static const String routeName = '/create-transaction';
@@ -96,7 +96,6 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
-      final transactionService = context.read<FinancialTransactionService>();
       final balanceNotifier = context.read<app_balance.BalanceNotifier>();
       final transactionNotifier = context
           .read<app_notifier.TransactionNotifier>();
@@ -115,26 +114,34 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
           ? _amountController.numberValue
           : -_amountController.numberValue;
 
-      final transactionRef = await transactionService.createTransaction(
-        userId: userId,
-        data: {
-          'amount': amount,
-          'balanceId': balanceId,
-          'category': _selectedCategory!.id,
-          'date': DateTime.now(),
-          'description': _descriptionController.text,
-        },
+      final tx = FinancialTransaction(
+        id: '',
+        amount: amount,
+        balanceId: balanceId,
+        category: _selectedCategory!.id,
+        date: DateTime.now(),
+        description: _descriptionController.text.isEmpty
+            ? null
+            : _descriptionController.text,
       );
+
+      await transactionNotifier.createTransaction(tx);
+
+      final created = transactionNotifier.state.transactions.isNotEmpty
+          ? transactionNotifier.state.transactions.first
+          : null;
 
       final filesToUpload = List<File>.from(attachmentsNotifier.selected);
 
       for (final f in filesToUpload) {
         try {
-          await _attachService.uploadSingle(
-            userId: userId,
-            transactionId: transactionRef.id,
-            file: f,
-          );
+          if (created != null && created.id.isNotEmpty) {
+            await _attachService.uploadSingle(
+              userId: userId,
+              transactionId: created.id,
+              file: f,
+            );
+          }
         } catch (e) {
           if (mounted) {
             scaffoldMessenger.showSnackBar(

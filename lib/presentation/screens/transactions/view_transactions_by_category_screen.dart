@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'dart:async';
 
 import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/application/notifiers/balance_notifier.dart';
 import 'package:bytebank/presentation/widgets/transactions/transaction_list_item.dart';
 import 'package:bytebank/presentation/screens/transactions/edit_transaction_screen.dart';
 

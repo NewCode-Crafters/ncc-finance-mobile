@@ -1,8 +1,8 @@
 import 'package:bytebank/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/features/transactions/models/financial_transaction.dart';
+import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart' as app_notifier;
-import 'package:bytebank/features/transactions/utils/transaction_helpers.dart';
+import 'package:bytebank/presentation/utils/transaction_helpers.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:bytebank/presentation/widgets/transactions/read_only_attachments_section.dart';

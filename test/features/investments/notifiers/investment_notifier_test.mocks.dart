@@ -6,8 +6,7 @@
 import 'dart:async' as _i3;
 
 import 'package:bytebank/domain/entities/investment.dart' as _i4;
-import 'package:bytebank/features/investments/services/investment_service.dart'
-    as _i2;
+import 'package:bytebank/domain/repositories/investment_repository.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -25,28 +24,38 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: subtype_of_sealed_class
 // ignore_for_file: invalid_use_of_internal_member
 
-/// A class which mocks [InvestmentService].
+/// A class which mocks [IInvestmentRepository].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockInvestmentService extends _i1.Mock implements _i2.InvestmentService {
+class MockInvestmentService extends _i1.Mock
+    implements _i2.IInvestmentRepository {
   MockInvestmentService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i3.Future<void> createInvestment({
+  _i3.Future<_i4.Investment> createInvestment({
     required String? userId,
-    required Map<String, dynamic>? data,
+    required _i4.Investment? investment,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#createInvestment, [], {
               #userId: userId,
-              #data: data,
+              #investment: investment,
             }),
-            returnValue: _i3.Future<void>.value(),
-            returnValueForMissingStub: _i3.Future<void>.value(),
+            returnValue: _i3.Future<_i4.Investment>.value(
+              _i4.Investment(
+                '',
+                '',
+                0.0,
+                '',
+                '',
+                DateTime.fromMillisecondsSinceEpoch(0),
+                '',
+              ),
+            ),
           )
-          as _i3.Future<void>);
+          as _i3.Future<_i4.Investment>);
 
   @override
   _i3.Future<void> deleteInvestment({

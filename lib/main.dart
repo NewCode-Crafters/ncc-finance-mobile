@@ -5,14 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/features/splash/screens/splash_screen.dart';
-import 'package:bytebank/features/transactions/models/financial_transaction.dart';
+import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
 import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/presentation/screens/transactions/create_transaction_screen.dart';
 import 'package:bytebank/presentation/screens/transactions/edit_transaction_screen.dart';
 import 'package:bytebank/presentation/screens/transactions/transactions_screen.dart';
-import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -22,15 +21,13 @@ import 'package:bytebank/features/authentication/screens/login_screen.dart';
 import 'package:bytebank/features/authentication/screens/register_screen.dart';
 import 'package:bytebank/features/authentication/screens/update_account_screen.dart';
 import 'package:bytebank/features/authentication/services/auth_service.dart';
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:bytebank/features/dashboard/screens/dashboard_screen.dart';
-import 'package:bytebank/features/dashboard/services/balance_service.dart';
+import 'package:bytebank/presentation/screens/dashboard/dashboard_screen.dart';
+import 'package:bytebank/domain/repositories/balance_repository.dart';
 import 'package:bytebank/application/notifiers/investment_notifier.dart';
-import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
-import 'package:bytebank/features/investments/screens/investments_screen.dart';
-import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
-import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
-import 'package:bytebank/features/profile/services/profile_service.dart';
+import 'package:bytebank/presentation/screens/investments/create_investment_screen.dart';
+import 'package:bytebank/presentation/screens/investments/investments_screen.dart';
+import 'package:bytebank/application/notifiers/profile_notifier.dart';
+import 'package:bytebank/presentation/screens/profile/my_profile_screen.dart';
 import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.dart';
 import 'package:bytebank/firebase_options.dart';
 import 'package:bytebank/theme/theme.dart';
@@ -61,16 +58,12 @@ class MyApp extends StatelessWidget {
         Provider<AuthService>(create: (_) => sl<AuthService>()),
         ChangeNotifierProvider<AuthNotifier>(create: (_) => sl<AuthNotifier>()),
         // --- Profile ---
-        Provider<ProfileService>(create: (_) => sl<ProfileService>()),
         ChangeNotifierProvider<ProfileNotifier>(
           create: (_) => sl<ProfileNotifier>(),
         ),
         // --- Balance ---
-        Provider<BalanceService>(create: (_) => sl<BalanceService>()),
-        ChangeNotifierProvider<BalanceNotifier>(
-          create: (_) => sl<BalanceNotifier>(),
-        ),
-        // Application-layer BalanceNotifier
+        Provider<IBalanceRepository>(create: (_) => sl<IBalanceRepository>()),
+        // Application-layer BalanceNotifier (single source of truth for balances)
         ChangeNotifierProvider<app_balance.BalanceNotifier>(
           create: (_) => sl<app_balance.BalanceNotifier>(),
         ),
@@ -80,9 +73,6 @@ class MyApp extends StatelessWidget {
         ),
         // --- Transactions ---
         Provider<MetadataService>(create: (_) => sl<MetadataService>()),
-        Provider<FinancialTransactionService>(
-          create: (_) => sl<FinancialTransactionService>(),
-        ),
         // --- Chart Animation ---
         ChangeNotifierProvider<ChartAnimationNotifier>(
           create: (_) => sl<ChartAnimationNotifier>(),

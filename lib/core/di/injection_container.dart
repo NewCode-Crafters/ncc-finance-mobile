@@ -4,10 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // App services and notifiers
 import 'package:bytebank/features/authentication/services/firebase_auth_service.dart';
 import 'package:bytebank/features/authentication/services/auth_service.dart';
-import 'package:bytebank/features/profile/services/profile_service.dart';
-import 'package:bytebank/features/dashboard/services/balance_service.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_user_repository.dart';
+import 'package:bytebank/domain/repositories/user_repository.dart';
+import 'package:bytebank/domain/use_cases/profile/get_user_profile_use_case.dart';
+import 'package:bytebank/domain/use_cases/profile/upload_profile_picture_use_case.dart';
+import 'package:bytebank/domain/use_cases/profile/pick_and_upload_profile_picture_use_case.dart';
+import 'package:bytebank/domain/repositories/balance_repository.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
-import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
+import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
 import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
@@ -31,8 +35,7 @@ import 'package:bytebank/application/notifiers/investment_notifier.dart'
     as app_investment;
 
 import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
-import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
+import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
 
@@ -55,13 +58,8 @@ Future<void> initializeDependencies() async {
 
   // -- Services (lazy singletons)
   sl.registerLazySingleton<AuthService>(() => FirebaseAuthService());
-  sl.registerLazySingleton<ProfileService>(() => ProfileService());
-  sl.registerLazySingleton<BalanceService>(() => BalanceService());
 
   sl.registerLazySingleton<MetadataService>(() => MetadataService());
-  sl.registerLazySingleton<FinancialTransactionService>(
-    () => FinancialTransactionService(),
-  );
 
   // -- Transaction infrastructure
   sl.registerLazySingleton<FirebaseTransactionDataSource>(
@@ -76,6 +74,10 @@ Future<void> initializeDependencies() async {
     ),
   );
 
+  sl.registerLazySingleton<IFinancialTransactionRepository>(
+    () => sl<FirebaseTransactionRepository>(),
+  );
+
   sl.registerLazySingleton<FinancialTransactionMapper>(
     () => const FinancialTransactionMapper(),
   );
@@ -85,30 +87,51 @@ Future<void> initializeDependencies() async {
 
   // -- Domain use-cases for transactions
   sl.registerLazySingleton<GetTransactionsUseCase>(
-    () => GetTransactionsUseCase(sl<FirebaseTransactionRepository>()),
+    () => GetTransactionsUseCase(sl<IFinancialTransactionRepository>()),
   );
   sl.registerLazySingleton<CreateTransactionUseCase>(
-    () => CreateTransactionUseCase(sl<FirebaseTransactionRepository>()),
+    () => CreateTransactionUseCase(sl<IFinancialTransactionRepository>()),
   );
   sl.registerLazySingleton<UpdateTransactionUseCase>(
-    () => UpdateTransactionUseCase(sl<FirebaseTransactionRepository>()),
+    () => UpdateTransactionUseCase(sl<IFinancialTransactionRepository>()),
   );
   sl.registerLazySingleton<DeleteTransactionUseCase>(
-    () => DeleteTransactionUseCase(sl<FirebaseTransactionRepository>()),
+    () => DeleteTransactionUseCase(sl<IFinancialTransactionRepository>()),
   );
 
   // -- Notifiers (factories so each consumer gets a fresh instance)
   sl.registerFactory<AuthNotifier>(() => AuthNotifier(sl<AuthService>()));
-  sl.registerFactory<ProfileNotifier>(
-    () => ProfileNotifier(sl<ProfileService>()),
+
+  // Profile infra + use-cases
+  // Register the IUserRepository interface to the concrete implementation
+  sl.registerLazySingleton<IUserRepository>(
+    () => FirebaseUserRepository(firestore: sl<FirebaseFirestore>()),
   );
-  // Legacy feature BalanceNotifier (keeps existing feature while migration proceeds)
-  sl.registerFactory<BalanceNotifier>(
-    () => BalanceNotifier(sl<BalanceService>()),
+
+  sl.registerLazySingleton<GetUserProfileUseCase>(
+    () => GetUserProfileUseCase(repository: sl<IUserRepository>()),
+  );
+  sl.registerLazySingleton<UploadProfilePictureUseCase>(
+    () => UploadProfilePictureUseCase(repository: sl<IUserRepository>()),
+  );
+  sl.registerLazySingleton<PickAndUploadProfilePictureUseCase>(
+    () => PickAndUploadProfilePictureUseCase(repository: sl<IUserRepository>()),
+  );
+
+  sl.registerFactory<ProfileNotifier>(
+    () => ProfileNotifier(
+      getUserProfile: sl<GetUserProfileUseCase>(),
+      pickAndUploadProfilePicture: sl<PickAndUploadProfilePictureUseCase>(),
+    ),
   );
 
   // Application-layer BalanceNotifier backed by domain use-cases
   sl.registerLazySingleton<FirebaseBalanceRepository>(
+    () => FirebaseBalanceRepository(firestore: sl<FirebaseFirestore>()),
+  );
+
+  // Register the IBalanceRepository interface to the concrete implementation
+  sl.registerLazySingleton<IBalanceRepository>(
     () => FirebaseBalanceRepository(firestore: sl<FirebaseFirestore>()),
   );
 

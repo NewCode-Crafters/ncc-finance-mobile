@@ -24,8 +24,8 @@ class FirebaseTransactionRepository implements IFinancialTransactionRepository {
   String _requireUserId() {
     // Prefer an injected currentUserId (useful for tests). If not provided,
     // attempt to read the currently authenticated user from FirebaseAuth.
-    if (_currentUserId != null && _currentUserId!.isNotEmpty) {
-      return _currentUserId!;
+    if (_currentUserId != null && _currentUserId.isNotEmpty) {
+      return _currentUserId;
     }
 
     final uid = FirebaseAuth.instance.currentUser?.uid;
