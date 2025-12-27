@@ -7,19 +7,18 @@ import 'package:bytebank/domain/repositories/auth_repository.dart';
 import 'package:bytebank/domain/entities/user_profile.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
-import 'login_screen_test.mocks.dart';
+import '../../helpers/mocks/fake_auth_service.dart';
 import '../../../helpers/profile/profile_notifier_test_helpers.dart';
 
 void main() {
-  late MockAuthService mockAuthService;
+  late FakeAuthService mockAuthService;
   late ProfileNotifier profileNotifier;
   late UserProfile fakeUserProfile;
 
   setUp(() {
-    mockAuthService = MockAuthService();
+    mockAuthService = FakeAuthService();
     profileNotifier = ProfileNotifier(
       getUserProfile: FakeGetUserProfileUseCase(null),
       pickAndUploadProfilePicture: FakePickAndUploadProfilePictureUseCase(null),
@@ -79,10 +78,6 @@ void main() {
     (WidgetTester tester) async {
       await pumpUpdateAccountScreen(tester);
 
-      when(
-        mockAuthService.updateUserName(newName: anyNamed('newName')),
-      ).thenAnswer((_) async {});
-
       final nameField = find.byKey(const Key('update_account_name_field'));
       await tester.enterText(nameField, 'New Name');
 
@@ -92,14 +87,15 @@ void main() {
       );
       await tester.tap(saveButton);
 
-      verify(mockAuthService.updateUserName(newName: 'New Name')).called(1);
+      expect(mockAuthService.lastUpdatedName, 'New Name');
+      expect(mockAuthService.updateUserNameCallCount, 1);
     },
   );
 }
 
 // Adapter that implements AuthRepository but forwards to MockAuthService.
 class _RepoAdapter implements AuthRepository {
-  final MockAuthService _service;
+  final FakeAuthService _service;
   _RepoAdapter(this._service);
 
   @override

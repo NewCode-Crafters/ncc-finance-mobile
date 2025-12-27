@@ -10,13 +10,13 @@ import 'package:bytebank/domain/use_cases/auth/logout_use_case.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
-import '../notifiers/auth_notifier_test.mocks.dart';
+import '../../helpers/mocks/fake_auth_service.dart';
 
 void main() {
-  late MockAuthService mockAuthService;
+  late FakeAuthService mockAuthService;
 
   Future<void> createRegisterScreen(WidgetTester tester) async {
-    mockAuthService = MockAuthService();
+    mockAuthService = FakeAuthService();
 
     await tester.pumpWidget(
       MultiProvider(
@@ -84,7 +84,7 @@ void main() {
 
 // Top-level adapters so they can be used from the test constructors
 class _LoginAdapter implements LoginUseCase {
-  final MockAuthService _service;
+  final FakeAuthService _service;
   _LoginAdapter(this._service);
   @override
   Future<void> call(String email, String password) =>
@@ -92,7 +92,7 @@ class _LoginAdapter implements LoginUseCase {
 }
 
 class _SignUpAdapter implements SignUpUseCase {
-  final MockAuthService _service;
+  final FakeAuthService _service;
   _SignUpAdapter(this._service);
   @override
   Future<void> call({
@@ -103,7 +103,7 @@ class _SignUpAdapter implements SignUpUseCase {
 }
 
 class _SendResetAdapter implements SendPasswordResetEmailUseCase {
-  final MockAuthService _service;
+  final FakeAuthService _service;
   _SendResetAdapter(this._service);
   @override
   Future<void> call({required String email}) =>
@@ -111,7 +111,7 @@ class _SendResetAdapter implements SendPasswordResetEmailUseCase {
 }
 
 class _LogoutAdapter implements LogoutUseCase {
-  final MockAuthService _service;
+  final FakeAuthService _service;
   _LogoutAdapter(this._service);
   @override
   Future<void> call() => _service.logout();

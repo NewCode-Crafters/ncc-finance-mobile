@@ -20,9 +20,7 @@ import 'package:bytebank/presentation/screens/authentication/auth_wrapper.dart';
 import 'package:bytebank/presentation/screens/authentication/login_screen.dart';
 import 'package:bytebank/presentation/screens/authentication/register_screen.dart';
 import 'package:bytebank/presentation/screens/authentication/update_account_screen.dart';
-import 'package:bytebank/domain/repositories/auth_repository.dart';
 import 'package:bytebank/presentation/screens/dashboard/dashboard_screen.dart';
-import 'package:bytebank/domain/repositories/balance_repository.dart';
 import 'package:bytebank/application/notifiers/investment_notifier.dart';
 import 'package:bytebank/presentation/screens/investments/create_investment_screen.dart';
 import 'package:bytebank/presentation/screens/investments/investments_screen.dart';
@@ -55,14 +53,12 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         // --- Authentication ---
-        Provider<AuthRepository>(create: (_) => sl<AuthRepository>()),
         ChangeNotifierProvider<AuthNotifier>(create: (_) => sl<AuthNotifier>()),
         // --- Profile ---
         ChangeNotifierProvider<ProfileNotifier>(
           create: (_) => sl<ProfileNotifier>(),
         ),
         // --- Balance ---
-        Provider<IBalanceRepository>(create: (_) => sl<IBalanceRepository>()),
         // Application-layer BalanceNotifier (single source of truth for balances)
         ChangeNotifierProvider<app_balance.BalanceNotifier>(
           create: (_) => sl<app_balance.BalanceNotifier>(),
