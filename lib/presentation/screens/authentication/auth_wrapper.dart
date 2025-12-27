@@ -2,7 +2,7 @@ import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
+import 'package:bytebank/application/notifiers/auth_notifier.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
 import 'package:bytebank/application/notifiers/investment_notifier.dart';

@@ -15,12 +15,12 @@ import 'package:bytebank/presentation/screens/transactions/transactions_screen.d
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
-import 'package:bytebank/features/authentication/screens/auth_wrapper.dart';
-import 'package:bytebank/features/authentication/screens/login_screen.dart';
-import 'package:bytebank/features/authentication/screens/register_screen.dart';
-import 'package:bytebank/features/authentication/screens/update_account_screen.dart';
-import 'package:bytebank/features/authentication/services/auth_service.dart';
+import 'package:bytebank/application/notifiers/auth_notifier.dart';
+import 'package:bytebank/presentation/screens/authentication/auth_wrapper.dart';
+import 'package:bytebank/presentation/screens/authentication/login_screen.dart';
+import 'package:bytebank/presentation/screens/authentication/register_screen.dart';
+import 'package:bytebank/presentation/screens/authentication/update_account_screen.dart';
+import 'package:bytebank/domain/repositories/auth_repository.dart';
 import 'package:bytebank/presentation/screens/dashboard/dashboard_screen.dart';
 import 'package:bytebank/domain/repositories/balance_repository.dart';
 import 'package:bytebank/application/notifiers/investment_notifier.dart';
@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         // --- Authentication ---
-        Provider<AuthService>(create: (_) => sl<AuthService>()),
+        Provider<AuthRepository>(create: (_) => sl<AuthRepository>()),
         ChangeNotifierProvider<AuthNotifier>(create: (_) => sl<AuthNotifier>()),
         // --- Profile ---
         ChangeNotifierProvider<ProfileNotifier>(

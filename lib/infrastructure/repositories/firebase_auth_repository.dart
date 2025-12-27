@@ -1,26 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:bytebank/features/authentication/services/auth_exceptions.dart';
-import 'package:bytebank/features/authentication/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb;
+import 'package:bytebank/domain/entities/user_profile.dart';
+import 'package:bytebank/domain/repositories/auth_repository.dart';
+import 'package:bytebank/domain/exceptions/auth_exceptions.dart';
+import 'package:bytebank/infrastructure/data_sources/remote/firebase_auth_data_source.dart';
 
-class FirebaseAuthService implements AuthService {
-  final FirebaseAuth _firebaseAuth;
-  final FirebaseFirestore _firestore;
+class FirebaseAuthRepository implements AuthRepository {
+  final FirebaseAuthDataSource _dataSource;
 
-  FirebaseAuthService({
-    FirebaseAuth? firebaseAuth,
-    FirebaseFirestore? firestore,
-  }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-       _firestore = firestore ?? FirebaseFirestore.instance;
+  FirebaseAuthRepository(this._dataSource);
 
   @override
   Future<void> login(String email, String password) async {
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(
+      await _dataSource.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-    } on FirebaseAuthException catch (e) {
+    } on fb.FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         throw UserNotFoundException();
       } else if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
@@ -40,12 +37,11 @@ class FirebaseAuthService implements AuthService {
     required String password,
   }) async {
     try {
-      final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+      final credential = await _dataSource.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-
-      final user = userCredential.user;
+      final user = credential.user;
 
       if (user == null) {
         throw Exception(
@@ -53,7 +49,9 @@ class FirebaseAuthService implements AuthService {
         );
       }
 
-      final userDocRef = _firestore.collection('users').doc(user.uid);
+      final userDocRef = _dataSource.firestore
+          .collection('users')
+          .doc(user.uid);
 
       await userDocRef.set({
         'name': name,
@@ -66,7 +64,7 @@ class FirebaseAuthService implements AuthService {
         'amount': 0.0,
         'currency': 'BRL',
       });
-    } on FirebaseAuthException catch (e) {
+    } on fb.FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         throw WeakPasswordException();
       } else if (e.code == 'email-already-in-use') {
@@ -82,8 +80,8 @@ class FirebaseAuthService implements AuthService {
   @override
   Future<void> sendPasswordResetEmail({required String email}) async {
     try {
-      await _firebaseAuth.sendPasswordResetEmail(email: email);
-    } on FirebaseAuthException catch (e) {
+      return _dataSource.sendPasswordResetEmail(email: email);
+    } on fb.FirebaseAuthException catch (e) {
       throw Exception('Ocorreu um erro desconhecido do Firebase: ${e.code}');
     } catch (e) {
       throw Exception('Ocorreu um erro desconhecido.');
@@ -93,7 +91,7 @@ class FirebaseAuthService implements AuthService {
   @override
   Future<void> logout() async {
     try {
-      await _firebaseAuth.signOut();
+      return _dataSource.signOut();
     } catch (e) {
       throw Exception('Ocorreu um erro durante o logout.');
     }
@@ -102,13 +100,13 @@ class FirebaseAuthService implements AuthService {
   @override
   Future<void> updateUserPhotoUrl({required String url}) async {
     try {
-      final user = _firebaseAuth.currentUser;
+      final user = _dataSource.currentUser;
 
       if (user == null) {
         throw Exception('Nenhum usuário autenticado encontrado.');
       }
 
-      await _firestore.collection('users').doc(user.uid).update({
+      await _dataSource.firestore.collection('users').doc(user.uid).update({
         'photoUrl': url,
       });
     } catch (e) {
@@ -119,17 +117,31 @@ class FirebaseAuthService implements AuthService {
   @override
   Future<void> updateUserName({required String newName}) async {
     try {
-      final user = _firebaseAuth.currentUser;
+      final user = _dataSource.currentUser;
       if (user == null) {
         throw Exception(
           'Não é possível atualizar o nome de um usuário não autenticado.',
         );
       }
-      await _firestore.collection('users').doc(user.uid).update({
+      await _dataSource.firestore.collection('users').doc(user.uid).update({
         'name': newName,
       });
     } catch (e) {
       throw Exception('Falha ao atualizar o nome do usuário.');
     }
+  }
+
+  @override
+  Future<UserProfile?> getCurrentUserProfile() async {
+    final user = _dataSource.currentUser;
+    if (user == null) return null;
+
+    final doc = await _dataSource.firestore
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    if (!doc.exists) return null;
+    final map = doc.data();
+    return UserProfile.fromMap(map, uid: doc.id);
   }
 }

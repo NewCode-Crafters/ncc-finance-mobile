@@ -2,7 +2,7 @@ import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/custom_text_field.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
-import 'package:bytebank/features/authentication/services/auth_service.dart';
+import 'package:bytebank/domain/repositories/auth_repository.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:provider/provider.dart';
 
@@ -39,12 +39,12 @@ class _UpdateAccountScreenState extends State<UpdateAccountScreen> {
       _isLoading = true;
     });
 
-    final authService = context.read<AuthService>();
+    final authRepository = context.read<AuthRepository>();
     final profileNotifier = context.read<ProfileNotifier>();
     final currentUser = context.read<ProfileNotifier>().state.userProfile;
 
     try {
-      await authService.updateUserName(newName: _nameController.text.trim());
+      await authRepository.updateUserName(newName: _nameController.text.trim());
 
       if (currentUser != null) {
         await profileNotifier.fetchUserProfile(

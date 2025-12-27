@@ -1,9 +1,14 @@
+import 'package:bytebank/domain/repositories/auth_repository.dart';
+import 'package:bytebank/domain/use_cases/auth/login_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/logout_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/send_password_reset_email_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/signup_use_case.dart';
+import 'package:bytebank/infrastructure/data_sources/remote/firebase_auth_data_source.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_auth_repository.dart';
 import 'package:get_it/get_it.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // App services and notifiers
-import 'package:bytebank/features/authentication/services/firebase_auth_service.dart';
-import 'package:bytebank/features/authentication/services/auth_service.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_user_repository.dart';
 import 'package:bytebank/domain/repositories/user_repository.dart';
 import 'package:bytebank/domain/use_cases/profile/get_user_profile_use_case.dart';
@@ -34,7 +39,7 @@ import 'package:bytebank/domain/use_cases/investments/delete_investment_use_case
 import 'package:bytebank/application/notifiers/investment_notifier.dart'
     as app_investment;
 
-import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
+import 'package:bytebank/application/notifiers/auth_notifier.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
@@ -56,8 +61,19 @@ Future<void> initializeDependencies() async {
   // If you initialize Firebase in main(), use FirebaseFirestore.instance here.
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
 
-  // -- Services (lazy singletons)
-  sl.registerLazySingleton<AuthService>(() => FirebaseAuthService());
+  // -- Authentication infra: data source and repository
+  sl.registerLazySingleton<FirebaseAuthDataSource>(
+    () => FirebaseAuthDataSourceImpl(
+      firebaseAuth: null,
+      firestore: sl<FirebaseFirestore>(),
+    ),
+  );
+
+  sl.registerLazySingleton<FirebaseAuthRepository>(
+    () => FirebaseAuthRepository(sl<FirebaseAuthDataSource>()),
+  );
+
+  sl.registerLazySingleton<AuthRepository>(() => sl<FirebaseAuthRepository>());
 
   sl.registerLazySingleton<MetadataService>(() => MetadataService());
 
@@ -99,8 +115,29 @@ Future<void> initializeDependencies() async {
     () => DeleteTransactionUseCase(sl<IFinancialTransactionRepository>()),
   );
 
-  // -- Notifiers (factories so each consumer gets a fresh instance)
-  sl.registerFactory<AuthNotifier>(() => AuthNotifier(sl<AuthService>()));
+  // -- Auth use-cases and Notifier
+  sl.registerLazySingleton<LoginUseCase>(
+    () => LoginUseCase(sl<AuthRepository>()),
+  );
+  sl.registerLazySingleton<SignUpUseCase>(
+    () => SignUpUseCase(sl<AuthRepository>()),
+  );
+  sl.registerLazySingleton<SendPasswordResetEmailUseCase>(
+    () => SendPasswordResetEmailUseCase(sl<AuthRepository>()),
+  );
+  sl.registerLazySingleton<LogoutUseCase>(
+    () => LogoutUseCase(sl<AuthRepository>()),
+  );
+
+  // Notifier factory that accepts use-cases
+  sl.registerFactory<AuthNotifier>(
+    () => AuthNotifier(
+      login: sl<LoginUseCase>(),
+      signUp: sl<SignUpUseCase>(),
+      sendReset: sl<SendPasswordResetEmailUseCase>(),
+      logout: sl<LogoutUseCase>(),
+    ),
+  );
 
   // Profile infra + use-cases
   // Register the IUserRepository interface to the concrete implementation

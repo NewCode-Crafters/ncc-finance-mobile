@@ -2,7 +2,7 @@ import 'package:bytebank/core/utils/color_helper.dart';
 import 'package:bytebank/features/onboarding/models/onboarding_item.dart';
 import 'package:bytebank/theme/theme.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:bytebank/features/authentication/screens/login_screen.dart';
+import 'package:bytebank/presentation/screens/authentication/login_screen.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingCarouselScreen extends StatefulWidget {

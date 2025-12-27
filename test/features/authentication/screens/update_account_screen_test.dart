@@ -1,7 +1,9 @@
+import 'dart:core';
+
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
-import 'package:bytebank/features/authentication/screens/update_account_screen.dart';
-import 'package:bytebank/features/authentication/services/auth_service.dart';
+import 'package:bytebank/presentation/screens/authentication/update_account_screen.dart';
+import 'package:bytebank/domain/repositories/auth_repository.dart';
 import 'package:bytebank/domain/entities/user_profile.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -36,7 +38,7 @@ void main() {
     await tester.pumpWidget(
       MultiProvider(
         providers: [
-          Provider<AuthService>.value(value: mockAuthService),
+          Provider<AuthRepository>.value(value: _RepoAdapter(mockAuthService)),
           ChangeNotifierProvider<ProfileNotifier>.value(value: profileNotifier),
         ],
         child: const MaterialApp(home: UpdateAccountScreen()),
@@ -93,4 +95,39 @@ void main() {
       verify(mockAuthService.updateUserName(newName: 'New Name')).called(1);
     },
   );
+}
+
+// Adapter that implements AuthRepository but forwards to MockAuthService.
+class _RepoAdapter implements AuthRepository {
+  final MockAuthService _service;
+  _RepoAdapter(this._service);
+
+  @override
+  Future<void> login(String email, String password) =>
+      _service.login(email, password);
+
+  @override
+  Future<void> logout() => _service.logout();
+
+  @override
+  Future<void> sendPasswordResetEmail({required String email}) =>
+      _service.sendPasswordResetEmail(email: email);
+
+  @override
+  Future<void> signUp({
+    required String name,
+    required String email,
+    required String password,
+  }) => _service.signUp(name: name, email: email, password: password);
+
+  @override
+  Future<void> updateUserName({required String newName}) =>
+      _service.updateUserName(newName: newName);
+
+  @override
+  Future<void> updateUserPhotoUrl({required String url}) =>
+      _service.updateUserPhotoUrl(url: url);
+
+  @override
+  Future<UserProfile?> getCurrentUserProfile() async => null;
 }

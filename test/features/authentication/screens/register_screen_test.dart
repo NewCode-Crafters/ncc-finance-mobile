@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
-import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
-import 'package:bytebank/features/authentication/screens/register_screen.dart';
-import 'package:bytebank/features/authentication/services/auth_service.dart';
+import 'package:bytebank/application/notifiers/auth_notifier.dart';
+import 'package:bytebank/presentation/screens/authentication/register_screen.dart';
 import 'package:bytebank/presentation/screens/dashboard/dashboard_screen.dart';
+import 'package:bytebank/domain/use_cases/auth/login_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/signup_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/send_password_reset_email_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/logout_use_case.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
 import 'package:provider/provider.dart';
 
 import '../notifiers/auth_notifier_test.mocks.dart';
 
-@GenerateMocks([AuthService])
 void main() {
   late MockAuthService mockAuthService;
 
@@ -20,9 +21,13 @@ void main() {
     await tester.pumpWidget(
       MultiProvider(
         providers: [
-          Provider<AuthService>.value(value: mockAuthService),
           ChangeNotifierProvider<AuthNotifier>(
-            create: (context) => AuthNotifier(mockAuthService),
+            create: (context) => AuthNotifier(
+              login: _LoginAdapter(mockAuthService),
+              signUp: _SignUpAdapter(mockAuthService),
+              sendReset: _SendResetAdapter(mockAuthService),
+              logout: _LogoutAdapter(mockAuthService),
+            ),
           ),
         ],
         child: MaterialApp(
@@ -75,4 +80,39 @@ void main() {
     await createRegisterScreen(tester);
     expect(find.widgetWithText(PrimaryButton, 'Criar conta'), findsOneWidget);
   });
+}
+
+// Top-level adapters so they can be used from the test constructors
+class _LoginAdapter implements LoginUseCase {
+  final MockAuthService _service;
+  _LoginAdapter(this._service);
+  @override
+  Future<void> call(String email, String password) =>
+      _service.login(email, password);
+}
+
+class _SignUpAdapter implements SignUpUseCase {
+  final MockAuthService _service;
+  _SignUpAdapter(this._service);
+  @override
+  Future<void> call({
+    required String name,
+    required String email,
+    required String password,
+  }) => _service.signUp(name: name, email: email, password: password);
+}
+
+class _SendResetAdapter implements SendPasswordResetEmailUseCase {
+  final MockAuthService _service;
+  _SendResetAdapter(this._service);
+  @override
+  Future<void> call({required String email}) =>
+      _service.sendPasswordResetEmail(email: email);
+}
+
+class _LogoutAdapter implements LogoutUseCase {
+  final MockAuthService _service;
+  _LogoutAdapter(this._service);
+  @override
+  Future<void> call() => _service.logout();
 }

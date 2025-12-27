@@ -1,8 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/validators.dart';
-import 'package:bytebank/features/authentication/services/auth_exceptions.dart';
-import 'package:bytebank/features/authentication/services/auth_service.dart';
+import 'package:bytebank/domain/exceptions/auth_exceptions.dart';
+import 'package:bytebank/domain/use_cases/auth/login_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/signup_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/send_password_reset_email_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/logout_use_case.dart';
 
 class AuthState extends Equatable {
   final bool isLoading;
@@ -41,12 +44,23 @@ class AuthState extends Equatable {
 }
 
 class AuthNotifier extends ChangeNotifier {
-  final AuthService _authService;
+  final LoginUseCase _loginUseCase;
+  final SignUpUseCase _signUpUseCase;
+  final SendPasswordResetEmailUseCase _sendResetUseCase;
+  final LogoutUseCase _logoutUseCase;
 
   AuthState _state = const AuthState();
   AuthState get state => _state;
 
-  AuthNotifier(this._authService);
+  AuthNotifier({
+    required LoginUseCase login,
+    required SignUpUseCase signUp,
+    required SendPasswordResetEmailUseCase sendReset,
+    required LogoutUseCase logout,
+  })  : _loginUseCase = login,
+        _signUpUseCase = signUp,
+        _sendResetUseCase = sendReset,
+        _logoutUseCase = logout;
 
   Future<bool> login(String email, String password) async {
     if (!Validators.isValidEmail(email)) {
@@ -59,7 +73,7 @@ class AuthNotifier extends ChangeNotifier {
       return false;
     }
 
-    return await _executeAuthAction(() => _authService.login(email, password));
+    return await _executeAuthAction(() => _loginUseCase.call(email, password));
   }
 
   Future<bool> signUp({
@@ -78,7 +92,7 @@ class AuthNotifier extends ChangeNotifier {
     }
 
     return await _executeAuthAction(() async {
-      await _authService.signUp(name: name, email: email, password: password);
+      await _signUpUseCase.call(name: name, email: email, password: password);
     });
   }
 
@@ -153,7 +167,7 @@ class AuthNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _authService.sendPasswordResetEmail(email: email);
+      await _sendResetUseCase.call(email: email);
       _state = _state.copyWith(
         isLoading: false,
         successMessage:
@@ -174,7 +188,7 @@ class AuthNotifier extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _authService.logout();
+      await _logoutUseCase.call();
       _state = const AuthState();
     } catch (e) {
       _state = _state.copyWith(

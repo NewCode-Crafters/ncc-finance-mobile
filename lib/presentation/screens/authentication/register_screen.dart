@@ -6,7 +6,7 @@ import 'package:bytebank/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
-import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
+import 'package:bytebank/application/notifiers/auth_notifier.dart';
 import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {

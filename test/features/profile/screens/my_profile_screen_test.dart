@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:bytebank/features/authentication/screens/update_account_screen.dart';
+import 'package:bytebank/presentation/screens/authentication/update_account_screen.dart';
 import 'package:bytebank/features/authentication/services/auth_service.dart';
+import 'package:bytebank/domain/use_cases/auth/login_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/signup_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/send_password_reset_email_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/logout_use_case.dart';
 import 'package:bytebank/domain/entities/user_profile.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:bytebank/presentation/screens/profile/my_profile_screen.dart';
@@ -36,7 +40,17 @@ void main() {
       MultiProvider(
         providers: [
           ChangeNotifierProvider<ProfileNotifier>.value(value: profileNotifier),
-          Provider<AuthService>.value(value: mockAuthService),
+          ChangeNotifierProvider(
+            create: (_) => profileNotifier,
+          ),
+          ChangeNotifierProvider(
+            create: (_) => profileNotifier,
+          ),
+          // Provide AuthNotifier constructed with adapters that forward to the MockAuthService
+          Provider<LoginUseCase>.value(value: _LoginAdapter(mockAuthService)),
+          Provider<SignUpUseCase>.value(value: _SignUpAdapter(mockAuthService)),
+          Provider<SendPasswordResetEmailUseCase>.value(value: _SendResetAdapter(mockAuthService)),
+          Provider<LogoutUseCase>.value(value: _LogoutAdapter(mockAuthService)),
         ],
         child: MaterialApp(
           home: const MyProfileScreen(), // The screen now takes no arguments.
@@ -108,4 +122,34 @@ void main() {
       },
     );
   });
+}
+
+// Adapters to bridge MockAuthService to domain use-cases
+class _LoginAdapter implements LoginUseCase {
+  final MockAuthService _service;
+  _LoginAdapter(this._service);
+  @override
+  Future<void> call(String email, String password) => _service.login(email, password);
+}
+
+class _SignUpAdapter implements SignUpUseCase {
+  final MockAuthService _service;
+  _SignUpAdapter(this._service);
+  @override
+  Future<void> call({required String name, required String email, required String password}) =>
+      _service.signUp(name: name, email: email, password: password);
+}
+
+class _SendResetAdapter implements SendPasswordResetEmailUseCase {
+  final MockAuthService _service;
+  _SendResetAdapter(this._service);
+  @override
+  Future<void> call({required String email}) => _service.sendPasswordResetEmail(email: email);
+}
+
+class _LogoutAdapter implements LogoutUseCase {
+  final MockAuthService _service;
+  _LogoutAdapter(this._service);
+  @override
+  Future<void> call() => _service.logout();
 }

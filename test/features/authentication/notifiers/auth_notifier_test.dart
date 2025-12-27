@@ -1,139 +1,332 @@
-import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
-import 'package:bytebank/features/authentication/services/auth_exceptions.dart';
-import 'package:bytebank/features/authentication/services/auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
+import 'package:bytebank/application/notifiers/auth_notifier.dart';
+import 'package:bytebank/domain/use_cases/auth/login_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/signup_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/send_password_reset_email_use_case.dart';
+import 'package:bytebank/domain/use_cases/auth/logout_use_case.dart';
+import 'package:bytebank/domain/exceptions/auth_exceptions.dart';
 
-import 'auth_notifier_test.mocks.dart';
+class _FakeLogin implements LoginUseCase {
+  final Future<void> Function() action;
+  _FakeLogin(this.action);
+  @override
+  Future<void> call(String email, String password) => action();
+}
 
-@GenerateMocks([AuthService])
+class _FakeSignUp implements SignUpUseCase {
+  final Future<void> Function() action;
+  _FakeSignUp(this.action);
+  @override
+  Future<void> call({
+    required String name,
+    required String email,
+    required String password,
+  }) => action();
+}
+
+class _FakeSendReset implements SendPasswordResetEmailUseCase {
+  final Future<void> Function() action;
+  _FakeSendReset(this.action);
+  @override
+  Future<void> call({required String email}) => action();
+}
+
+class _FakeLogout implements LogoutUseCase {
+  final Future<void> Function() action;
+  _FakeLogout(this.action);
+  @override
+  Future<void> call() => action();
+}
+
+// Spy fakes to verify calls and capture arguments
+class _SpyLogin implements LoginUseCase {
+  bool called = false;
+  String? email;
+  String? password;
+
+  @override
+  Future<void> call(String email, String password) async {
+    called = true;
+    this.email = email;
+    this.password = password;
+  }
+}
+
+class _SpySignUp implements SignUpUseCase {
+  bool called = false;
+  String? name;
+  String? email;
+  String? password;
+
+  @override
+  Future<void> call({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    called = true;
+    this.name = name;
+    this.email = email;
+    this.password = password;
+  }
+}
+
+class _SpySendReset implements SendPasswordResetEmailUseCase {
+  bool called = false;
+  String? email;
+
+  @override
+  Future<void> call({required String email}) async {
+    called = true;
+    this.email = email;
+  }
+}
+
+class _SpyLogout implements LogoutUseCase {
+  int callCount = 0;
+  @override
+  Future<void> call() async {
+    callCount += 1;
+  }
+}
+
 void main() {
-  late MockAuthService mockAuthService;
-  late AuthNotifier authNotifier;
+  test('login success sets authenticated', () async {
+    final notifier = AuthNotifier(
+      login: _FakeLogin(() async {}),
+      signUp: _FakeSignUp(() async {}),
+      sendReset: _FakeSendReset(() async {}),
+      logout: _FakeLogout(() async {}),
+    );
 
-  setUp(() {
-    mockAuthService = MockAuthService();
-    authNotifier = AuthNotifier(mockAuthService);
+    final res = await notifier.login('a@b.com', 'p');
+    expect(res, isTrue);
+    expect(notifier.state.isAuthenticated, isTrue);
   });
 
-  group('AuthNotifier', () {
-    test('initial state must be correct (not loading, not error)', () {
-      final notifier = AuthNotifier(mockAuthService);
+  test('login invalid credentials maps to error', () async {
+    final notifier = AuthNotifier(
+      login: _FakeLogin(() async {
+        throw InvalidCredentialsException();
+      }),
+      signUp: _FakeSignUp(() async {}),
+      sendReset: _FakeSendReset(() async {}),
+      logout: _FakeLogout(() async {}),
+    );
 
+    final res = await notifier.login('a@b.com', 'p');
+    expect(res, isFalse);
+    expect(notifier.state.errorMessage, isNotNull);
+  });
+
+  test('signUp weak password maps to error', () async {
+    final notifier = AuthNotifier(
+      login: _FakeLogin(() async {}),
+      signUp: _FakeSignUp(() async {
+        throw WeakPasswordException();
+      }),
+      sendReset: _FakeSendReset(() async {}),
+      logout: _FakeLogout(() async {}),
+    );
+
+    final res = await notifier.signUp(
+      name: 'n',
+      email: 'a@b.com',
+      password: 'p',
+    );
+    expect(res, isFalse);
+    expect(notifier.state.errorMessage, contains('fraca'));
+  });
+
+  test('send reset success sets success message', () async {
+    final notifier = AuthNotifier(
+      login: _FakeLogin(() async {}),
+      signUp: _FakeSignUp(() async {}),
+      sendReset: _FakeSendReset(() async {}),
+      logout: _FakeLogout(() async {}),
+    );
+
+    await notifier.sendPasswordResetEmail(email: 'a@b.com');
+    expect(notifier.state.successMessage, isNotNull);
+  });
+
+  test('logout resets state', () async {
+    final notifier = AuthNotifier(
+      login: _FakeLogin(() async {}),
+      signUp: _FakeSignUp(() async {}),
+      sendReset: _FakeSendReset(() async {}),
+      logout: _FakeLogout(() async {}),
+    );
+
+    await notifier.logout();
+    expect(notifier.state.isAuthenticated, isFalse);
+  });
+
+  test('initial state must be correct (not loading, not error)', () {
+    final notifier = AuthNotifier(
+      login: _SpyLogin(),
+      signUp: _SpySignUp(),
+      sendReset: _SpySendReset(),
+      logout: _SpyLogout(),
+    );
+
+    expect(notifier.state.isLoading, isFalse);
+    expect(notifier.state.errorMessage, isNull);
+  });
+
+  test('login succeeds and state is updated', () async {
+    final spyLogin = _SpyLogin();
+    final notifier = AuthNotifier(
+      login: spyLogin,
+      signUp: _SpySignUp(),
+      sendReset: _SpySendReset(),
+      logout: _SpyLogout(),
+    );
+
+    final result = await notifier.login('user@test.com', 'password');
+
+    expect(result, isTrue);
+    expect(notifier.state.isAuthenticated, isTrue);
+    expect(notifier.state.isLoading, isFalse);
+    expect(notifier.state.errorMessage, isNull);
+    expect(spyLogin.called, isTrue);
+    expect(spyLogin.email, 'user@test.com');
+  });
+
+  test(
+    'login fails with wrong password and state maps to invalid credentials message',
+    () async {
+      final notifier = AuthNotifier(
+        login: _FakeLogin(() async {
+          throw InvalidCredentialsException();
+        }),
+        signUp: _SpySignUp(),
+        sendReset: _SpySendReset(),
+        logout: _SpyLogout(),
+      );
+
+      final res = await notifier.login('a@b.com', 'p');
+      expect(res, isFalse);
+      expect(
+        notifier.state.errorMessage,
+        'Credenciais inválidas. Por favor, tente novamente.',
+      );
+    },
+  );
+
+  test(
+    'login fails with user not found and maps to not found message',
+    () async {
+      final notifier = AuthNotifier(
+        login: _FakeLogin(() async {
+          throw UserNotFoundException();
+        }),
+        signUp: _SpySignUp(),
+        sendReset: _SpySendReset(),
+        logout: _SpyLogout(),
+      );
+
+      final res = await notifier.login('notfound@test.com', 'p');
+      expect(res, isFalse);
+      expect(
+        notifier.state.errorMessage,
+        'Usuário não encontrado. Por favor, verifique o e-mail ou cadastre-se.',
+      );
+    },
+  );
+
+  test(
+    'login does not call use case and sets error message for invalid email',
+    () async {
+      final spyLogin = _SpyLogin();
+      final notifier = AuthNotifier(
+        login: spyLogin,
+        signUp: _SpySignUp(),
+        sendReset: _SpySendReset(),
+        logout: _SpyLogout(),
+      );
+
+      const invalidEmail = 'invalid_email';
+      final res = await notifier.login(invalidEmail, 'password');
+
+      expect(res, isFalse);
+      expect(
+        notifier.state.errorMessage,
+        'Por favor, insira um e-mail válido.',
+      );
       expect(notifier.state.isLoading, isFalse);
-      expect(notifier.state.errorMessage, isNull);
-    });
+      expect(spyLogin.called, isFalse);
+    },
+  );
 
-    test('login succeeds and state is updated', () async {
-      when(mockAuthService.login(any, any)).thenAnswer((_) async {});
+  test(
+    'signUp succeeds and state is updated to authenticated and call recorded',
+    () async {
+      final spySignUp = _SpySignUp();
+      final notifier = AuthNotifier(
+        login: _SpyLogin(),
+        signUp: spySignUp,
+        sendReset: _SpySendReset(),
+        logout: _SpyLogout(),
+      );
 
-      await authNotifier.login('test@test.com', 'password');
-
-      expect(authNotifier.state.isAuthenticated, isTrue);
-      expect(authNotifier.state.isLoading, isFalse);
-      expect(authNotifier.state.errorMessage, isNull);
-    });
-
-    test(
-      'login fails with wrong password and state is updated with error message',
-      () async {
-        when(
-          mockAuthService.login(any, any),
-        ).thenThrow(InvalidCredentialsException());
-
-        await authNotifier.login('test@test.com', 'wrong_password');
-
-        expect(
-          authNotifier.state.errorMessage,
-          'Credenciais inválidas. Por favor, tente novamente.',
-        );
-        expect(authNotifier.state.isAuthenticated, isFalse);
-        expect(authNotifier.state.isLoading, isFalse);
-      },
-    );
-
-    test(
-      'login fails with user not found and state is updated with error message',
-      () async {
-        when(
-          mockAuthService.login(any, any),
-        ).thenThrow(UserNotFoundException());
-
-        await authNotifier.login('not_found@test.com', 'password');
-
-        expect(
-          authNotifier.state.errorMessage,
-          'Usuário não encontrado. Por favor, verifique o e-mail ou cadastre-se.',
-        );
-        expect(authNotifier.state.isAuthenticated, isFalse);
-        expect(authNotifier.state.isLoading, isFalse);
-      },
-    );
-
-    test(
-      'login does not call service and sets error message for invalid email',
-      () async {
-        const invalidEmail = 'invalid_email';
-
-        await authNotifier.login(invalidEmail, 'password');
-
-        expect(
-          authNotifier.state.errorMessage,
-          'Por favor, insira um e-mail válido.',
-        );
-        expect(authNotifier.state.isLoading, isFalse);
-
-        verifyNever(mockAuthService.login(any, any));
-      },
-    );
-
-    test('signUp succeeds and state is updated to authenticated', () async {
-      when(
-        mockAuthService.signUp(
-          name: anyNamed('name'),
-          email: anyNamed('email'),
-          password: anyNamed('password'),
-        ),
-      ).thenAnswer((_) async {});
-
-      await authNotifier.signUp(
+      final res = await notifier.signUp(
         name: 'New User',
         email: 'new@test.com',
         password: 'password123',
       );
 
-      expect(authNotifier.state.isAuthenticated, isTrue);
-      expect(authNotifier.state.isLoading, isFalse);
-      expect(authNotifier.state.errorMessage, isNull);
-    });
+      expect(res, isTrue);
+      expect(notifier.state.isAuthenticated, isTrue);
+      expect(notifier.state.isLoading, isFalse);
+      expect(notifier.state.errorMessage, isNull);
+      expect(spySignUp.called, isTrue);
+      expect(spySignUp.email, 'new@test.com');
+    },
+  );
 
-    test('sendPasswordResetEmail succeeds and sets a success message ', () async {
-      when(
-        mockAuthService.sendPasswordResetEmail(email: anyNamed('email')),
-      ).thenAnswer((_) async {});
+  test(
+    'sendPasswordResetEmail succeeds and sets a success message and calls use case',
+    () async {
+      final spySend = _SpySendReset();
+      final notifier = AuthNotifier(
+        login: _SpyLogin(),
+        signUp: _SpySignUp(),
+        sendReset: spySend,
+        logout: _SpyLogout(),
+      );
 
-      await authNotifier.sendPasswordResetEmail(email: 'test@test.com');
+      await notifier.sendPasswordResetEmail(email: 'test@test.com');
 
       expect(
-        authNotifier.state.successMessage,
+        notifier.state.successMessage,
         'E-mail de redefinição de senha enviado. Por favor, verifique sua caixa de entrada.',
       );
-      expect(authNotifier.state.isLoading, isFalse);
-      expect(authNotifier.state.errorMessage, isNull);
-    });
+      expect(notifier.state.isLoading, isFalse);
+      expect(notifier.state.errorMessage, isNull);
+      expect(spySend.called, isTrue);
+      expect(spySend.email, 'test@test.com');
+    },
+  );
 
-    test('logout succeeds and clears authentication state', () async {
-      when(mockAuthService.logout()).thenAnswer((_) async {});
+  test(
+    'logout succeeds and clears authentication state and calls logout once',
+    () async {
+      final spyLogout = _SpyLogout();
+      final notifier = AuthNotifier(
+        login: _SpyLogin(),
+        signUp: _SpySignUp(),
+        sendReset: _SpySendReset(),
+        logout: spyLogout,
+      );
 
-      await authNotifier.logout();
+      await notifier.logout();
 
-      expect(authNotifier.state.isAuthenticated, isFalse);
-      expect(authNotifier.state.isLoading, isFalse);
-      expect(authNotifier.state.errorMessage, isNull);
-      expect(authNotifier.state.successMessage, isNull);
-
-      verify(mockAuthService.logout()).called(1);
-    });
-  });
+      expect(notifier.state.isAuthenticated, isFalse);
+      expect(notifier.state.isLoading, isFalse);
+      expect(notifier.state.errorMessage, isNull);
+      expect(notifier.state.successMessage, isNull);
+      expect(spyLogout.callCount, 1);
+    },
+  );
 }
