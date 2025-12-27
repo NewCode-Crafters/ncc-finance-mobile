@@ -1,5 +1,5 @@
 import 'package:bytebank/core/widgets/app_snackbar.dart';
-import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.dart';
+import 'package:bytebank/presentation/screens/onboarding/onboarding_carousel_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/application/notifiers/auth_notifier.dart';

@@ -8,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../features/transactions/models/attachment.dart';
 import '../../../features/transactions/services/transaction_attachment_service.dart';
-import 'package:bytebank/theme/theme.dart';
+import 'package:bytebank/presentation/theme/theme.dart';
 
 class EditAttachmentsController {
   _EditAttachmentsSectionState? _state;

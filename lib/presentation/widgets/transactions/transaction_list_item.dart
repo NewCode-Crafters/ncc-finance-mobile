@@ -1,5 +1,5 @@
 import 'package:bytebank/core/widgets/app_snackbar.dart';
-import 'package:bytebank/theme/theme.dart';
+import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/presentation/utils/transaction_helpers.dart';

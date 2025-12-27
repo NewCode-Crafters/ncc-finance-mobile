@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
-import 'package:bytebank/theme/theme.dart';
+import 'package:bytebank/presentation/theme/theme.dart';
 
 class ViewTransactionScreen extends StatefulWidget {
   static const String routeName = '/view-transaction';

@@ -8,7 +8,7 @@ import 'package:bytebank/presentation/screens/transactions/create_transaction_sc
 import 'package:bytebank/core/widgets/animated_tab_switcher.dart';
 import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
 import 'package:bytebank/presentation/screens/transactions/view_transaction_screen.dart';
-import 'package:bytebank/theme/theme.dart';
+import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/presentation/widgets/dashboard/action_card.dart';

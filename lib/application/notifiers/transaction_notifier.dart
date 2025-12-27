@@ -4,7 +4,7 @@ import 'package:bytebank/domain/use_cases/transactions/get_transactions_use_case
 import 'package:bytebank/domain/use_cases/transactions/update_transaction_use_case.dart';
 import 'package:bytebank/domain/use_cases/transactions/delete_transaction_use_case.dart';
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
-import 'package:bytebank/theme/theme.dart';
+import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 
 FinancialTransactionEntity _toEntity(FinancialTransaction t) =>

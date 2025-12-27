@@ -4,7 +4,7 @@ import 'package:bytebank/presentation/screens/transactions/view_transaction_scre
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
-import 'package:bytebank/features/splash/screens/splash_screen.dart';
+import 'package:bytebank/presentation/screens/splash/splash_screen.dart';
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
@@ -28,9 +28,9 @@ import 'package:bytebank/presentation/screens/investments/create_investment_scre
 import 'package:bytebank/presentation/screens/investments/investments_screen.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:bytebank/presentation/screens/profile/my_profile_screen.dart';
-import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.dart';
+import 'package:bytebank/presentation/screens/onboarding/onboarding_carousel_screen.dart';
 import 'package:bytebank/firebase_options.dart';
-import 'package:bytebank/theme/theme.dart';
+import 'package:bytebank/presentation/theme/theme.dart';
 import 'core/di/injection_container.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;

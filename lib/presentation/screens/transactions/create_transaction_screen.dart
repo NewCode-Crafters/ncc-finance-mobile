@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/features/transactions/services/transaction_attachment_service.dart';
-import 'package:bytebank/theme/theme.dart';
+import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'

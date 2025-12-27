@@ -1,4 +1,4 @@
-import 'package:bytebank/theme/theme.dart';
+import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/constants/app_assets.dart';
 import 'package:bytebank/presentation/screens/authentication/auth_wrapper.dart';
