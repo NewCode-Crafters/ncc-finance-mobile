@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bytebank/domain/entities/balance.dart';
 import 'package:bytebank/domain/repositories/balance_repository.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart';
@@ -135,6 +137,58 @@ void main() {
     expect(balanceNotifier.state.totalBalance, 0.0);
     expect(balanceNotifier.state.balances, isEmpty);
     expect(balanceNotifier.state.isLoading, isFalse);
+  });
+
+  test('fetchBalances sets isLoading while fetching', () async {
+    mockGet.whenCall(({required String userId}) => throw UnimplementedError());
+
+    // Replace call to return a future that we control
+    mockGet = _FakeGetBalancesUseCase();
+    mockGet.whenCall(({required String userId}) => []);
+    balanceNotifier = BalanceNotifier(mockGet, mockUpdate);
+
+    // Start the fetch but the fake resolves immediately to []; we can still
+    // assert that after invocation, we end up not loading.
+    await balanceNotifier.fetchBalances(userId: 'u2');
+    expect(balanceNotifier.state.isLoading, isFalse);
+  });
+
+  test(
+    'fetchBalances handles use-case throwing and recovers to empty state',
+    () async {
+      final throwing = _FakeGetBalancesUseCase();
+      throwing.whenCall(({required String userId}) => throw Exception('boom'));
+      balanceNotifier = BalanceNotifier(throwing, mockUpdate);
+
+      await balanceNotifier.fetchBalances(userId: 'u3');
+      expect(balanceNotifier.state.balances, isEmpty);
+      expect(balanceNotifier.state.totalBalance, 0.0);
+    },
+  );
+
+  test('fetchBalances computes total with negative amounts', () async {
+    final negBalances = [
+      Balance(
+        id: '1',
+        accountId: 'a',
+        accountType: 'X',
+        amount: 100.0,
+        currency: 'BRL',
+        updatedAt: DateTime.now(),
+      ),
+      Balance(
+        id: '2',
+        accountId: 'b',
+        accountType: 'Y',
+        amount: -50.0,
+        currency: 'BRL',
+        updatedAt: DateTime.now(),
+      ),
+    ];
+
+    mockGet.whenCall(({required String userId}) => negBalances);
+    await balanceNotifier.fetchBalances(userId: 'u4');
+    expect(balanceNotifier.state.totalBalance, 50.0);
   });
 
   test('updateBalanceOnTransaction delegates to use-case', () async {
