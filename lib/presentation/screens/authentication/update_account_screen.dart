@@ -38,9 +38,25 @@ class _UpdateAccountScreenState extends State<UpdateAccountScreen> {
       _isLoading = true;
     });
 
-    final authRepository = context.read<AuthRepository>();
+    late final AuthRepository authRepository;
+    try {
+      authRepository = context.read<AuthRepository>();
+    } catch (e) {
+      if (mounted) {
+        showAppSnackBar(
+          context,
+          'Erro interno: serviço de autenticação não disponível.',
+          AppMessageType.error,
+        );
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      return;
+    }
+
     final profileNotifier = context.read<ProfileNotifier>();
-    final currentUser = context.read<ProfileNotifier>().state.userProfile;
+    final currentUser = profileNotifier.state.userProfile;
 
     try {
       await authRepository.updateUserName(newName: _nameController.text.trim());

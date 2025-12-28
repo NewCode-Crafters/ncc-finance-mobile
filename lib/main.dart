@@ -25,6 +25,7 @@ import 'package:bytebank/application/notifiers/investment_notifier.dart';
 import 'package:bytebank/presentation/screens/investments/create_investment_screen.dart';
 import 'package:bytebank/presentation/screens/investments/investments_screen.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
+import 'package:bytebank/domain/repositories/auth_repository.dart';
 import 'package:bytebank/presentation/screens/profile/my_profile_screen.dart';
 import 'package:bytebank/presentation/screens/onboarding/onboarding_carousel_screen.dart';
 import 'package:bytebank/firebase_options.dart';
@@ -54,12 +55,12 @@ class MyApp extends StatelessWidget {
       providers: [
         // --- Authentication ---
         ChangeNotifierProvider<AuthNotifier>(create: (_) => sl<AuthNotifier>()),
+        Provider<AuthRepository>(create: (_) => sl<AuthRepository>()),
         // --- Profile ---
         ChangeNotifierProvider<ProfileNotifier>(
           create: (_) => sl<ProfileNotifier>(),
         ),
         // --- Balance ---
-        // Application-layer BalanceNotifier (single source of truth for balances)
         ChangeNotifierProvider<app_balance.BalanceNotifier>(
           create: (_) => sl<app_balance.BalanceNotifier>(),
         ),
