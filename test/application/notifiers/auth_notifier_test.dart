@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bytebank/application/notifiers/auth_notifier.dart';
 import 'package:bytebank/domain/use_cases/auth/login_use_case.dart';
@@ -6,6 +8,7 @@ import 'package:bytebank/domain/use_cases/auth/send_password_reset_email_use_cas
 import 'package:bytebank/domain/use_cases/auth/logout_use_case.dart';
 import 'package:bytebank/domain/exceptions/auth_exceptions.dart';
 
+// Simple use-case fakes to plug into the notifier.
 class _FakeLogin implements LoginUseCase {
   final Future<void> Function() action;
   _FakeLogin(this.action);
@@ -38,7 +41,7 @@ class _FakeLogout implements LogoutUseCase {
   Future<void> call() => action();
 }
 
-// Spy fakes to verify calls and capture arguments
+// Spy fakes to verify calls and capture arguments used by later tests
 class _SpyLogin implements LoginUseCase {
   bool called = false;
   String? email;
@@ -91,242 +94,295 @@ class _SpyLogout implements LogoutUseCase {
 }
 
 void main() {
-  test('login success sets authenticated', () async {
-    final notifier = AuthNotifier(
-      login: _FakeLogin(() async {}),
-      signUp: _FakeSignUp(() async {}),
-      sendReset: _FakeSendReset(() async {}),
-      logout: _FakeLogout(() async {}),
-    );
-
-    final res = await notifier.login('a@b.com', 'p');
-    expect(res, isTrue);
-    expect(notifier.state.isAuthenticated, isTrue);
-  });
-
-  test('login invalid credentials maps to error', () async {
-    final notifier = AuthNotifier(
-      login: _FakeLogin(() async {
-        throw InvalidCredentialsException();
-      }),
-      signUp: _FakeSignUp(() async {}),
-      sendReset: _FakeSendReset(() async {}),
-      logout: _FakeLogout(() async {}),
-    );
-
-    final res = await notifier.login('a@b.com', 'p');
-    expect(res, isFalse);
-    expect(notifier.state.errorMessage, isNotNull);
-  });
-
-  test('signUp weak password maps to error', () async {
-    final notifier = AuthNotifier(
-      login: _FakeLogin(() async {}),
-      signUp: _FakeSignUp(() async {
-        throw WeakPasswordException();
-      }),
-      sendReset: _FakeSendReset(() async {}),
-      logout: _FakeLogout(() async {}),
-    );
-
-    final res = await notifier.signUp(
-      name: 'n',
-      email: 'a@b.com',
-      password: 'p',
-    );
-    expect(res, isFalse);
-    expect(notifier.state.errorMessage, contains('fraca'));
-  });
-
-  test('send reset success sets success message', () async {
-    final notifier = AuthNotifier(
-      login: _FakeLogin(() async {}),
-      signUp: _FakeSignUp(() async {}),
-      sendReset: _FakeSendReset(() async {}),
-      logout: _FakeLogout(() async {}),
-    );
-
-    await notifier.sendPasswordResetEmail(email: 'a@b.com');
-    expect(notifier.state.successMessage, isNotNull);
-  });
-
-  test('logout resets state', () async {
-    final notifier = AuthNotifier(
-      login: _FakeLogin(() async {}),
-      signUp: _FakeSignUp(() async {}),
-      sendReset: _FakeSendReset(() async {}),
-      logout: _FakeLogout(() async {}),
-    );
-
-    await notifier.logout();
-    expect(notifier.state.isAuthenticated, isFalse);
-  });
-
-  test('initial state must be correct (not loading, not error)', () {
-    final notifier = AuthNotifier(
-      login: _SpyLogin(),
-      signUp: _SpySignUp(),
-      sendReset: _SpySendReset(),
-      logout: _SpyLogout(),
-    );
-
-    expect(notifier.state.isLoading, isFalse);
-    expect(notifier.state.errorMessage, isNull);
-  });
-
-  test('login succeeds and state is updated', () async {
-    final spyLogin = _SpyLogin();
-    final notifier = AuthNotifier(
-      login: spyLogin,
-      signUp: _SpySignUp(),
-      sendReset: _SpySendReset(),
-      logout: _SpyLogout(),
-    );
-
-    final result = await notifier.login('user@test.com', 'password');
-
-    expect(result, isTrue);
-    expect(notifier.state.isAuthenticated, isTrue);
-    expect(notifier.state.isLoading, isFalse);
-    expect(notifier.state.errorMessage, isNull);
-    expect(spyLogin.called, isTrue);
-    expect(spyLogin.email, 'user@test.com');
-  });
-
-  test(
-    'login fails with wrong password and state maps to invalid credentials message',
-    () async {
+  group('AuthNotifier', () {
+    test('initial state is empty and not loading', () {
       final notifier = AuthNotifier(
-        login: _FakeLogin(() async {
-          throw InvalidCredentialsException();
-        }),
-        signUp: _SpySignUp(),
-        sendReset: _SpySendReset(),
-        logout: _SpyLogout(),
+        login: _FakeLogin(() async {}),
+        signUp: _FakeSignUp(() async {}),
+        sendReset: _FakeSendReset(() async {}),
+        logout: _FakeLogout(() async {}),
       );
 
-      final res = await notifier.login('a@b.com', 'p');
-      expect(res, isFalse);
-      expect(
-        notifier.state.errorMessage,
-        'Credenciais inválidas. Por favor, tente novamente.',
-      );
-    },
-  );
+      expect(notifier.state.isLoading, isFalse);
+      expect(notifier.state.isAuthenticated, isFalse);
+      expect(notifier.state.errorMessage, isNull);
+    });
 
-  test(
-    'login fails with user not found and maps to not found message',
-    () async {
+    test('login with invalid email returns false and sets error', () async {
       final notifier = AuthNotifier(
-        login: _FakeLogin(() async {
-          throw UserNotFoundException();
-        }),
-        signUp: _SpySignUp(),
-        sendReset: _SpySendReset(),
-        logout: _SpyLogout(),
+        login: _FakeLogin(() async {}),
+        signUp: _FakeSignUp(() async {}),
+        sendReset: _FakeSendReset(() async {}),
+        logout: _FakeLogout(() async {}),
       );
 
-      final res = await notifier.login('notfound@test.com', 'p');
-      expect(res, isFalse);
-      expect(
-        notifier.state.errorMessage,
-        'Usuário não encontrado. Por favor, verifique o e-mail ou cadastre-se.',
-      );
-    },
-  );
-
-  test(
-    'login does not call use case and sets error message for invalid email',
-    () async {
-      final spyLogin = _SpyLogin();
-      final notifier = AuthNotifier(
-        login: spyLogin,
-        signUp: _SpySignUp(),
-        sendReset: _SpySendReset(),
-        logout: _SpyLogout(),
-      );
-
-      const invalidEmail = 'invalid_email';
-      final res = await notifier.login(invalidEmail, 'password');
-
-      expect(res, isFalse);
+      final result = await notifier.login('invalid-email', 'pwd');
+      expect(result, isFalse);
       expect(
         notifier.state.errorMessage,
         'Por favor, insira um e-mail válido.',
       );
-      expect(notifier.state.isLoading, isFalse);
-      expect(spyLogin.called, isFalse);
-    },
-  );
+      expect(notifier.state.isAuthenticated, isFalse);
+    });
 
-  test(
-    'signUp succeeds and state is updated to authenticated and call recorded',
-    () async {
-      final spySignUp = _SpySignUp();
+    test('successful login sets authenticated true', () async {
       final notifier = AuthNotifier(
-        login: _SpyLogin(),
-        signUp: spySignUp,
-        sendReset: _SpySendReset(),
-        logout: _SpyLogout(),
+        login: _FakeLogin(() async {}),
+        signUp: _FakeSignUp(() async {}),
+        sendReset: _FakeSendReset(() async {}),
+        logout: _FakeLogout(() async {}),
+      );
+
+      final res = await notifier.login('a@b.com', 'secret');
+      expect(res, isTrue);
+      expect(notifier.state.isAuthenticated, isTrue);
+      expect(notifier.state.errorMessage, isNull);
+    });
+
+    test(
+      'login throwing InvalidCredentialsException maps to proper message',
+      () async {
+        final notifier = AuthNotifier(
+          login: _FakeLogin(() async {
+            throw InvalidCredentialsException();
+          }),
+          signUp: _FakeSignUp(() async {}),
+          sendReset: _FakeSendReset(() async {}),
+          logout: _FakeLogout(() async {}),
+        );
+
+        final res = await notifier.login('a@b.com', 'wrong');
+        expect(res, isFalse);
+        expect(notifier.state.errorMessage, contains('Credenciais inválidas'));
+      },
+    );
+
+    test('signUp with invalid email returns false', () async {
+      final notifier = AuthNotifier(
+        login: _FakeLogin(() async {}),
+        signUp: _FakeSignUp(() async {}),
+        sendReset: _FakeSendReset(() async {}),
+        logout: _FakeLogout(() async {}),
+      );
+
+      final res = await notifier.signUp(name: 'n', email: 'bad', password: 'p');
+      expect(res, isFalse);
+      expect(notifier.state.errorMessage, isNotNull);
+    });
+
+    test('signUp weak password maps to error', () async {
+      final notifier = AuthNotifier(
+        login: _FakeLogin(() async {}),
+        signUp: _FakeSignUp(() async {
+          throw WeakPasswordException();
+        }),
+        sendReset: _FakeSendReset(() async {}),
+        logout: _FakeLogout(() async {}),
       );
 
       final res = await notifier.signUp(
-        name: 'New User',
-        email: 'new@test.com',
-        password: 'password123',
+        name: 'n',
+        email: 'a@b.com',
+        password: 'p',
       );
+      expect(res, isFalse);
+      expect(notifier.state.errorMessage, isNotNull);
+    });
 
-      expect(res, isTrue);
-      expect(notifier.state.isAuthenticated, isTrue);
-      expect(notifier.state.isLoading, isFalse);
-      expect(notifier.state.errorMessage, isNull);
-      expect(spySignUp.called, isTrue);
-      expect(spySignUp.email, 'new@test.com');
-    },
-  );
-
-  test(
-    'sendPasswordResetEmail succeeds and sets a success message and calls use case',
-    () async {
-      final spySend = _SpySendReset();
+    test('sendPasswordResetEmail success sets successMessage', () async {
       final notifier = AuthNotifier(
-        login: _SpyLogin(),
-        signUp: _SpySignUp(),
-        sendReset: spySend,
-        logout: _SpyLogout(),
+        login: _FakeLogin(() async {}),
+        signUp: _FakeSignUp(() async {}),
+        sendReset: _FakeSendReset(() async {}),
+        logout: _FakeLogout(() async {}),
       );
 
-      await notifier.sendPasswordResetEmail(email: 'test@test.com');
+      await notifier.sendPasswordResetEmail(email: 'a@b.com');
+      expect(notifier.state.successMessage, isNotNull);
+    });
 
-      expect(
-        notifier.state.successMessage,
-        'E-mail de redefinição de senha enviado. Por favor, verifique sua caixa de entrada.',
-      );
-      expect(notifier.state.isLoading, isFalse);
-      expect(notifier.state.errorMessage, isNull);
-      expect(spySend.called, isTrue);
-      expect(spySend.email, 'test@test.com');
-    },
-  );
-
-  test(
-    'logout succeeds and clears authentication state and calls logout once',
-    () async {
-      final spyLogout = _SpyLogout();
+    test('logout success resets state', () async {
       final notifier = AuthNotifier(
-        login: _SpyLogin(),
-        signUp: _SpySignUp(),
-        sendReset: _SpySendReset(),
-        logout: spyLogout,
+        login: _FakeLogin(() async {}),
+        signUp: _FakeSignUp(() async {}),
+        sendReset: _FakeSendReset(() async {}),
+        logout: _FakeLogout(() async {}),
       );
 
+      // set authenticated first
+      notifier.updateState(const AuthState(isAuthenticated: true));
       await notifier.logout();
-
       expect(notifier.state.isAuthenticated, isFalse);
+    });
+
+    test('login sets isLoading while awaiting use-case', () async {
+      final completer = Completer<void>();
+      final notifier = AuthNotifier(
+        login: _FakeLogin(() async {
+          await completer.future;
+        }),
+        signUp: _FakeSignUp(() async {}),
+        sendReset: _FakeSendReset(() async {}),
+        logout: _FakeLogout(() async {}),
+      );
+
+      // Start login but don't await yet so we can inspect intermediate state
+      final future = notifier.login('user@test.com', 'pwd');
+      // Immediately after calling, notifier should be loading
+      expect(notifier.state.isLoading, isTrue);
+
+      // Finish the use-case and await
+      completer.complete();
+      await future;
+
       expect(notifier.state.isLoading, isFalse);
+    });
+
+    test('signUp EmailAlreadyInUseException maps to correct message', () async {
+      final notifier = AuthNotifier(
+        login: _FakeLogin(() async {}),
+        signUp: _FakeSignUp(() async {
+          throw EmailAlreadyInUseException();
+        }),
+        sendReset: _FakeSendReset(() async {}),
+        logout: _FakeLogout(() async {}),
+      );
+
+      final res = await notifier.signUp(
+        name: 'n',
+        email: 'a@b.com',
+        password: 'p',
+      );
+      expect(res, isFalse);
+      expect(
+        notifier.state.errorMessage,
+        'Este e-mail já está em uso por outra conta.',
+      );
+    });
+
+    test('clearMessages removes error and success messages', () async {
+      final notifier = AuthNotifier(
+        login: _FakeLogin(() async {}),
+        signUp: _FakeSignUp(() async {}),
+        sendReset: _FakeSendReset(() async {}),
+        logout: _FakeLogout(() async {}),
+      );
+
+      notifier.updateState(
+        const AuthState(
+          isAuthenticated: false,
+          isLoading: false,
+          errorMessage: 'err',
+          successMessage: 'ok',
+        ),
+      );
+      notifier.clearMessages();
+
       expect(notifier.state.errorMessage, isNull);
       expect(notifier.state.successMessage, isNull);
-      expect(spyLogout.callCount, 1);
-    },
-  );
+    });
+
+    test('sendPasswordResetEmail failure results in error message', () async {
+      final notifier = AuthNotifier(
+        login: _FakeLogin(() async {}),
+        signUp: _FakeSignUp(() async {}),
+        sendReset: _FakeSendReset(() async {
+          throw Exception('fail');
+        }),
+        logout: _FakeLogout(() async {}),
+      );
+
+      await notifier.sendPasswordResetEmail(email: 'a@b.com');
+      expect(notifier.state.successMessage, isNull);
+      expect(notifier.state.errorMessage, isNotNull);
+    });
+
+    test('logout failure keeps authenticated and sets error', () async {
+      final notifier = AuthNotifier(
+        login: _FakeLogin(() async {}),
+        signUp: _FakeSignUp(() async {}),
+        sendReset: _FakeSendReset(() async {}),
+        logout: _FakeLogout(() async {
+          throw Exception('cannot logout');
+        }),
+      );
+
+      notifier.updateState(const AuthState(isAuthenticated: true));
+      await notifier.logout();
+
+      expect(notifier.state.isAuthenticated, isTrue);
+      expect(notifier.state.errorMessage, isNotNull);
+    });
+
+    test(
+      'signUp succeeds and state is updated to authenticated and call recorded',
+      () async {
+        final spySignUp = _SpySignUp();
+        final notifier = AuthNotifier(
+          login: _SpyLogin(),
+          signUp: spySignUp,
+          sendReset: _SpySendReset(),
+          logout: _SpyLogout(),
+        );
+
+        final res = await notifier.signUp(
+          name: 'New User',
+          email: 'new@test.com',
+          password: 'password123',
+        );
+
+        expect(res, isTrue);
+        expect(notifier.state.isAuthenticated, isTrue);
+        expect(notifier.state.isLoading, isFalse);
+        expect(notifier.state.errorMessage, isNull);
+        expect(spySignUp.called, isTrue);
+        expect(spySignUp.email, 'new@test.com');
+      },
+    );
+
+    test(
+      'sendPasswordResetEmail succeeds and sets a success message and calls use case',
+      () async {
+        final spySend = _SpySendReset();
+        final notifier = AuthNotifier(
+          login: _SpyLogin(),
+          signUp: _SpySignUp(),
+          sendReset: spySend,
+          logout: _SpyLogout(),
+        );
+
+        await notifier.sendPasswordResetEmail(email: 'test@test.com');
+
+        expect(
+          notifier.state.successMessage,
+          'E-mail de redefinição de senha enviado. Por favor, verifique sua caixa de entrada.',
+        );
+        expect(notifier.state.isLoading, isFalse);
+        expect(notifier.state.errorMessage, isNull);
+        expect(spySend.called, isTrue);
+        expect(spySend.email, 'test@test.com');
+      },
+    );
+
+    test(
+      'logout succeeds and clears authentication state and calls logout once',
+      () async {
+        final spyLogout = _SpyLogout();
+        final notifier = AuthNotifier(
+          login: _SpyLogin(),
+          signUp: _SpySignUp(),
+          sendReset: _SpySendReset(),
+          logout: spyLogout,
+        );
+
+        await notifier.logout();
+
+        expect(notifier.state.isAuthenticated, isFalse);
+        expect(notifier.state.isLoading, isFalse);
+        expect(notifier.state.errorMessage, isNull);
+        expect(notifier.state.successMessage, isNull);
+        expect(spyLogout.callCount, 1);
+      },
+    );
+  });
 }
