@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/presentation/widgets/common/widgets.dart';
 import 'package:bytebank/domain/entities/financial_transaction.dart';
+import 'package:bytebank/domain/entities/transaction_category.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
 import 'package:bytebank/core/utils/transaction_utils.dart';
@@ -107,6 +108,21 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
         ? notifier.incomeCategories
         : notifier.expenseCategories;
 
+    final seenIds = <String>{};
+    final uniqueCategories = <TransactionCategory>[];
+    for (final TransactionCategory c in categories) {
+      if (seenIds.add(c.id)) {
+        uniqueCategories.add(c);
+      }
+    }
+
+    final safeSelectedCategoryId =
+        (_selectedCategoryId != null &&
+            uniqueCategories.where((c) => c.id == _selectedCategoryId).length ==
+                1)
+        ? _selectedCategoryId
+        : null;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Editar Transação')),
       body: SingleChildScrollView(
@@ -115,7 +131,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             DropdownButtonFormField<String>(
-              value: _selectedCategoryId,
+              value: safeSelectedCategoryId,
               hint: const Text('Selecione uma categoria'),
               decoration: const InputDecoration(
                 enabledBorder: OutlineInputBorder(
@@ -133,7 +149,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                   ),
                 ),
               ),
-              items: categories.map((category) {
+              items: uniqueCategories.map((category) {
                 return DropdownMenuItem<String>(
                   value: category.id,
                   child: Row(

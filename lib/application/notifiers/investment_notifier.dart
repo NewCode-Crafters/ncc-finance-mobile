@@ -154,7 +154,15 @@ class InvestmentNotifier extends ChangeNotifier {
 
   void clearError() {
     if (_state.errorMessage != null) {
-      _state = _state.copyWith(errorMessage: null);
+      _state = InvestmentState(
+        investments: _state.investments,
+        isLoading: _state.isLoading,
+        errorMessage: null,
+        totalInvestments: _state.totalInvestments,
+        totalFixedIncome: _state.totalFixedIncome,
+        totalVariableIncome: _state.totalVariableIncome,
+        chartData: _state.chartData,
+      );
     }
   }
 }

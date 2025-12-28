@@ -7,6 +7,7 @@ import 'package:bytebank/domain/use_cases/investments/get_investments_use_case.d
 import 'package:bytebank/domain/use_cases/investments/create_investment_use_case.dart';
 import 'package:bytebank/domain/use_cases/investments/delete_investment_use_case.dart';
 import 'package:bytebank/domain/repositories/investment_repository.dart';
+import 'package:bytebank/domain/exceptions/investment_exception.dart';
 
 class _FakeInvestmentRepo implements IInvestmentRepository {
   final List<Investment> storage;
@@ -54,6 +55,35 @@ class _FakeInvestmentRepo implements IInvestmentRepository {
     required Investment investment,
   }) {
     throw UnimplementedError();
+  }
+}
+
+class _SlowCreateRepo extends _FakeInvestmentRepo {
+  final Completer<void> completer;
+
+  _SlowCreateRepo({required this.completer, super.storage});
+
+  @override
+  Future<Investment> createInvestment({
+    required String userId,
+    required Investment investment,
+  }) async {
+    createCalled = true;
+    await completer.future;
+    return investment.copyWith(id: 'new-id');
+  }
+}
+
+class _ThrowDeleteRepo extends _FakeInvestmentRepo {
+  _ThrowDeleteRepo() : super(storage: []);
+
+  @override
+  Future<void> deleteInvestment({
+    required String userId,
+    required String investmentId,
+  }) async {
+    deleteCalled = true;
+    throw InvestmentException('delete failed');
   }
 }
 
@@ -219,4 +249,52 @@ void main() {
     expect(notifier2.state.chartData['X'], 15);
     expect(notifier2.state.chartData['Y'], 20);
   });
+
+  test('createInvestment sets isLoading while creating', () async {
+    final completer = Completer<void>();
+
+    final repoSlow = _SlowCreateRepo(completer: completer, storage: []);
+    final notifier = InvestmentNotifier(
+      GetInvestmentsUseCase(repository: repoSlow),
+      CreateInvestmentUseCase(repository: repoSlow),
+      DeleteInvestmentUseCase(repository: repoSlow),
+    );
+
+    final inv = Investment(
+      id: '',
+      name: 'x',
+      amount: 1,
+      category: 'c',
+      type: 't',
+      investedAt: DateTime.now(),
+      balanceId: 'b',
+    );
+
+    final future = notifier.createInvestment(userId: 'u1', investment: inv);
+    // while pending, isLoading should be true
+    expect(notifier.state.isLoading, isTrue);
+
+    completer.complete();
+    await future;
+    expect(notifier.state.isLoading, isFalse);
+    expect(repoSlow.createCalled, isTrue);
+  });
+
+  test(
+    'deleteInvestment maps InvestmentException to errorMessage and clearError clears it',
+    () async {
+      final repoErr = _ThrowDeleteRepo();
+      final notifier = InvestmentNotifier(
+        GetInvestmentsUseCase(repository: repoErr),
+        CreateInvestmentUseCase(repository: repoErr),
+        DeleteInvestmentUseCase(repository: repoErr),
+      );
+
+      await notifier.deleteInvestment(userId: 'u', investmentId: 'i');
+      expect(notifier.state.errorMessage, 'delete failed');
+
+      notifier.clearError();
+      expect(notifier.state.errorMessage, isNull);
+    },
+  );
 }

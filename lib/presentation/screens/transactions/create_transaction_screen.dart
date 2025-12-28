@@ -39,7 +39,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
     leftSymbol: 'R\$ ',
   );
 
-  TransactionCategory? _selectedCategory;
+  String? _selectedCategoryId;
   bool _isLoading = false;
   TransactionType _selectedType = TransactionType.expense;
 
@@ -53,12 +53,12 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
       _selectedType = index == 0
           ? TransactionType.expense
           : TransactionType.income;
-      _selectedCategory = null;
+      _selectedCategoryId = null;
     });
   }
 
   Future<void> _handleCreateTransaction() async {
-    if (_selectedCategory == null || _amountController.numberValue <= 0) {
+    if (_selectedCategoryId == null || _amountController.numberValue <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         buildAppSnackBar(
           'Por favor, selecione uma categoria e preencha o valor.',
@@ -115,7 +115,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
         id: '',
         amount: amount,
         balanceId: balanceId,
-        category: _selectedCategory!.id,
+        category: _selectedCategoryId!,
         date: DateTime.now(),
         description: _descriptionController.text.isEmpty
             ? null
@@ -318,6 +318,19 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
         ? notifier.incomeCategories
         : notifier.expenseCategories;
 
+    final seenIds = <String>{};
+    final uniqueCategories = <TransactionCategory>[];
+    for (final c in categories) {
+      if (seenIds.add(c.id)) uniqueCategories.add(c);
+    }
+
+    final safeSelected =
+        (_selectedCategoryId != null &&
+            uniqueCategories.where((c) => c.id == _selectedCategoryId).length ==
+                1)
+        ? uniqueCategories.firstWhere((c) => c.id == _selectedCategoryId)
+        : null;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Criar Transação')),
       backgroundColor: AppColors.surfaceDefault,
@@ -359,7 +372,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
                   ),
                   const SizedBox(height: 24),
                   DropdownButtonFormField<TransactionCategory>(
-                    value: _selectedCategory,
+                    value: safeSelected,
                     hint: const Text(
                       'Selecione uma categoria',
                       style: TextStyle(color: AppColors.textSubtle),
@@ -380,7 +393,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
                         ),
                       ),
                     ),
-                    items: categories.map((category) {
+                    items: uniqueCategories.map((category) {
                       return DropdownMenuItem(
                         value: category,
                         child: Row(
@@ -398,7 +411,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
-                        _selectedCategory = value;
+                        _selectedCategoryId = value?.id;
                       });
                     },
                   ),

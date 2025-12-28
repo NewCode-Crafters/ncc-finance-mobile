@@ -399,13 +399,36 @@ class TransactionNotifier extends ChangeNotifier {
     required Map<String, dynamic> data,
   }) async {
     try {
+      final existing = _state.allTransactions.firstWhere(
+        (t) => t.id == transactionId,
+        orElse: () => _state.transactions.firstWhere(
+          (t) => t.id == transactionId,
+          orElse: () => FinancialTransaction(
+            id: transactionId,
+            amount: 0.0,
+            balanceId: data['balanceId'] ?? '',
+            category: data['category'] ?? '',
+            date: (data['date'] as DateTime?) ?? DateTime.now(),
+            description: data['description'],
+          ),
+        ),
+      );
+
       final entity = FinancialTransactionEntity(
         id: transactionId,
-        amount: ((data['amount'] ?? 0.0) as num).toDouble(),
-        balanceId: data['balanceId'] ?? '',
-        category: data['category'] ?? '',
-        date: (data['date'] as DateTime?) ?? DateTime.now(),
-        description: data['description'],
+        amount: (data.containsKey('amount')
+            ? ((data['amount'] as num).toDouble())
+            : existing.amount),
+        balanceId: data.containsKey('balanceId')
+            ? (data['balanceId'] as String)
+            : existing.balanceId,
+        category: data.containsKey('category')
+            ? (data['category'] as String)
+            : existing.category,
+        date: DateTime.now(),
+        description: data.containsKey('description')
+            ? (data['description'] as String?)
+            : existing.description,
       );
       await _updateUseCase.call(entity);
       await fetchTransactions(userId);
@@ -413,6 +436,12 @@ class TransactionNotifier extends ChangeNotifier {
       _state = _state.copyWith(error: 'Falha ao editar a transação.');
       notifyListeners();
     }
+  }
+
+  // Test helper: replace internal state for unit tests.
+  // Not intended for production usage.
+  void replaceStateForTesting(TransactionState state) {
+    _state = state;
   }
 
   void resetFilters() {
