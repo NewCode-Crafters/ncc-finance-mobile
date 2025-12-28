@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:firebase_auth/firebase_auth.dart' show UserCredential;
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import '../../test_helpers/fake_firestore_helpers.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_auth_repository.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_auth_data_source.dart';
 
@@ -77,7 +78,7 @@ void main() {
   });
 
   test('getCurrentUserProfile returns profile when doc exists', () async {
-    final fakeFs = FakeFirebaseFirestore();
+    final fakeFs = makeFakeFirestore();
     final ds = FakeFirebaseAuthDataSource(firestore: fakeFs);
     final repo = FirebaseAuthRepository(ds);
 
@@ -88,8 +89,8 @@ void main() {
     );
     final user = cred.user!;
 
-    // write a user doc
-    await fakeFs.collection('users').doc(user.uid).set({
+    // write a user doc using the shared helper
+    await seedUserDoc(fakeFs, user.uid, {
       'name': 'Test',
       'email': 'a@b.com',
       'photoUrl': null,
