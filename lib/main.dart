@@ -1,44 +1,43 @@
-import 'package:bytebank/features/transactions/screens/expense_control_screen.dart';
-import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
-import 'package:bytebank/features/transactions/screens/view_transaction_screen.dart';
+import 'package:bytebank/presentation/screens/transactions/expense_control_screen.dart';
+import 'package:bytebank/application/notifiers/chart_animation_notifier.dart';
+import 'package:bytebank/presentation/screens/transactions/view_transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:bytebank/core/services/metadata_service.dart';
-import 'package:bytebank/features/splash/screens/splash_screen.dart';
-import 'package:bytebank/features/transactions/models/financial_transaction.dart';
-import 'package:bytebank/features/transactions/notifiers/transaction_notifier.dart';
-import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
-import 'package:bytebank/features/transactions/screens/create_transaction_screen.dart';
-import 'package:bytebank/features/transactions/screens/edit_transaction_screen.dart';
-import 'package:bytebank/features/transactions/screens/transactions_screen.dart';
-import 'package:bytebank/features/transactions/services/financial_transaction_service.dart';
+import 'package:bytebank/infrastructure/services/metadata_service.dart';
+import 'package:bytebank/presentation/screens/splash/splash_screen.dart';
+import 'package:bytebank/domain/entities/financial_transaction.dart';
+import 'package:bytebank/application/notifiers/transaction_notifier.dart'
+    as app_notifier;
+import 'package:bytebank/application/notifiers/transaction_attachments_notifier.dart';
+import 'package:bytebank/presentation/screens/transactions/create_transaction_screen.dart';
+import 'package:bytebank/presentation/screens/transactions/edit_transaction_screen.dart';
+import 'package:bytebank/presentation/screens/transactions/transactions_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:bytebank/features/authentication/notifiers/auth_notifier.dart';
-import 'package:bytebank/features/authentication/screens/auth_wrapper.dart';
-import 'package:bytebank/features/authentication/screens/login_screen.dart';
-import 'package:bytebank/features/authentication/screens/register_screen.dart';
-import 'package:bytebank/features/authentication/screens/update_account_screen.dart';
-import 'package:bytebank/features/authentication/services/auth_service.dart';
-import 'package:bytebank/features/authentication/services/firebase_auth_service.dart';
-import 'package:bytebank/features/dashboard/notifiers/balance_notifier.dart';
-import 'package:bytebank/features/dashboard/screens/dashboard_screen.dart';
-import 'package:bytebank/features/dashboard/services/balance_service.dart';
-import 'package:bytebank/features/investments/notifiers/investment_notifier.dart';
-import 'package:bytebank/features/investments/screens/create_investment_screen.dart';
-import 'package:bytebank/features/investments/screens/investments_screen.dart';
-import 'package:bytebank/features/investments/services/investment_service.dart';
-import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
-import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
-import 'package:bytebank/features/profile/services/profile_service.dart';
-import 'package:bytebank/features/onboarding/screens/onboarding_carousel_screen.dart';
+import 'package:bytebank/application/notifiers/auth_notifier.dart';
+import 'package:bytebank/presentation/screens/authentication/auth_wrapper.dart';
+import 'package:bytebank/presentation/screens/authentication/login_screen.dart';
+import 'package:bytebank/presentation/screens/authentication/register_screen.dart';
+import 'package:bytebank/presentation/screens/authentication/update_account_screen.dart';
+import 'package:bytebank/presentation/screens/dashboard/dashboard_screen.dart';
+import 'package:bytebank/application/notifiers/investment_notifier.dart';
+import 'package:bytebank/presentation/screens/investments/create_investment_screen.dart';
+import 'package:bytebank/presentation/screens/investments/investments_screen.dart';
+import 'package:bytebank/application/notifiers/profile_notifier.dart';
+import 'package:bytebank/domain/repositories/auth_repository.dart';
+import 'package:bytebank/presentation/screens/profile/my_profile_screen.dart';
+import 'package:bytebank/presentation/screens/onboarding/onboarding_carousel_screen.dart';
 import 'package:bytebank/firebase_options.dart';
-import 'package:bytebank/theme/theme.dart';
+import 'package:bytebank/presentation/theme/theme.dart';
+import 'core/di/injection_container.dart';
+import 'package:bytebank/application/notifiers/balance_notifier.dart'
+    as app_balance;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await initializeDependencies();
   await initializeDateFormatting('pt_BR', '');
 
   runApp(const MyApp());
@@ -49,49 +48,38 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // We wrap our app in a MultiProvider to make our services and notifiers
-    // available to the entire widget tree.
+    // We wrap our app in Provider wrappers, but the instances come from GetIt.
+    // Keep using Provider/ChangeNotifierProvider for widget bindings, but
+    // obtain the actual instances from the service locator `sl`.
     return MultiProvider(
       providers: [
         // --- Authentication ---
-        Provider<AuthService>(create: (_) => FirebaseAuthService()),
-        ChangeNotifierProvider<AuthNotifier>(
-          create: (context) => AuthNotifier(context.read<AuthService>()),
-        ),
+        ChangeNotifierProvider<AuthNotifier>(create: (_) => sl<AuthNotifier>()),
+        Provider<AuthRepository>(create: (_) => sl<AuthRepository>()),
         // --- Profile ---
-        Provider<ProfileService>(create: (_) => ProfileService()),
         ChangeNotifierProvider<ProfileNotifier>(
-          create: (context) => ProfileNotifier(context.read<ProfileService>()),
+          create: (_) => sl<ProfileNotifier>(),
         ),
         // --- Balance ---
-        Provider<BalanceService>(create: (_) => BalanceService()),
-        ChangeNotifierProvider<BalanceNotifier>(
-          create: (context) => BalanceNotifier(context.read<BalanceService>()),
+        ChangeNotifierProvider<app_balance.BalanceNotifier>(
+          create: (_) => sl<app_balance.BalanceNotifier>(),
         ),
         // --- Investments ---
-        Provider<InvestmentService>(create: (_) => InvestmentService()),
         ChangeNotifierProvider<InvestmentNotifier>(
-          create: (context) =>
-              InvestmentNotifier(context.read<InvestmentService>()),
+          create: (_) => sl<InvestmentNotifier>(),
         ),
         // --- Transactions ---
-        Provider<MetadataService>(create: (_) => MetadataService()),
-        Provider<FinancialTransactionService>(
-          create: (_) => FinancialTransactionService(),
-        ),
+        Provider<MetadataService>(create: (_) => sl<MetadataService>()),
         // --- Chart Animation ---
         ChangeNotifierProvider<ChartAnimationNotifier>(
-          create: (_) => ChartAnimationNotifier(),
+          create: (_) => sl<ChartAnimationNotifier>(),
         ),
-        ChangeNotifierProvider<TransactionNotifier>(
-          create: (context) => TransactionNotifier(
-            context.read<FinancialTransactionService>(),
-            context.read<MetadataService>(),
-          ),
+        ChangeNotifierProvider<app_notifier.TransactionNotifier>(
+          create: (_) => sl<app_notifier.TransactionNotifier>(),
         ),
         // Local attachments selection for transaction creation
         ChangeNotifierProvider<TransactionAttachmentsNotifier>(
-          create: (_) => TransactionAttachmentsNotifier(),
+          create: (_) => sl<TransactionAttachmentsNotifier>(),
         ),
       ],
       child: MaterialApp(

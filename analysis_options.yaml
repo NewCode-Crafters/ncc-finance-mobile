@@ -21,13 +21,40 @@ linter:
   # `// ignore_for_file: name_of_lint` syntax on the line or in the file
   # producing the lint.
   rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+    avoid_print: true
+    prefer_single_quotes: true
+    prefer_final_fields: true
+    prefer_const_constructors: true
+    avoid_dynamic_calls: true
+    unnecessary_null_checks: true
+    always_declare_return_types: true
+    file_names: true
 
 analyzer:
   exclude:
-  # ignore all mockito-generated mock files
-  - "**/*.mocks.dart"
+    # ignore all mockito-generated mock files
+    - "**/*.mocks.dart"
+    # Exclude generated and build folders from analysis to reduce noise
+    - "**/build/**"
+    - "**/.dart_tool/**"
+    - "**/generated/**"
+
+  errors:
+    # Treat some common lints as errors to enforce them in CI
+    prefer_final_fields: error
+    avoid_print: error
+    unnecessary_null_checks: error
+    always_declare_return_types: error
+
+  # Note: For enforcing layer-import rules (domain must not import infrastructure)
+  # consider adding `custom_lint` package and writing a rule, or use
+  # a CI script that scans imports. Custom rules are more involved and
+  # can be added in a later step.
+
+  # Note: For enforcing layer-import rules (domain must not import infrastructure)
+  # consider adding `custom_lint` package and writing a rule, or use
+  # a CI script that scans imports. Custom rules are more involved and
+  # can be added in a later step.
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

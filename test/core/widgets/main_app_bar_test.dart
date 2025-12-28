@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:bytebank/core/widgets/main_app_bar.dart';
-import 'package:bytebank/features/profile/models/user_profile.dart';
-import 'package:bytebank/features/profile/notifiers/profile_notifier.dart';
-import 'package:bytebank/features/profile/screens/my_profile_screen.dart';
+import 'package:bytebank/presentation/widgets/common/main_app_bar.dart';
+import 'package:bytebank/domain/entities/user_profile.dart';
+import 'package:bytebank/application/notifiers/profile_notifier.dart';
+import 'package:bytebank/presentation/screens/profile/my_profile_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 
-import '../../features/profile/screens/my_profile_screen_test.mocks.dart';
+// mocks removed: not needed after test reorganization
+import '../../helpers/profile/profile_notifier_test_helpers.dart';
 
 void main() {
-  late MockProfileService mockProfileService;
   late ProfileNotifier profileNotifier;
 
   setUp(() {
-    mockProfileService = MockProfileService();
-    profileNotifier = ProfileNotifier(mockProfileService);
+    profileNotifier = ProfileNotifier(
+      getUserProfile: FakeGetUserProfileUseCase(null),
+      pickAndUploadProfilePicture: FakePickAndUploadProfilePictureUseCase(null),
+    );
 
     final fakeProfile = UserProfile(
       uid: '1',
