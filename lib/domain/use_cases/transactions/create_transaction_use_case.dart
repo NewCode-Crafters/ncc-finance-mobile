@@ -1,5 +1,5 @@
-import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
-import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
+import 'package:bytebank/domain/entities/financial_transaction.dart';
+import 'package:bytebank/domain/repositories/financial_transaction_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CreateTransactionUseCase {

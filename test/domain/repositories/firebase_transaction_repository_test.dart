@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_investment_repository.dart';
-import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
-import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/domain/repositories/financial_transaction_repository.dart';
+import 'package:bytebank/domain/entities/financial_transaction.dart';
 import 'package:bytebank/domain/entities/investment.dart';
 import 'package:flutter_test/flutter_test.dart';
 

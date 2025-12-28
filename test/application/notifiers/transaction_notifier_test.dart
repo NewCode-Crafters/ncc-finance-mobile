@@ -1,14 +1,15 @@
 import 'package:bytebank/application/notifiers/transaction_notifier.dart';
-import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/domain/entities/financial_transaction.dart';
 import 'package:bytebank/domain/use_cases/transactions/create_transaction_use_case.dart';
 import 'package:bytebank/domain/use_cases/transactions/get_transactions_use_case.dart';
 import 'package:bytebank/domain/use_cases/transactions/delete_transaction_use_case.dart';
 import 'package:bytebank/domain/use_cases/transactions/update_transaction_use_case.dart';
-import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
+import 'package:bytebank/domain/repositories/financial_transaction_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bytebank/domain/entities/transaction_category.dart';
-import 'package:bytebank/infrastructure/services/metadata_service.dart' as infra;
+import 'package:bytebank/infrastructure/services/metadata_service.dart'
+    as infra;
 
 class _FakeRepository implements IFinancialTransactionRepository {
   bool createCalled = false;

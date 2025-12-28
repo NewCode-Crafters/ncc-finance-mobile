@@ -1,4 +1,4 @@
-import 'package:bytebank/core/widgets/main_app_bar.dart';
+import 'package:bytebank/presentation/widgets/common/main_app_bar.dart';
 import 'package:bytebank/application/notifiers/chart_animation_notifier.dart';
 import 'package:bytebank/presentation/widgets/dashboard/action_card.dart';
 import 'package:bytebank/presentation/screens/investments/create_investment_screen.dart';

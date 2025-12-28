@@ -2,10 +2,10 @@ import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/presentation/widgets/common/widgets.dart';
-import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/domain/entities/financial_transaction.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
-import 'package:bytebank/presentation/utils/transaction_helpers.dart';
+import 'package:bytebank/core/utils/transaction_utils.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';

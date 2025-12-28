@@ -1,4 +1,4 @@
-import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/domain/entities/financial_transaction.dart';
 import 'package:bytebank/infrastructure/dtos/financial_transaction_dto.dart';
 
 class FinancialTransactionMapper {

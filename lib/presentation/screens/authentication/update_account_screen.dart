@@ -1,4 +1,4 @@
-import 'package:bytebank/core/widgets/app_snackbar.dart';
+import 'package:bytebank/presentation/widgets/common/app_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/presentation/widgets/common/widgets.dart';
 import 'package:bytebank/domain/repositories/auth_repository.dart';

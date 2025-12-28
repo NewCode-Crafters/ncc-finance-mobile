@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
-import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
+import 'package:bytebank/domain/entities/financial_transaction.dart';
+import 'package:bytebank/domain/repositories/financial_transaction_repository.dart';
 import 'package:bytebank/domain/use_cases/financial_transactions/create_financial_transaction_use_case.dart';
 import 'package:bytebank/domain/use_cases/financial_transactions/get_financial_transactions_use_case.dart';
 import 'package:bytebank/domain/use_cases/financial_transactions/update_financial_transaction_use_case.dart';

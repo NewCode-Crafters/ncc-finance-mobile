@@ -3,7 +3,7 @@ import 'package:bytebank/domain/use_cases/transactions/create_transaction_use_ca
 import 'package:bytebank/domain/use_cases/transactions/get_transactions_use_case.dart';
 import 'package:bytebank/domain/use_cases/transactions/update_transaction_use_case.dart';
 import 'package:bytebank/domain/use_cases/transactions/delete_transaction_use_case.dart';
-import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/domain/entities/financial_transaction.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:bytebank/infrastructure/services/metadata_service.dart'
     as infra;
@@ -121,18 +121,18 @@ class TransactionNotifier extends ChangeNotifier {
     final query = _state.searchText.trim().toLowerCase();
     if (query.isEmpty) return _state.transactions;
 
-    final querysemfiltro = _state.searchText.toLowerCase();
+    final querySemFiltro = _state.searchText.toLowerCase();
 
-    if (querysemfiltro.isEmpty) {
+    if (querySemFiltro.isEmpty) {
       return _state.transactions;
     }
 
     return _state.allTransactions.where((t) {
       final descriptionMatch =
-          t.description?.toLowerCase().contains(querysemfiltro) ?? false;
+          t.description?.toLowerCase().contains(querySemFiltro) ?? false;
       final categoryMatch = getCategoryLabel(
         t.category,
-      ).toLowerCase().contains(querysemfiltro);
+      ).toLowerCase().contains(querySemFiltro);
       return descriptionMatch || categoryMatch;
     }).toList();
   }

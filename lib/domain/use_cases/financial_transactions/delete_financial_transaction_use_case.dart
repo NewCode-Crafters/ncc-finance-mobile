@@ -1,4 +1,4 @@
-import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
+import 'package:bytebank/domain/repositories/financial_transaction_repository.dart';
 
 class DeleteFinancialTransactionUseCase {
   final IFinancialTransactionRepository repository;

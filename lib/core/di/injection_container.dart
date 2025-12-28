@@ -22,7 +22,7 @@ import 'package:bytebank/domain/use_cases/profile/upload_profile_picture_use_cas
 import 'package:bytebank/domain/use_cases/profile/pick_and_upload_profile_picture_use_case.dart';
 import 'package:bytebank/domain/repositories/balance_repository.dart';
 import 'package:bytebank/infrastructure/services/metadata_service.dart';
-import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
+import 'package:bytebank/domain/repositories/financial_transaction_repository.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
 import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';

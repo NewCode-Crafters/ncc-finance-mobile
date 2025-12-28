@@ -1,5 +1,5 @@
 import 'package:bytebank/core/constants/app_assets.dart';
-import 'package:bytebank/core/widgets/nav_bar.dart';
+import 'package:bytebank/presentation/widgets/common/nav_bar.dart';
 import 'package:bytebank/presentation/screens/transactions/expense_control_screen.dart';
 import 'package:bytebank/domain/entities/nav_model.dart';
 import 'package:bytebank/presentation/screens/investments/create_investment_screen.dart';
@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:bytebank/presentation/widgets/dashboard/action_card.dart';
 import 'package:bytebank/presentation/screens/transactions/transactions_screen.dart';
 import 'package:intl/intl.dart';
-import 'package:bytebank/core/widgets/main_app_bar.dart';
+import 'package:bytebank/presentation/widgets/common/main_app_bar.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
 import 'package:bytebank/presentation/screens/investments/investments_screen.dart';

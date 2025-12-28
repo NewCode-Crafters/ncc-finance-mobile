@@ -1,4 +1,4 @@
-import 'package:bytebank/core/widgets/app_snackbar.dart';
+import 'package:bytebank/presentation/widgets/common/app_snackbar.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
 import 'package:bytebank/presentation/theme/theme.dart';

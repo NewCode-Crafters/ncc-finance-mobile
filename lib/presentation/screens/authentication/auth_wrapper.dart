@@ -1,4 +1,4 @@
-import 'package:bytebank/core/widgets/app_snackbar.dart';
+import 'package:bytebank/presentation/widgets/common/app_snackbar.dart';
 import 'package:bytebank/presentation/screens/onboarding/onboarding_carousel_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

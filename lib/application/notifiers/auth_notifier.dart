@@ -1,4 +1,4 @@
-import 'package:bytebank/presentation/validators/validators.dart';
+import 'package:bytebank/core/utils/validators.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 

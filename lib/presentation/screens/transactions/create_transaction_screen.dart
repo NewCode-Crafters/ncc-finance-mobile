@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:provider/provider.dart';
 
-import 'package:bytebank/core/widgets/app_snackbar.dart';
+import 'package:bytebank/presentation/widgets/common/app_snackbar.dart';
 import 'package:bytebank/application/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:bytebank/domain/entities/transaction_category.dart';
@@ -17,8 +17,8 @@ import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
-import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
-import 'package:bytebank/presentation/utils/transaction_helpers.dart';
+import 'package:bytebank/domain/entities/financial_transaction.dart';
+import 'package:bytebank/core/utils/transaction_utils.dart';
 
 class CreateTransactionScreen extends StatefulWidget {
   static const String routeName = '/create-transaction';

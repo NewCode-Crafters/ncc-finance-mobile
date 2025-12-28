@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
+import 'package:bytebank/domain/entities/financial_transaction.dart';
 import 'package:bytebank/infrastructure/dtos/financial_transaction_dto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
@@ -129,7 +129,11 @@ class _FakeDataSource implements FirebaseTransactionDataSource {
 
 class _FakeWriteBatch implements WriteBatch {
   @override
-  void set<T>(DocumentReference<T> documentRef, Object? data, [SetOptions? options]) {}
+  void set<T>(
+    DocumentReference<T> documentRef,
+    Object? data, [
+    SetOptions? options,
+  ]) {}
 
   @override
   void update(DocumentReference documentRef, Map<String, dynamic> data) {}

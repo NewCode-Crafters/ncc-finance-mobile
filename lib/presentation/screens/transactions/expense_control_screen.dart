@@ -1,4 +1,4 @@
-import 'package:bytebank/core/widgets/main_app_bar.dart';
+import 'package:bytebank/presentation/widgets/common/main_app_bar.dart';
 import 'package:bytebank/application/notifiers/chart_animation_notifier.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
-import 'package:bytebank/presentation/utils/transaction_helpers.dart';
+import 'package:bytebank/core/utils/transaction_utils.dart';
 import 'package:bytebank/presentation/widgets/dashboard/action_card.dart';
 
 class ExpenseControlScreen extends StatefulWidget {
