@@ -1,5 +1,5 @@
 import 'package:bytebank/domain/repositories/attachment_repository.dart';
-import 'package:bytebank/features/transactions/models/attachment.dart';
+import 'package:bytebank/domain/entities/attachment.dart';
 
 class WatchAttachmentsUseCase {
   final AttachmentRepository repository;

@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:bytebank/features/transactions/models/attachment.dart';
+import 'package:bytebank/domain/entities/attachment.dart';
 
 abstract class AttachmentRepository {
   Future<Attachment> uploadSingle({

@@ -47,7 +47,7 @@ import 'package:bytebank/application/notifiers/investment_notifier.dart'
 
 import 'package:bytebank/application/notifiers/auth_notifier.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
-import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
+import 'package:bytebank/application/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
 
 // This file contains the application's dependency injection container.
@@ -265,5 +265,4 @@ Future<void> initializeDependencies() async {
 
   // -----------------------------------------------------------------------
   // Note: Keep registrations in the recommended order: external -> infra -> domain -> app -> presentation
-  // Expand this function as you migrate features. For tests, consider registering test doubles.
 }

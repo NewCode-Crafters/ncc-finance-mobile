@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_attachment_repository.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_attachment_data_source.dart';
-import 'package:bytebank/features/transactions/models/attachment.dart';
+import 'package:bytebank/domain/entities/attachment.dart';
 
 class _FakeDataSource extends FirebaseTransactionAttachmentDataSource {
   late String receivedUserId;

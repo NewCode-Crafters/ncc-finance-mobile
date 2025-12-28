@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
-import 'package:bytebank/features/transactions/models/attachment.dart';
+import 'package:bytebank/domain/entities/attachment.dart';
 
 class FirebaseTransactionAttachmentDataSource {
   final FirebaseFirestore? _firestore;
@@ -77,7 +77,7 @@ class FirebaseTransactionAttachmentDataSource {
         createdAt: DateTime.now(),
       );
 
-        final attachmentsCol = firestore
+      final attachmentsCol = firestore
           .collection('users')
           .doc(userId)
           .collection('transactions')
@@ -85,7 +85,7 @@ class FirebaseTransactionAttachmentDataSource {
           .collection('attachments');
 
       final attachmentDocRef = attachmentsCol.doc(fileId);
-        final parentTransactionRef = firestore
+      final parentTransactionRef = firestore
           .collection('users')
           .doc(userId)
           .collection('transactions')

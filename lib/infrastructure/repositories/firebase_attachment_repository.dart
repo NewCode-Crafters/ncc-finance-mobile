@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:bytebank/domain/repositories/attachment_repository.dart';
-import 'package:bytebank/features/transactions/models/attachment.dart';
+import 'package:bytebank/domain/entities/attachment.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_attachment_data_source.dart';
 
 class FirebaseAttachmentRepository implements AttachmentRepository {

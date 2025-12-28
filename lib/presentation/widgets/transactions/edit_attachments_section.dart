@@ -6,9 +6,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../../features/transactions/models/attachment.dart';
+import '../../../domain/entities/attachment.dart';
 import 'package:provider/provider.dart';
-import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
+import 'package:bytebank/application/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
 
 class EditAttachmentsController {

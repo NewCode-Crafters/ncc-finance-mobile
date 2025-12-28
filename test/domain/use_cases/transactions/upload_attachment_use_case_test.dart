@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bytebank/domain/use_cases/transactions/upload_attachment_use_case.dart';
-import 'package:bytebank/features/transactions/models/attachment.dart';
+import 'package:bytebank/domain/entities/attachment.dart';
 import 'package:bytebank/domain/repositories/attachment_repository.dart';
 
 class _FakeRepository implements AttachmentRepository {

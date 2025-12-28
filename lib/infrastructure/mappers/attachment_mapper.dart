@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:bytebank/features/transactions/models/attachment.dart';
+import 'package:bytebank/domain/entities/attachment.dart';
 import 'package:bytebank/infrastructure/dtos/attachment_dto.dart';
 
 class AttachmentMapper {

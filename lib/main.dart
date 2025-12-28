@@ -8,7 +8,7 @@ import 'package:bytebank/presentation/screens/splash/splash_screen.dart';
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
-import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
+import 'package:bytebank/application/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/presentation/screens/transactions/create_transaction_screen.dart';
 import 'package:bytebank/presentation/screens/transactions/edit_transaction_screen.dart';
 import 'package:bytebank/presentation/screens/transactions/transactions_screen.dart';
