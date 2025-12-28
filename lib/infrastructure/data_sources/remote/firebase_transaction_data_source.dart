@@ -138,7 +138,8 @@ class FirebaseTransactionDataSource {
       final batch = _firestore.batch();
       batch.delete(transactionRef);
 
-      final amountToRevert = (transactionData['amount'] ?? 0.0).toDouble();
+      final amountToRevert = ((transactionData['amount'] ?? 0.0) as num)
+          .toDouble();
       final balanceId = transactionData['balanceId'] as String?;
 
       if (balanceId != null && balanceId.isNotEmpty) {

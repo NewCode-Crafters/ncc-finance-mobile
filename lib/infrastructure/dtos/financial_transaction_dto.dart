@@ -32,7 +32,7 @@ class FinancialTransactionDTO {
   factory FinancialTransactionDTO.fromMap(String id, Map<String, dynamic> map) {
     return FinancialTransactionDTO(
       id: id,
-      amount: (map['amount'] ?? 0.0).toDouble(),
+      amount: ((map['amount'] ?? 0.0) as num).toDouble(),
       balanceId: map['balanceId'] ?? '',
       category: map['category'] ?? '',
       date: (map['date'] is Timestamp)

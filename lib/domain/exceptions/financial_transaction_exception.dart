@@ -17,22 +17,22 @@ abstract class FinancialTransactionException implements Exception {
 class FinancialTransactionNotFoundException
     extends FinancialTransactionException {
   const FinancialTransactionNotFoundException([
-    String message = 'Transaction not found',
-  ]) : super(message);
+    super.message = 'Transaction not found',
+  ]);
 }
 
 /// Thrown when validation of a transaction fails (business rule violation).
 class FinancialTransactionValidationException
     extends FinancialTransactionException {
   const FinancialTransactionValidationException([
-    String message = 'Invalid transaction data',
-  ]) : super(message);
+    super.message = 'Invalid transaction data',
+  ]);
 }
 
 /// Thrown when a repository or external data source returns an unexpected error.
 class FinancialTransactionRepositoryException
     extends FinancialTransactionException {
   const FinancialTransactionRepositoryException([
-    String message = 'Repository error',
-  ]) : super(message);
+    super.message = 'Repository error',
+  ]);
 }

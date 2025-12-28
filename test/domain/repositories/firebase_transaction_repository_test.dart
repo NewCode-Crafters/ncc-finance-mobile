@@ -191,9 +191,7 @@ void main() {
         investment: investment,
       );
 
-      final created =
-          fakeTransactionRepo.lastCreatedTransaction!
-              as FinancialTransactionEntity;
+      final created = fakeTransactionRepo.lastCreatedTransaction!;
 
       expect(created.amount, -5000.0);
       expect(created.category, 'INVESTMENT');
@@ -230,9 +228,7 @@ void main() {
         investmentId: investmentDocRef.id,
       );
 
-      final created =
-          fakeTransactionRepo.lastCreatedTransaction!
-              as FinancialTransactionEntity;
+      final created = fakeTransactionRepo.lastCreatedTransaction!;
 
       expect(created.amount, 5000.0);
       expect(created.category, 'INVESTMENT_REDEMPTION');

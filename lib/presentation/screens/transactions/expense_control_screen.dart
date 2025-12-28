@@ -191,12 +191,13 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
     for (final transaction in transactionState.allTransactions) {
       if (transaction.category == 'INVESTMENT' ||
           transaction.category == 'INVESTMENT_REDEMPTION' ||
-          transaction.amount > 0)
+          transaction.amount > 0) {
         continue;
+      }
       categoryTotals[transaction.category] =
           (categoryTotals[transaction.category] ?? 0) + transaction.amount;
     }
-    if (categoryTotals.isEmpty)
+    if (categoryTotals.isEmpty) {
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -215,6 +216,7 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
           ],
         ),
       );
+    }
     final entries = categoryTotals.entries.toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

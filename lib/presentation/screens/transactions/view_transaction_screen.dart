@@ -38,8 +38,9 @@ class _ViewTransactionScreenState extends State<ViewTransactionScreen> {
         if (notifier.state.searchText == text) return;
         notifier.updateSearchText(text);
         final userId = FirebaseAuth.instance.currentUser?.uid;
-        if (userId != null)
+        if (userId != null) {
           Future.microtask(() => notifier.fetchFirstPage(userId));
+        }
         if (_scrollController.hasClients) {
           try {
             _scrollController.jumpTo(0);
@@ -80,14 +81,16 @@ class _ViewTransactionScreenState extends State<ViewTransactionScreen> {
       final pos = _scrollController.position;
       if (pos.atEdge && pos.pixels != 0) {
         final userId = FirebaseAuth.instance.currentUser?.uid;
-        if (userId != null)
+        if (userId != null) {
           Future.microtask(() => notifier.fetchNextPage(userId));
+        }
         return;
       }
       if (pos.extentAfter < 300) {
         final userId = FirebaseAuth.instance.currentUser?.uid;
-        if (userId != null)
+        if (userId != null) {
           Future.microtask(() => notifier.fetchNextPage(userId));
+        }
       }
     } catch (_) {}
   }

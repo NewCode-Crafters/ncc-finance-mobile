@@ -3,7 +3,7 @@ import 'package:bytebank/infrastructure/dtos/financial_transaction_dto.dart';
 import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
 
 void main() {
-  final mapper = FinancialTransactionMapper();
+  final mapper = const FinancialTransactionMapper();
 
   test('DTO -> Domain and Domain -> DTO', () {
     final dto = FinancialTransactionDTO(

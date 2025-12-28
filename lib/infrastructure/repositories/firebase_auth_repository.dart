@@ -49,9 +49,8 @@ class FirebaseAuthRepository implements AuthRepository {
         );
       }
 
-      final userDocRef = _dataSource.firestore
-          .collection('users')
-          .doc(user.uid);
+      final firestore = _dataSource.firestore as FirebaseFirestore;
+      final userDocRef = firestore.collection('users').doc(user.uid);
 
       await userDocRef.set({
         'name': name,
@@ -101,12 +100,11 @@ class FirebaseAuthRepository implements AuthRepository {
   Future<void> updateUserPhotoUrl({required String url}) async {
     try {
       final user = _dataSource.currentUser;
-
       if (user == null) {
         throw Exception('Nenhum usuário autenticado encontrado.');
       }
-
-      await _dataSource.firestore.collection('users').doc(user.uid).update({
+      final firestore = _dataSource.firestore as FirebaseFirestore;
+      await firestore.collection('users').doc(user.uid).update({
         'photoUrl': url,
       });
     } catch (e) {
@@ -123,7 +121,8 @@ class FirebaseAuthRepository implements AuthRepository {
           'Não é possível atualizar o nome de um usuário não autenticado.',
         );
       }
-      await _dataSource.firestore.collection('users').doc(user.uid).update({
+      final firestore = _dataSource.firestore as FirebaseFirestore;
+      await firestore.collection('users').doc(user.uid).update({
         'name': newName,
       });
     } catch (e) {
@@ -136,12 +135,10 @@ class FirebaseAuthRepository implements AuthRepository {
     final user = _dataSource.currentUser;
     if (user == null) return null;
 
-    final doc = await _dataSource.firestore
-        .collection('users')
-        .doc(user.uid)
-        .get();
+    final firestore = _dataSource.firestore as FirebaseFirestore;
+    final doc = await firestore.collection('users').doc(user.uid).get();
     if (!doc.exists) return null;
     final map = doc.data();
-    return UserProfile.fromMap(map, uid: doc.id);
+    return UserProfile.fromMap(map ?? {}, uid: doc.id);
   }
 }

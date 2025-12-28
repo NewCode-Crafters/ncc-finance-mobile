@@ -100,7 +100,7 @@ class TransactionAttachmentsNotifier extends ChangeNotifier {
           userId: userId,
           transactionId: transactionId,
         );
-        if (r != null) uploaded.add(r);
+        uploaded.add(r);
       }
       clearLocal();
       return uploaded;

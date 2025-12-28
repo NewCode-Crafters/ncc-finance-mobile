@@ -394,7 +394,7 @@ class TransactionNotifier extends ChangeNotifier {
     try {
       final entity = FinancialTransactionEntity(
         id: transactionId,
-        amount: (data['amount'] ?? 0.0).toDouble(),
+        amount: ((data['amount'] ?? 0.0) as num).toDouble(),
         balanceId: data['balanceId'] ?? '',
         category: data['category'] ?? '',
         date: (data['date'] as DateTime?) ?? DateTime.now(),

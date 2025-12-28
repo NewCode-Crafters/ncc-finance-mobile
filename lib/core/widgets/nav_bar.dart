@@ -65,7 +65,9 @@ class NavBar extends StatelessWidget {
         onTap: onTap,
         child: Icon(
           icon,
-          color: selected ? Colors.white : Colors.white.withOpacity(0.6),
+          color: selected
+              ? Colors.white
+              : const Color.fromRGBO(255, 255, 255, 0.6),
         ),
       ),
     );

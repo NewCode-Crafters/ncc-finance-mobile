@@ -77,8 +77,9 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
           'description': _descriptionController.text,
         },
       );
-      if (_attachmentsController.hasPendingChanges)
+      if (_attachmentsController.hasPendingChanges) {
         await _attachmentsController.commit(userId);
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -89,10 +90,11 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
         Navigator.of(context).pop();
       }
     } finally {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _isLoading = false;
         });
+      }
     }
   }
 
