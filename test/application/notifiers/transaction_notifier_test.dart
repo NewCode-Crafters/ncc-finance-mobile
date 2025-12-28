@@ -62,8 +62,11 @@ class _FakeRepository implements IFinancialTransactionRepository {
     FinancialTransactionEntity transaction,
   ) async {
     updateCalled = true;
+    lastUpdated = transaction;
     return transaction;
   }
+
+  FinancialTransactionEntity? lastUpdated;
 }
 
 void main() {
@@ -85,6 +88,52 @@ void main() {
     await notifier.loadTransactions(limit: 10);
     expect(fakeRepo.getCalled, isTrue);
     expect(notifier.state.isLoading, isFalse);
+  });
+
+  test('editTransaction preserves amount when amount omitted', () async {
+    final fakeRepo = _FakeRepository();
+    final create = CreateTransactionUseCase(fakeRepo);
+    final get = GetTransactionsUseCase(fakeRepo);
+    final update = UpdateTransactionUseCase(fakeRepo);
+    final delete = DeleteTransactionUseCase(fakeRepo);
+
+    final notifier = TransactionNotifier(
+      getUseCase: get,
+      createUseCase: create,
+      updateUseCase: update,
+      deleteUseCase: delete,
+      metadataService: _FakeMetadata(),
+    );
+
+    // seed state with an existing transaction
+    final existing = FinancialTransaction(
+      id: 'tx1',
+      amount: -123.45,
+      balanceId: 'bal1',
+      category: 'CAT1',
+      date: DateTime(2025, 12, 28),
+      description: 'orig',
+    );
+
+    // inject state for test using public test helper
+    notifier.replaceStateForTesting(notifier.state.copyWith(
+      allTransactions: [existing],
+      transactions: [existing],
+    ));
+
+    await notifier.editTransaction(
+      userId: 'user1',
+      transactionId: 'tx1',
+      data: {
+        'description': 'updated desc',
+        // amount intentionally omitted
+      },
+    );
+
+    expect(fakeRepo.updateCalled, isTrue);
+    expect(fakeRepo.lastUpdated, isNotNull);
+    expect(fakeRepo.lastUpdated!.amount, equals(existing.amount));
+    expect(fakeRepo.lastUpdated!.description, equals('updated desc'));
   });
 }
 
