@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 class Attachment extends Equatable {
@@ -25,17 +26,19 @@ class Attachment extends Equatable {
     'size': size,
     'storagePath': storagePath,
     'downloadUrl': downloadUrl,
-    'createdAt': createdAt.toIso8601String(),
+    'createdAt': Timestamp.fromDate(createdAt),
   };
 
   factory Attachment.fromMap(String id, Map<String, dynamic> map) => Attachment(
     id: id,
-    name: map['name'] as String,
-    contentType: map['contentType'] as String,
-    size: (map['size'] as num).toInt(),
-    storagePath: map['storagePath'] as String,
-    downloadUrl: map['downloadUrl'] as String,
-    createdAt: DateTime.parse(map['createdAt'] as String),
+    name: map['name'] as String? ?? '',
+    contentType: map['contentType'] as String? ?? 'application/octet-stream',
+    size: (map['size'] as num?)?.toInt() ?? 0,
+    storagePath: map['storagePath'] as String? ?? '',
+    downloadUrl: map['downloadUrl'] as String? ?? '',
+    createdAt: (map['createdAt'] is Timestamp)
+        ? (map['createdAt'] as Timestamp).toDate()
+        : DateTime.now(),
   );
 
   @override

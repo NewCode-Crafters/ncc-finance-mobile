@@ -1,9 +1,15 @@
+import 'package:bytebank/domain/repositories/attachment_repository.dart';
 import 'package:bytebank/domain/repositories/auth_repository.dart';
 import 'package:bytebank/domain/use_cases/auth/login_use_case.dart';
 import 'package:bytebank/domain/use_cases/auth/logout_use_case.dart';
 import 'package:bytebank/domain/use_cases/auth/send_password_reset_email_use_case.dart';
 import 'package:bytebank/domain/use_cases/auth/signup_use_case.dart';
+import 'package:bytebank/domain/use_cases/transactions/delete_attachment_use_case.dart';
+import 'package:bytebank/domain/use_cases/transactions/upload_attachment_use_case.dart';
+import 'package:bytebank/domain/use_cases/transactions/watch_attachments_use_case.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_auth_data_source.dart';
+import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_attachment_data_source.dart';
+import 'package:bytebank/infrastructure/repositories/firebase_attachment_repository.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_auth_repository.dart';
 import 'package:get_it/get_it.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -222,7 +228,39 @@ Future<void> initializeDependencies() async {
   );
 
   sl.registerFactory<TransactionAttachmentsNotifier>(
-    () => TransactionAttachmentsNotifier(),
+    () => TransactionAttachmentsNotifier(
+      uploadUseCase: sl<UploadAttachmentUseCase>(),
+      deleteUseCase: sl<DeleteAttachmentUseCase>(),
+      watchUseCase: sl<WatchAttachmentsUseCase>(),
+    ),
+  );
+
+  // Attachment infra: data source, repository and use-cases
+  sl.registerLazySingleton<FirebaseTransactionAttachmentDataSource>(
+    () => FirebaseTransactionAttachmentDataSource(
+      firestore: sl<FirebaseFirestore>(),
+      storage: null,
+    ),
+  );
+
+  sl.registerLazySingleton<FirebaseAttachmentRepository>(
+    () => FirebaseAttachmentRepository(
+      sl<FirebaseTransactionAttachmentDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<AttachmentRepository>(
+    () => sl<FirebaseAttachmentRepository>(),
+  );
+
+  sl.registerLazySingleton<UploadAttachmentUseCase>(
+    () => UploadAttachmentUseCase(sl<AttachmentRepository>()),
+  );
+  sl.registerLazySingleton<DeleteAttachmentUseCase>(
+    () => DeleteAttachmentUseCase(sl<AttachmentRepository>()),
+  );
+  sl.registerLazySingleton<WatchAttachmentsUseCase>(
+    () => WatchAttachmentsUseCase(sl<AttachmentRepository>()),
   );
 
   // -----------------------------------------------------------------------

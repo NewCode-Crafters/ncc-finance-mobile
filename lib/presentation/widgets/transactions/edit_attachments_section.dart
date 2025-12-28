@@ -7,7 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../features/transactions/models/attachment.dart';
-import '../../../features/transactions/services/transaction_attachment_service.dart';
+import 'package:provider/provider.dart';
+import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
 
 class EditAttachmentsController {
@@ -34,7 +35,8 @@ class EditAttachmentsSection extends StatefulWidget {
 }
 
 class _EditAttachmentsSectionState extends State<EditAttachmentsSection> {
-  final _service = TransactionAttachmentService();
+  // Resolve notifier to orchestrate attachment flows
+  TransactionAttachmentsNotifier? _attachmentsNotifier;
 
   final List<File> _stagedAdds = [];
   final Set<String> _stagedRemovals = {};
@@ -46,6 +48,18 @@ class _EditAttachmentsSectionState extends State<EditAttachmentsSection> {
   void initState() {
     super.initState();
     widget.controller._state = this;
+    // Resolve notifier lazily during init.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _attachmentsNotifier ??= context.read<TransactionAttachmentsNotifier>();
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Start watching attachments for this transaction
+        _attachmentsNotifier?.startWatching(
+          userId: user.uid,
+          transactionId: widget.transactionId,
+        );
+      }
+    });
   }
 
   @override
@@ -138,42 +152,49 @@ class _EditAttachmentsSectionState extends State<EditAttachmentsSection> {
 
   Future<void> commitChanges(String userId) async {
     try {
+      final notifier =
+          _attachmentsNotifier ??
+          context.read<TransactionAttachmentsNotifier>();
+
+      // Apply replacements: upload new file then delete old
       final replacements = Map<String, File>.from(_stagedReplacements);
       for (final entry in replacements.entries) {
         final oldId = entry.key;
         final file = entry.value;
-        await _service.uploadSingle(
+        await notifier.uploadLocal(
+          file: file,
           userId: userId,
           transactionId: widget.transactionId,
-          file: file,
         );
         final old = _findLatestById(oldId);
         if (old != null) {
-          await _service.deleteAttachment(
+          await notifier.deleteAttachment(
             userId: userId,
-            transactionId: widget.transactionId,
             attachment: old,
+            transactionId: widget.transactionId,
           );
         }
       }
 
+      // Adds
       final adds = List<File>.from(_stagedAdds);
       for (final f in adds) {
-        await _service.uploadSingle(
+        await notifier.uploadLocal(
+          file: f,
           userId: userId,
           transactionId: widget.transactionId,
-          file: f,
         );
       }
 
+      // Removals
       final removals = List<String>.from(_stagedRemovals);
       for (final id in removals) {
         final a = _findLatestById(id);
         if (a != null) {
-          await _service.deleteAttachment(
+          await notifier.deleteAttachment(
             userId: userId,
-            transactionId: widget.transactionId,
             attachment: a,
+            transactionId: widget.transactionId,
           );
         }
       }
@@ -244,10 +265,9 @@ class _EditAttachmentsSectionState extends State<EditAttachmentsSection> {
           ),
           const SizedBox(height: 8),
           StreamBuilder<List<Attachment>>(
-            stream: _service.watchAttachments(
-              userId: user.uid,
-              transactionId: widget.transactionId,
-            ),
+            stream: context
+                .read<TransactionAttachmentsNotifier>()
+                .attachmentsStream,
             builder: (context, snap) {
               if (!snap.hasData) return const LinearProgressIndicator();
               final items = snap.data!;

@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 
 import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:bytebank/features/transactions/notifiers/transaction_attachments_notifier.dart';
-import 'package:bytebank/features/transactions/services/transaction_attachment_service.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:bytebank/core/services/metadata_service.dart';
 import 'package:bytebank/core/widgets/primary_button.dart';
@@ -43,12 +42,10 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
   TransactionCategory? _selectedCategory;
   bool _isLoading = false;
   TransactionType _selectedType = TransactionType.expense;
-  late final TransactionAttachmentService _attachService;
 
   @override
   void initState() {
     super.initState();
-    _attachService = TransactionAttachmentService();
   }
 
   void _onToggleTypePressed(int index) {
@@ -131,30 +128,23 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
           ? transactionNotifier.state.transactions.first
           : null;
 
-      final filesToUpload = List<File>.from(attachmentsNotifier.selected);
-
-      for (final f in filesToUpload) {
+      if (created != null && created.id.isNotEmpty) {
         try {
-          if (created != null && created.id.isNotEmpty) {
-            await _attachService.uploadSingle(
-              userId: userId,
-              transactionId: created.id,
-              file: f,
-            );
-          }
+          await attachmentsNotifier.commitAll(
+            userId: userId,
+            transactionId: created.id,
+          );
         } catch (e) {
           if (mounted) {
             scaffoldMessenger.showSnackBar(
               buildAppSnackBar(
-                'Falha ao enviar ${p.basename(f.path)}: ${e.toString()}',
+                'Falha ao enviar anexos: ${e.toString()}',
                 AppMessageType.error,
               ),
             );
           }
         }
       }
-
-      attachmentsNotifier.clear();
 
       if (mounted) {
         await transactionNotifier.fetchTransactions(userId);
