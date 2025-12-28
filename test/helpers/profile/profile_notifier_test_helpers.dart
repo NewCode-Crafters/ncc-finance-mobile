@@ -4,7 +4,7 @@ import 'package:bytebank/domain/use_cases/profile/get_user_profile_use_case.dart
 import 'package:bytebank/domain/use_cases/profile/pick_and_upload_profile_picture_use_case.dart';
 import 'package:bytebank/domain/entities/user_profile.dart';
 import 'package:bytebank/domain/repositories/user_repository.dart';
-import 'package:bytebank/core/services/image_picker_service.dart';
+import 'package:bytebank/domain/entities/image_source_type.dart';
 
 class _DummyRepo implements IUserRepository {
   @override

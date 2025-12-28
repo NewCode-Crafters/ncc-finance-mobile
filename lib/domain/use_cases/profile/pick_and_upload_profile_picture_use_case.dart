@@ -1,5 +1,5 @@
 import 'package:bytebank/domain/repositories/user_repository.dart';
-import 'package:bytebank/core/services/image_picker_service.dart';
+import 'package:bytebank/domain/entities/image_source_type.dart';
 
 class PickAndUploadProfilePictureUseCase {
   final IUserRepository repository;

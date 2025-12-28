@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bytebank/core/widgets/primary_button.dart';
+import 'package:bytebank/presentation/widgets/common/widgets.dart';
 import 'package:bytebank/application/notifiers/auth_notifier.dart';
 import 'package:bytebank/presentation/screens/authentication/register_screen.dart';
 import 'package:bytebank/presentation/screens/dashboard/dashboard_screen.dart';

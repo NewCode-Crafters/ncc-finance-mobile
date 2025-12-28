@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bytebank/core/utils/color_helper.dart';
+import 'package:bytebank/presentation/utils/color_helper.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:bytebank/presentation/screens/profile/my_profile_screen.dart';
 import 'package:provider/provider.dart';

@@ -1,4 +1,4 @@
-import 'package:bytebank/core/utils/color_helper.dart';
+import 'package:bytebank/presentation/utils/color_helper.dart';
 import 'package:bytebank/domain/entities/onboarding_item.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:carousel_slider/carousel_slider.dart';

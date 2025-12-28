@@ -4,7 +4,7 @@ import 'package:bytebank/application/notifiers/transaction_notifier.dart'
 import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/core/widgets/primary_button.dart';
+import 'package:bytebank/presentation/widgets/common/widgets.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
 import 'package:bytebank/application/notifiers/investment_notifier.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bytebank/core/utils/color_helper.dart';
+import 'package:bytebank/presentation/utils/color_helper.dart';
 
 class EditableAvatar extends StatelessWidget {
   final double radius;

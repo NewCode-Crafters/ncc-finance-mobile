@@ -1,7 +1,7 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:bytebank/core/widgets/primary_button.dart';
+import 'package:bytebank/presentation/widgets/common/widgets.dart';
 import 'package:bytebank/presentation/screens/authentication/update_account_screen.dart';
 import 'package:bytebank/domain/repositories/auth_repository.dart';
 import 'package:bytebank/domain/entities/user_profile.dart';

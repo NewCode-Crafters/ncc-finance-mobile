@@ -1,6 +1,7 @@
+import 'package:bytebank/presentation/validators/validators.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/core/validators.dart';
+
 import 'package:bytebank/domain/exceptions/auth_exceptions.dart';
 import 'package:bytebank/domain/use_cases/auth/login_use_case.dart';
 import 'package:bytebank/domain/use_cases/auth/signup_use_case.dart';
@@ -57,10 +58,10 @@ class AuthNotifier extends ChangeNotifier {
     required SignUpUseCase signUp,
     required SendPasswordResetEmailUseCase sendReset,
     required LogoutUseCase logout,
-  })  : _loginUseCase = login,
-        _signUpUseCase = signUp,
-        _sendResetUseCase = sendReset,
-        _logoutUseCase = logout;
+  }) : _loginUseCase = login,
+       _signUpUseCase = signUp,
+       _sendResetUseCase = sendReset,
+       _logoutUseCase = logout;
 
   Future<bool> login(String email, String password) async {
     if (!Validators.isValidEmail(email)) {

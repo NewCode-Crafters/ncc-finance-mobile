@@ -1,25 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-class TransactionCategory {
-  final String id;
-  final String label;
-  final String type; // 'income' or 'expense'
-
-  TransactionCategory({
-    required this.id,
-    required this.label,
-    required this.type,
-  });
-
-  factory TransactionCategory.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return TransactionCategory(
-      id: doc.id,
-      label: data['label'] ?? '',
-      type: data['type'] ?? 'expense',
-    );
-  }
-}
+import 'package:bytebank/domain/entities/transaction_category.dart';
 
 class MetadataService {
   final FirebaseFirestore _firestore;

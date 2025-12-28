@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:bytebank/domain/entities/user_profile.dart';
-import 'package:bytebank/core/services/image_picker_service.dart';
+import 'package:bytebank/domain/entities/image_source_type.dart';
 
 abstract class IUserRepository {
   /// Fetch the `UserProfile` for the given `userId`, or `null` if not found.

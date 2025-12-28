@@ -7,7 +7,8 @@ import 'package:bytebank/domain/use_cases/transactions/update_transaction_use_ca
 import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:bytebank/core/services/metadata_service.dart';
+import 'package:bytebank/domain/entities/transaction_category.dart';
+import 'package:bytebank/infrastructure/services/metadata_service.dart' as infra;
 
 class _FakeRepository implements IFinancialTransactionRepository {
   bool createCalled = false;
@@ -86,10 +87,9 @@ void main() {
   });
 }
 
-class _FakeMetadata implements MetadataService {
+class _FakeMetadata implements infra.MetadataService {
   @override
   Future<List<TransactionCategory>> getTransactionCategories() async => [];
 
-  // Constructor satisfies MetadataService signature but we don't need firestore here.
   _FakeMetadata();
 }

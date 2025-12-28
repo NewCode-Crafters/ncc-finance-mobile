@@ -1,12 +1,12 @@
 import 'package:bytebank/core/constants/app_assets.dart';
 import 'package:bytebank/core/widgets/nav_bar.dart';
 import 'package:bytebank/presentation/screens/transactions/expense_control_screen.dart';
-import 'package:bytebank/core/models/nav_model.dart';
+import 'package:bytebank/domain/entities/nav_model.dart';
 import 'package:bytebank/presentation/screens/investments/create_investment_screen.dart';
 import 'package:bytebank/presentation/screens/profile/my_profile_screen.dart';
 import 'package:bytebank/presentation/screens/transactions/create_transaction_screen.dart';
-import 'package:bytebank/core/widgets/animated_tab_switcher.dart';
-import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
+import 'package:bytebank/presentation/widgets/dashboard/animated_tab_switcher.dart';
+import 'package:bytebank/application/notifiers/chart_animation_notifier.dart';
 import 'package:bytebank/presentation/screens/transactions/view_transaction_screen.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';

@@ -21,7 +21,7 @@ import 'package:bytebank/domain/use_cases/profile/get_user_profile_use_case.dart
 import 'package:bytebank/domain/use_cases/profile/upload_profile_picture_use_case.dart';
 import 'package:bytebank/domain/use_cases/profile/pick_and_upload_profile_picture_use_case.dart';
 import 'package:bytebank/domain/repositories/balance_repository.dart';
-import 'package:bytebank/core/services/metadata_service.dart';
+import 'package:bytebank/infrastructure/services/metadata_service.dart';
 import 'package:bytebank/domain/repositories/i_financial_transaction_repository.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
@@ -48,7 +48,7 @@ import 'package:bytebank/application/notifiers/investment_notifier.dart'
 import 'package:bytebank/application/notifiers/auth_notifier.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:bytebank/application/notifiers/transaction_attachments_notifier.dart';
-import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
+import 'package:bytebank/application/notifiers/chart_animation_notifier.dart';
 
 // This file contains the application's dependency injection container.
 // Call `initializeDependencies()` early in `main()` before running the app.

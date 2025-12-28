@@ -2,7 +2,7 @@ import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/core/constants/app_assets.dart';
-import 'package:bytebank/core/widgets/primary_button.dart';
+import 'package:bytebank/presentation/widgets/common/widgets.dart';
 import 'package:bytebank/application/notifiers/auth_notifier.dart';
 import 'package:bytebank/presentation/screens/authentication/register_screen.dart';
 import 'package:provider/provider.dart';

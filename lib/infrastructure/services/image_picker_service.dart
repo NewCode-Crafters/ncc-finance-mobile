@@ -1,6 +1,5 @@
 import 'package:image_picker/image_picker.dart';
-
-enum ImageSourceType { camera, gallery }
+import 'package:bytebank/domain/entities/image_source_type.dart';
 
 class ImagePickerService {
   final ImagePicker _picker = ImagePicker();

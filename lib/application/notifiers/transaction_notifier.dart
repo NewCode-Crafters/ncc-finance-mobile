@@ -5,7 +5,9 @@ import 'package:bytebank/domain/use_cases/transactions/update_transaction_use_ca
 import 'package:bytebank/domain/use_cases/transactions/delete_transaction_use_case.dart';
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
-import 'package:bytebank/core/services/metadata_service.dart';
+import 'package:bytebank/infrastructure/services/metadata_service.dart'
+    as infra;
+import 'package:bytebank/domain/entities/transaction_category.dart';
 
 FinancialTransactionEntity _toEntity(FinancialTransaction t) =>
     FinancialTransactionEntity(
@@ -90,7 +92,7 @@ class TransactionNotifier extends ChangeNotifier {
   final CreateTransactionUseCase _createUseCase;
   final UpdateTransactionUseCase _updateUseCase;
   final DeleteTransactionUseCase _deleteUseCase;
-  final MetadataService _metadataService;
+  final infra.MetadataService _metadataService;
 
   TransactionState _state = TransactionState();
   TransactionState get state => _state;
@@ -108,7 +110,7 @@ class TransactionNotifier extends ChangeNotifier {
     required CreateTransactionUseCase createUseCase,
     required UpdateTransactionUseCase updateUseCase,
     required DeleteTransactionUseCase deleteUseCase,
-    required MetadataService metadataService,
+    required infra.MetadataService metadataService,
   }) : _getUseCase = getUseCase,
        _createUseCase = createUseCase,
        _updateUseCase = updateUseCase,
@@ -227,7 +229,12 @@ class TransactionNotifier extends ChangeNotifier {
 
   Future<List<TransactionCategory>> _metadataServiceGetCategoriesSafe() async {
     try {
-      return await _metadataService.getTransactionCategories();
+      final infraCats = await _metadataService.getTransactionCategories();
+      return infraCats
+          .map(
+            (c) => TransactionCategory(id: c.id, label: c.label, type: c.type),
+          )
+          .toList();
     } catch (_) {
       return [];
     }

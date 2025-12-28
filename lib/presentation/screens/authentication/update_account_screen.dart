@@ -1,7 +1,6 @@
 import 'package:bytebank/core/widgets/app_snackbar.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/core/widgets/custom_text_field.dart';
-import 'package:bytebank/core/widgets/primary_button.dart';
+import 'package:bytebank/presentation/widgets/common/widgets.dart';
 import 'package:bytebank/domain/repositories/auth_repository.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:provider/provider.dart';

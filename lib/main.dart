@@ -1,9 +1,9 @@
 import 'package:bytebank/presentation/screens/transactions/expense_control_screen.dart';
-import 'package:bytebank/core/notifiers/chart_animation_notifier.dart';
+import 'package:bytebank/application/notifiers/chart_animation_notifier.dart';
 import 'package:bytebank/presentation/screens/transactions/view_transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:bytebank/core/services/metadata_service.dart';
+import 'package:bytebank/infrastructure/services/metadata_service.dart';
 import 'package:bytebank/presentation/screens/splash/splash_screen.dart';
 import 'package:bytebank/domain/entities/financial_transaction_entity.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'

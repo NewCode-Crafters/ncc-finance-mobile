@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:bytebank/core/services/image_picker_service.dart';
-import 'package:bytebank/core/widgets/editable_avatar.dart';
+import 'package:bytebank/domain/entities/image_source_type.dart';
+import 'package:bytebank/presentation/widgets/common/widgets.dart';
 import 'package:bytebank/application/notifiers/auth_notifier.dart';
 import 'package:bytebank/presentation/screens/authentication/update_account_screen.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
