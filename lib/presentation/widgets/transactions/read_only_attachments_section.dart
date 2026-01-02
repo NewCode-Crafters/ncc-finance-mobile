@@ -34,12 +34,11 @@ class _ReadOnlyAttachmentsSectionState extends State<ReadOnlyAttachmentsSection>
       );
     } else {
       final uri = Uri.parse(a.downloadUrl);
+      final messenger = ScaffoldMessenger.of(context);
       if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Não foi possível abrir o arquivo.')),
-          );
-        }
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Não foi possível abrir o arquivo.')),
+        );
       }
     }
   }
