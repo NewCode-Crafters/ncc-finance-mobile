@@ -1,3 +1,4 @@
+import 'package:bytebank/presentation/screens/transactions/view_transactions_by_category_screen.dart';
 import 'package:bytebank/presentation/widgets/common/main_app_bar.dart';
 import 'package:bytebank/application/notifiers/chart_animation_notifier.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
@@ -241,7 +242,16 @@ class _ExpenseControlScreenState extends State<ExpenseControlScreen> {
             return ActionCard(
               icon: iconData,
               label: '$label\nR\$ ${(value * -1).toStringAsFixed(2)}',
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ViewTransactionsByCategoryScreen(
+                      categoryId: entry.key,
+                      categoryLabel: label,
+                    ),
+                  ),
+                );
+              },
             );
           },
         ),

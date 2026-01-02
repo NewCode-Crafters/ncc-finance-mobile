@@ -1,3 +1,4 @@
+import 'package:bytebank/presentation/screens/transactions/view_transaction_detail_screen.dart';
 import 'package:bytebank/presentation/widgets/common/app_snackbar.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -55,27 +56,59 @@ class TransactionListItem extends StatelessWidget {
           } else {
             showModalBottomSheet(
               context: context,
-              builder: (context) => Wrap(
-                children: <Widget>[
-                  ListTile(
-                    leading: const Icon(Icons.edit),
-                    title: const Text('Editar Transação'),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      onEdit();
-                    },
+              builder: (context) => SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Wrap(
+                    children: <Widget>[
+                      ListTile(
+                        leading: const Icon(Icons.visibility),
+                        title: const Text('Visualizar Transação'),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => ViewTransactionDetailScreen(transaction: transaction),
+                            ),
+                          );
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.edit),
+                        title: const Text('Editar Transação'),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          onEdit();
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.delete),
+                        title: const Text('Excluir Transação'),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          onDelete();
+                        },
+                      ),
+                      
+
+                    ],
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.delete),
-                    title: const Text('Excluir Transação'),
-                    onTap: () {
-                      Navigator.of(context).pop();
-                      onDelete();
-                    },
-                  ),
-                ],
+                ),
               ),
             );
+          }
+        },
+        onTap: () {
+          if (isReadOnly) {
+             final message = transaction.category == 'INVESTMENT_REDEMPTION'
+                ? 'Transações de resgate de investimento não podem ser editadas ou excluídas.'
+                : 'Transações de investimento são somente para visualização.';
+
+            showAppSnackBar(context, message, AppMessageType.info);
+          } else {
+            final message = 'Clique longo para visualizar, editar ou excluir esta transação, ou você pode deslizar para direita para editar ou para esquerda para excluir.';
+
+            showAppSnackBar(context, message, AppMessageType.info);
           }
         },
         child: ListTile(
