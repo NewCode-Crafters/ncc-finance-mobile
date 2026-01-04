@@ -372,7 +372,7 @@ class TransactionNotifier extends ChangeNotifier {
               primary: AppColors.brandTertiary,
               onPrimary: Colors.white,
               onSurface: Colors.white,
-              secondary: AppColors.lightGreenColor,
+              secondary: Color.fromARGB(121, 198, 224, 174),
             ),
             dialogTheme: const DialogThemeData(
               backgroundColor: AppColors.surfaceDefault,
