@@ -212,6 +212,75 @@ Os testes validam serviços e regras de negócio principais usando mocks e fakes
 - `balance_service_test.dart` → valida cálculos de saldo.
 - `profile_service_test.dart` → verifica o mapeamento de dados do perfil.
 
+## Boas Práticas de Segurança
+
+O Bytebank segue práticas recomendadas de segurança para proteger dados e credenciais dos usuários:
+
+### Autenticação
+
+- **Firebase Authentication**: O app usa Firebase Auth para autenticação por e-mail/senha. Todos os fluxos de autenticação são processados no servidor do Firebase, garantindo que credenciais nunca sejam armazenadas no app.
+- **Gerenciamento de sessão**: Firebase Auth gerencia sessões de forma segura com renovação automática de tokens. Sessões expiram conforme políticas padrão do Firebase.
+
+### Segurança de transporte
+
+- **Somente HTTPS**: Toda comunicação de rede com serviços Firebase (Auth, Firestore, Storage) usa HTTPS por padrão. O app não aceita conexões HTTP em texto plano com backends Firebase.
+- **Validação de certificados**: Os SDKs do Firebase lidam automaticamente com validação de certificados.
+
+### Armazenamento de dados sensíveis
+
+- **Serviço SecureStorage**: O app implementa `ISecureStorage` (localizado em `lib/core/security/`) usando `flutter_secure_storage`. Este serviço armazena dados sensíveis usando:
+  - **iOS**: Keychain com acessibilidade `kSecAttrAccessibleAfterFirstUnlock`.
+  - **Android**: EncryptedSharedPreferences baseado em Keystore com criptografia AES256_GCM.
+- **Casos de uso**: SecureStorage é projetado para dados sensíveis futuros como PINs de usuário, flags biométricas ou tokens de autenticação em cache. Atualmente, a autenticação é totalmente gerenciada pelo Firebase Auth.
+- **Testes**: Uma implementação `FakeSecureStorage` (em `test/fakes/`) permite testes unitários sem dependências reais de plataforma.
+
+### Configuração do Firebase e credenciais
+
+- **Tratamento de arquivos de configuração**: Os arquivos `google-services.json` (Android) e `GoogleService-Info.plist` (iOS) contêm identificadores do projeto Firebase e chaves de API. Estes arquivos:
+  - Estão incluídos no repositório **apenas para fins de avaliação** para simplificar testes para revisores.
+  - **Serão rotacionados** após o período de avaliação. Em produção, estes arquivos devem ser mantidos privados (ex: via secrets de CI/CD ou armazenamento seguro de artefatos).
+- **Rotação de credenciais**: Após a avaliação, as chaves do projeto Firebase serão regeneradas e os arquivos de configuração públicos serão substituídos por templates placeholder.
+
+### Regras de Segurança do Firestore
+
+- **Configuração atual**: O app usa Firebase Firestore para armazenar transações, investimentos e perfis de usuário. As Regras de Segurança do Firestore controlam acesso de leitura/escrita no nível do banco de dados.
+- **Localização das regras**: As Regras de Segurança são configuradas no Console do Firebase (Firestore > aba Rules) ou via arquivo `firestore.rules` se usar deploy via Firebase CLI.
+- **Regras recomendadas**: Certifique-se de que:
+  - Usuários possam ler/escrever apenas seus próprios dados (force verificações de `request.auth.uid`).
+  - Coleções como `transactions`, `profiles` e `investments` sejam escopadas por ID de usuário.
+  - Considere validação em nível de campo (ex: valores de transação devem ser não-negativos).
+- **Exemplo de regra**:
+  ```javascript
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /transactions/{transactionId} {
+        allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      }
+      match /profiles/{userId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+  ```
+  Ajuste essas regras conforme seus requisitos específicos e teste-as no Rules Playground do Console Firebase.
+
+### Tratamento de erros e logs
+
+- **Sem dados sensíveis em logs**: O app evita registrar tokens de autenticação, senhas ou informações pessoais identificáveis (PII).
+- **Erros para usuários**: Erros de autenticação (ex: credenciais inválidas) exibem mensagens genéricas para prevenir vazamento de informações.
+
+### Recomendações adicionais
+
+- **Atualizações de dependências**: Atualize regularmente pacotes relacionados ao Firebase e segurança para corrigir vulnerabilidades conhecidas.
+- **Revisão de código**: Todo código de autenticação e acesso a dados deve ser revisado quanto a problemas de segurança antes do deploy em produção.
+- **Testes de penetração**: Considere auditorias de segurança para releases de produção.
+
+Para mais informações sobre segurança no Firebase:
+- [Firebase Auth Security](https://firebase.google.com/docs/auth/admin/manage-sessions)
+- [Firestore Security Rules](https://firebase.google.com/docs/firestore/security/get-started)
+- [Documentação flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage)
+
 ## Resolução de problemas
 
 - Erros no Firebase: confira se `google-services.json` / `GoogleService-Info.plist` estão corretos.

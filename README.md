@@ -229,6 +229,75 @@ TDD note:
 
 - The core business rules (balance updates, transaction effects, profile mapping) were designed and validated using tests before UI was implemented. This TDD-inspired workflow helped capture edge cases and keep UI code focused on presentation.
 
+## Security Best Practices
+
+Bytebank follows security best practices to protect user data and credentials:
+
+### Authentication
+
+- **Firebase Authentication**: The app uses Firebase Auth for email/password authentication. All authentication flows are handled server-side by Firebase, ensuring credentials are never stored in the app.
+- **Session management**: Firebase Auth manages user sessions securely with automatic token refresh. Sessions expire according to Firebase's default policies.
+
+### Transport security
+
+- **HTTPS only**: All network communication with Firebase services (Auth, Firestore, Storage) uses HTTPS by default. The app does not accept plaintext HTTP connections to Firebase backends.
+- **Certificate pinning**: Firebase SDKs handle certificate validation automatically.
+
+### Sensitive data storage
+
+- **SecureStorage service**: The app implements `ISecureStorage` (located in `lib/core/security/`) backed by `flutter_secure_storage`. This service stores sensitive data using:
+  - **iOS**: Keychain with `kSecAttrAccessibleAfterFirstUnlock` accessibility.
+  - **Android**: Keystore-backed EncryptedSharedPreferences with AES256_GCM encryption.
+- **Use cases**: SecureStorage is designed for future sensitive data like user PINs, biometric flags, or cached authentication tokens. Currently, authentication is fully handled by Firebase Auth.
+- **Testing**: A `FakeSecureStorage` implementation (in `test/fakes/`) allows unit testing without real platform dependencies.
+
+### Firebase configuration and credentials
+
+- **Config file handling**: The files `google-services.json` (Android) and `GoogleService-Info.plist` (iOS) contain Firebase project identifiers and API keys. These files are:
+  - Included in the repository **only for evaluation purposes** to simplify testing for reviewers.
+  - **Will be rotated** after the evaluation period. For production, these files should be kept private (e.g., via CI/CD secrets or secure artifact storage).
+- **Credential rotation**: After evaluation, the Firebase project keys will be regenerated and the public config files will be replaced with placeholder templates.
+
+### Firestore Security Rules
+
+- **Current setup**: The app uses Firebase Firestore for storing transactions, investments, and user profiles. Firestore Security Rules control read/write access at the database level.
+- **Rule location**: Security Rules are configured in the Firebase Console (Firestore > Rules tab) or via `firestore.rules` file if using Firebase CLI deployment.
+- **Recommended rules**: Ensure that:
+  - Users can only read/write their own data (enforce `request.auth.uid` checks).
+  - Collections like `transactions`, `profiles`, and `investments` are scoped by user ID.
+  - Consider adding field-level validation (e.g., transaction amounts must be non-negative).
+- **Example rule snippet**:
+  ```javascript
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /transactions/{transactionId} {
+        allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      }
+      match /profiles/{userId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+  ```
+  Adjust these rules based on your specific requirements and test them in the Firebase Console's Rules Playground.
+
+### Error handling and logging
+
+- **No sensitive data in logs**: The app avoids logging authentication tokens, passwords, or personally identifiable information (PII).
+- **User-facing errors**: Authentication errors (e.g., invalid credentials) display generic messages to prevent information leakage.
+
+### Additional recommendations
+
+- **Dependency updates**: Regularly update Firebase and security-related packages to patch known vulnerabilities.
+- **Code review**: All authentication and data access code should be reviewed for security issues before production deployment.
+- **Penetration testing**: Consider security audits for production releases.
+
+For more information on Firebase security:
+- [Firebase Auth Security](https://firebase.google.com/docs/auth/admin/manage-sessions)
+- [Firestore Security Rules](https://firebase.google.com/docs/firestore/security/get-started)
+- [flutter_secure_storage documentation](https://pub.dev/packages/flutter_secure_storage)
+
 ## Troubleshooting
 
 - Firebase initialization errors: ensure `google-services.json` / `GoogleService-Info.plist` match `firebase_options.dart` or re-run `flutterfire configure`.
