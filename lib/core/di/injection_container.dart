@@ -49,6 +49,8 @@ import 'package:bytebank/application/notifiers/auth_notifier.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:bytebank/application/notifiers/transaction_attachments_notifier.dart';
 import 'package:bytebank/application/notifiers/chart_animation_notifier.dart';
+import 'package:bytebank/core/security/i_secure_storage.dart';
+import 'package:bytebank/infrastructure/services/secure_storage_service.dart';
 
 // This file contains the application's dependency injection container.
 // Call `initializeDependencies()` early in `main()` before running the app.
@@ -66,6 +68,10 @@ Future<void> initializeDependencies() async {
   // Register a singleton of FirebaseFirestore so repositories can use it.
   // If you initialize Firebase in main(), use FirebaseFirestore.instance here.
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
+
+  // -- Secure Storage (Phase 1.1 - Tech Challenge Fase 04)
+  // Register the secure storage service for sensitive data (tokens, pins, etc.)
+  sl.registerLazySingleton<ISecureStorage>(() => SecureStorageService());
 
   // -- Authentication infra: data source and repository
   sl.registerLazySingleton<FirebaseAuthDataSource>(
