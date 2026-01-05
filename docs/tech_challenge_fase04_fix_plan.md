@@ -355,7 +355,7 @@ Executar após cada fase:
 - ✅ Mudança: `value` → `initialValue` em `DropdownButtonFormField`
 - ✅ Validação: `flutter analyze` → **0 issues** (7.7s)
 - ✅ Validação: `flutter test` → **134/134 pass** (16s)
-- ✅ Commit: TBD (próximo passo)
+- ✅ Commit: `5853cc8` - "fix: corrige deprecated_member_use warnings"
 - 📋 Próxima ação: FASE 1 (Segurança Imediata)
 
 ### [DATA] - FASE 1: Segurança
