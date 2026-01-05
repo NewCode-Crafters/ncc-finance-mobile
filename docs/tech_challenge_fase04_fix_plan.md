@@ -59,13 +59,13 @@ Dart 3.9.2 • DevTools 2.48.0
 
 ## 🚀 PLANO DE EXECUÇÃO POR FASE
 
-### 📌 **PRÉ-FASE: Correções Rápidas (30 min)**
+### 📌 **PRÉ-FASE: Correções Rápidas (30 min)** ✅ CONCLUÍDA
 **Objetivo**: Limpar warnings do `flutter analyze`
 
-- [ ] **PR-1**: Fix `deprecated_member_use` warnings
+- [x] **PR-1**: Fix `deprecated_member_use` warnings
   - Substituir `value` por `initialValue` nos 3 arquivos
-  - Validação: `flutter analyze` deve retornar 0 issues
-  - Testes: `flutter test` deve continuar 100% pass
+  - Validação: `flutter analyze` deve retornar 0 issues ✅
+  - Testes: `flutter test` deve continuar 100% pass ✅
 
 ---
 
@@ -345,11 +345,18 @@ Executar após cada fase:
 - ✅ Status git: 2 arquivos untracked (relatórios)
 - 📋 Próxima ação: Corrigir warnings do analyze (PRÉ-FASE)
 
-### [DATA] - PRÉ-FASE: Correções Rápidas
-- [ ] Status: Pendente
-- [ ] Branch: `fix/tech-challenge-fase04`
-- [ ] Commit: TBD
-- [ ] Notas: ...
+### 04/01/2026 - PRÉ-FASE: Correções Rápidas (CONCLUÍDA)
+- ✅ Status: **COMPLETO**
+- ✅ Branch: `fix/tech-challenge-fase04`
+- ✅ Arquivos alterados (3):
+  - `lib/presentation/screens/investments/create_investment_screen.dart`
+  - `lib/presentation/screens/transactions/create_transaction_screen.dart`
+  - `lib/presentation/screens/transactions/edit_transaction_screen.dart`
+- ✅ Mudança: `value` → `initialValue` em `DropdownButtonFormField`
+- ✅ Validação: `flutter analyze` → **0 issues** (7.7s)
+- ✅ Validação: `flutter test` → **134/134 pass** (16s)
+- ✅ Commit: TBD (próximo passo)
+- 📋 Próxima ação: FASE 1 (Segurança Imediata)
 
 ### [DATA] - FASE 1: Segurança
 - [ ] Status: Pendente
