@@ -73,13 +73,10 @@ Visualização do repositório:
 ├── ios/
 ├── lib/
 │   ├── core/                # constantes, widgets, serviços, utilitários, validadores
-│   ├── features/            # módulos de funcionalidades: autenticação, dashboard, transações, investimentos, perfil, splash, pokemons
-│   │   ├── authentication/
-│   │   ├── dashboard/
-│   │   ├── transactions/
-│   │   ├── investments/
-│   │   ├── profile/
-│   │   └── splash/
+│   ├── domain/              # entidades, objetos de valor, interfaces de repositório e casos de uso do domínio
+│   ├── application/         # notifiers, controladores e casos de uso para apresentação
+│   ├── infrastructure/      # implementações: data-sources, repositórios, mapeadores e DTOs
+│   ├── presentation/        # telas, widgets, roteamento e código de UI
 │   ├── firebase_options.dart # configuração gerada do Firebase
 │   ├── main.dart             # ponto de entrada do app + registro do Provider
 │   └── theme/
@@ -92,8 +89,11 @@ Visualização do repositório:
 
 Descrição resumida:
 
-- `lib/core/` – utilitários, modelos, validadores e widgets compartilhados.
-- `lib/features/` – pastas com funcionalidades contendo telas, serviços, notifiers e modelos.
+- `lib/core/` – utilitários, modelos, validadores e widgets compartilhados usados pelo app.
+- `lib/domain/` – Entidades, objetos de valor, interfaces de repositório e casos de uso ao nível de domínio (lógica de negócio pura).
+- `lib/application/` – Notifiers, controladores e casos de uso que orquestram a lógica de domínio para a camada de apresentação.
+- `lib/infrastructure/` – Implementações: data-sources, repositórios, DTOs, mapeadores e clientes remotos.
+- `lib/presentation/` – Widgets, telas, roteamento, tema e código específico de UI.
 - `lib/firebase_options.dart` – gerado pelo FlutterFire; mantenha em sincronia com seu projeto Firebase.
 
 ## Primeiros passos
@@ -143,11 +143,11 @@ O projeto usa **Codemagic** (https://codemagic.io) para integração e entrega c
 
 ### Visão geral dos pipelines
 
-| Workflow           | Gatilho                                                                  | Finalidade                                                                                                     |
-| ------------------ | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `DEV-WORKFLOW`     | Pull requests com prefixos `task/`, `fix/`, `enhancement/`              | Executa build/test para validar PRs antes da revisão.                                                          |
-| `HOMOLOG-WORKFLOW` | Pull requests da branch `dev`                                           | Gera artefatos (.apk) para QA/Homolog e distribui via Firebase App Distribution.                              |
-| `PROD-WORKFLOW`    | Pushes para `main` ou tags de release                                   | Cria builds de produção e inicia distribuição.                                                                |
+| Workflow           | Gatilho                                                    | Finalidade                                                                       |
+| ------------------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `DEV-WORKFLOW`     | Pull requests com prefixos `task/`, `fix/`, `enhancement/` | Executa build/test para validar PRs antes da revisão.                            |
+| `HOMOLOG-WORKFLOW` | Pull requests da branch `dev`                              | Gera artefatos (.apk) para QA/Homolog e distribui via Firebase App Distribution. |
+| `PROD-WORKFLOW`    | Pushes para `main` ou tags de release                      | Cria builds de produção e inicia distribuição.                                   |
 
 ## Comandos disponíveis
 
@@ -185,32 +185,37 @@ flutter run -d <device-id>
 
 ## Pacotes principais
 
-| Pacote                                                   | Finalidade                                                                   |
-| -------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `firebase_core`                                          | Inicializa e configura o Firebase.                                            |
-| `firebase_auth`                                          | Autenticação por e-mail/senha.                                                |
-| `cloud_firestore`                                        | Banco de dados NoSQL principal.                                               |
-| `firebase_storage`                                       | Armazena e serve imagens de usuários.                                         |
-| `provider`                                               | Gerenciamento de estado.                                                      |
-| `fl_chart`                                               | Renderiza gráficos no dashboard.                                              |
-| `image_picker`                                           | Seleção de imagens da câmera/galeria.                                         |
-| `intl`                                                   | Localização de datas e números.                                               |
-| `flutter_localizations`                                  | Delegates nativos de localização do Flutter.                                  |
-| `http`                                                   | Cliente HTTP para chamadas externas.                                          |
-| `equatable`                                              | Comparação simplificada entre modelos.                                        |
-| `flutter_native_splash`                                  | Gera telas de splash nativas.                                                |
-| `flutter_launcher_icons`                                 | Gera ícones de inicialização.                                                |
-| `mockito`, `fake_cloud_firestore`, `firebase_auth_mocks` | Utilitários para testes unitários.                                            |
-| `build_runner`                                           | Ferramentas de geração de código.                                            |
-| `flutter_lints`                                          | Regras de lint recomendadas.                                                 |
+| Pacote                                                   | Finalidade                                   |
+| -------------------------------------------------------- | -------------------------------------------- |
+| `firebase_core`                                          | Inicializa e configura o Firebase.           |
+| `firebase_auth`                                          | Autenticação por e-mail/senha.               |
+| `cloud_firestore`                                        | Banco de dados NoSQL principal.              |
+| `firebase_storage`                                       | Armazena e serve imagens de usuários.        |
+| `provider`                                               | Gerenciamento de estado.                     |
+| `fl_chart`                                               | Renderiza gráficos no dashboard.             |
+| `image_picker`                                           | Seleção de imagens da câmera/galeria.        |
+| `intl`                                                   | Localização de datas e números.              |
+| `flutter_localizations`                                  | Delegates nativos de localização do Flutter. |
+| `http`                                                   | Cliente HTTP para chamadas externas.         |
+| `equatable`                                              | Comparação simplificada entre modelos.       |
+| `flutter_native_splash`                                  | Gera telas de splash nativas.                |
+| `flutter_launcher_icons`                                 | Gera ícones de inicialização.                |
+| `mockito`, `fake_cloud_firestore`, `firebase_auth_mocks` | Utilitários para testes unitários.           |
+| `build_runner`                                           | Ferramentas de geração de código.            |
+| `flutter_lints`                                          | Regras de lint recomendadas.                 |
 
 ## Testes unitários
 
-Os testes validam serviços e regras de negócio principais usando mocks e fakes do Firebase.
+Os testes validam serviços e regras de negócio principais usando `fake_cloud_firestore`, `firebase_auth_mocks` e `mockito` para isolar lógica do Firebase e de serviços externos.
 
-- `financial_transaction_service_test.dart` → cria, lista e edita transações.
-- `balance_service_test.dart` → valida cálculos de saldo.
-- `profile_service_test.dart` → verifica o mapeamento de dados do perfil.
+Exemplos de organização dos testes:
+
+- `test/application/notifiers/` — testes de `ChangeNotifier` (ex.: `auth_notifier_test.dart`, `transaction_notifier_test.dart`).
+- `test/domain/entities/` — testes de entidades/objetos de valor (ex.: `transaction_category_test.dart`).
+- `test/infrastructure/mappers/` — testes de mapeadores DTO ↔ domínio (ex.: `financial_transaction_mapper_test.dart`).
+- `test/infrastructure/repositories/` — testes de repositório usando Firestore falso para validar lógica de persistência.
+
+O projeto adota uma mentalidade orientada a testes quando prático; a suíte visa cobrir notifiers, casos de uso, mapeadores, repositórios e entidades de domínio para capturar cenários e evitar regressões. Veja a pasta `test/` para a lista completa de casos de teste.
 
 ## Resolução de problemas
 
@@ -219,12 +224,12 @@ Os testes validam serviços e regras de negócio principais usando mocks e fakes
 
 ## Autores
 
-| Nome              | Perfil GitHub                                      |
-| ----------------- | -------------------------------------------------- |
-| Carlos Ferreira   | [@carlosrfjrdev](https://github.com/carlosrfjrdev) |
-| Joelton Matos     | [@joeltonmats](https://github.com/joeltonmats)     |
-| Larissa Rocha     | [@larisr](https://github.com/larisr)               |
-| Leonardo Medeiros | [@leomartinsm](https://github.com/leomartinsm)     |
+| Nome              | Perfil GitHub                                        |
+| ----------------- | ---------------------------------------------------- |
+| Carlos Ferreira   | [@carlosrfjrdev](https://github.com/carlosrfjrdev)   |
+| Joelton Matos     | [@joeltonmats](https://github.com/joeltonmats)       |
+| Larissa Rocha     | [@larisr](https://github.com/larisr)                 |
+| Leonardo Medeiros | [@leomartinsm](https://github.com/leomartinsm)       |
 | Ricardo Momberg   | [@ricardomomberg](https://github.com/RicardoMomberg) |
 
 ## Links externos

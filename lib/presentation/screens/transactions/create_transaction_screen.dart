@@ -372,7 +372,7 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
                   ),
                   const SizedBox(height: 24),
                   DropdownButtonFormField<TransactionCategory>(
-                    value: safeSelected,
+                    initialValue: safeSelected,
                     hint: const Text(
                       'Selecione uma categoria',
                       style: TextStyle(color: AppColors.textSubtle),
