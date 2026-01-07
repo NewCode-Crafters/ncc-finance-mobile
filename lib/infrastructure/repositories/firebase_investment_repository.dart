@@ -9,6 +9,7 @@ import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction
 import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
 import 'package:bytebank/domain/entities/financial_transaction.dart';
+import 'package:bytebank/infrastructure/data_sources/local/hive_transaction_cache_data_source.dart';
 
 class FirebaseInvestmentRepository implements IInvestmentRepository {
   final FirebaseFirestore _firestore;
@@ -27,6 +28,7 @@ class FirebaseInvestmentRepository implements IInvestmentRepository {
              dataSource: FirebaseTransactionDataSource(
                firestore: firestore ?? FirebaseFirestore.instance,
              ),
+             cacheDataSource: HiveTransactionCacheDataSource(),
              mapper: const FinancialTransactionMapper(),
              currentUserId: null,
            );

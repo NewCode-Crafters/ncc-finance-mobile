@@ -7,6 +7,7 @@ import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dar
 import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
 import 'package:flutter_test/flutter_test.dart';
+import '../../fakes/fake_hive_transaction_cache_data_source.dart';
 
 class _FakeDataSource implements FirebaseTransactionDataSource {
   String? lastCreateUserId;
@@ -154,6 +155,7 @@ void main() {
       final fake = _FakeDataSource();
       final repo = FirebaseTransactionRepository(
         dataSource: fake as dynamic,
+        cacheDataSource: FakeHiveTransactionCacheDataSource(),
         mapper: mapper,
         currentUserId: userId,
       );
@@ -182,6 +184,7 @@ void main() {
       final fake = _FakeDataSource();
       final repo = FirebaseTransactionRepository(
         dataSource: fake as dynamic,
+        cacheDataSource: FakeHiveTransactionCacheDataSource(),
         mapper: mapper,
         currentUserId: userId,
       );
@@ -205,6 +208,7 @@ void main() {
       final fake = _FakeDataSource();
       final repo = FirebaseTransactionRepository(
         dataSource: fake as dynamic,
+        cacheDataSource: FakeHiveTransactionCacheDataSource(),
         mapper: mapper,
         currentUserId: userId,
       );
@@ -228,6 +232,7 @@ void main() {
 
       final repo = FirebaseTransactionRepository(
         dataSource: fake as dynamic,
+        cacheDataSource: FakeHiveTransactionCacheDataSource(),
         mapper: mapper,
         currentUserId: userId,
       );
@@ -255,6 +260,7 @@ void main() {
 
       final repo = FirebaseTransactionRepository(
         dataSource: fake as dynamic,
+        cacheDataSource: FakeHiveTransactionCacheDataSource(),
         mapper: mapper,
         currentUserId: userId,
       );
@@ -293,6 +299,7 @@ void main() {
 
       final repo = FirebaseTransactionRepository(
         dataSource: fake as dynamic,
+        cacheDataSource: FakeHiveTransactionCacheDataSource(),
         mapper: mapper,
         currentUserId: userId,
       );

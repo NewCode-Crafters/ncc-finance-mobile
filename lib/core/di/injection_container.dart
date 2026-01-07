@@ -9,8 +9,10 @@ import 'package:bytebank/domain/use_cases/transactions/upload_attachment_use_cas
 import 'package:bytebank/domain/use_cases/transactions/watch_attachments_use_case.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_auth_data_source.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_attachment_data_source.dart';
+import 'package:bytebank/infrastructure/data_sources/local/hive_transaction_cache_data_source.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_attachment_repository.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_auth_repository.dart';
+import 'package:bytebank/core/cache/cache_policy.dart';
 import 'package:get_it/get_it.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -89,6 +91,15 @@ Future<void> initializeDependencies() async {
 
   sl.registerLazySingleton<MetadataService>(() => MetadataService());
 
+  // -- Cache infrastructure (Phase 2 - Tech Challenge Fase 04)
+  // Register cache data source for local transactions storage
+  sl.registerLazySingleton<HiveTransactionCacheDataSource>(
+    () => HiveTransactionCacheDataSource()..initialize(),
+  );
+
+  // Register cache policy with default TTL (5 minutes)
+  sl.registerLazySingleton<CachePolicy>(() => const CachePolicy());
+
   // -- Transaction infrastructure
   sl.registerLazySingleton<FirebaseTransactionDataSource>(
     () => FirebaseTransactionDataSource(firestore: sl<FirebaseFirestore>()),
@@ -97,7 +108,9 @@ Future<void> initializeDependencies() async {
   sl.registerLazySingleton<FirebaseTransactionRepository>(
     () => FirebaseTransactionRepository(
       dataSource: sl<FirebaseTransactionDataSource>(),
+      cacheDataSource: sl<HiveTransactionCacheDataSource>(),
       mapper: sl<FinancialTransactionMapper>(),
+      cachePolicy: sl<CachePolicy>(),
       currentUserId: null,
     ),
   );

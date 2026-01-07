@@ -3,6 +3,7 @@ import 'package:bytebank/application/notifiers/chart_animation_notifier.dart';
 import 'package:bytebank/presentation/screens/transactions/view_transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:bytebank/core/bootstrap/local_storage_initializer.dart';
 import 'package:bytebank/infrastructure/services/metadata_service.dart';
 import 'package:bytebank/presentation/screens/splash/splash_screen.dart';
 import 'package:bytebank/domain/entities/financial_transaction.dart';
@@ -36,8 +37,17 @@ import 'package:bytebank/application/notifiers/balance_notifier.dart'
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  
+  // Initialize local storage (Hive)
+  await LocalStorageInitializer.initialize();
+  
+  // Initialize dependencies (DI)
   await initializeDependencies();
+  
+  // Initialize date formatting
   await initializeDateFormatting('pt_BR', '');
 
   runApp(const MyApp());

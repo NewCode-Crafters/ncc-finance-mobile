@@ -49,6 +49,18 @@ class FinancialTransactionDTO {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
+      'amount': amount,
+      'balanceId': balanceId,
+      'category': category,
+      'date': date.toIso8601String(), // Use ISO string for cache (not Timestamp)
+      'description': description,
+    };
+  }
+
+  /// Returns a map suitable for Firestore `set`/`update` operations.
+  Map<String, dynamic> toFirestore() {
+    return {
       'amount': amount,
       'balanceId': balanceId,
       'category': category,
@@ -56,9 +68,6 @@ class FinancialTransactionDTO {
       'description': description,
     };
   }
-
-  /// Returns a map suitable for Firestore `set`/`update` operations.
-  Map<String, dynamic> toFirestore() => toMap();
 
   FinancialTransactionDTO copyWith({
     String? id,

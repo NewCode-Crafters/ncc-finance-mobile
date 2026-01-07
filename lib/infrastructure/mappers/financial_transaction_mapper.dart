@@ -18,4 +18,12 @@ class FinancialTransactionMapper {
       description: entity.description,
     );
   }
+
+  /// Create DTO from JSON map (used for cache deserialization).
+  FinancialTransactionDTO fromJson(Map<String, dynamic> json) {
+    return FinancialTransactionDTO.fromMap(
+      json['id'] as String? ?? '',
+      json,
+    );
+  }
 }

@@ -5,12 +5,14 @@ import 'package:bytebank/domain/entities/investment.dart';
 import 'package:bytebank/infrastructure/repositories/firebase_transaction_repository.dart';
 import 'package:bytebank/infrastructure/data_sources/remote/firebase_transaction_data_source.dart';
 import 'package:bytebank/infrastructure/mappers/financial_transaction_mapper.dart';
+import '../../fakes/fake_hive_transaction_cache_data_source.dart';
 
 void main() {
   test('create/get/delete investment flows', () async {
     final fakeFs = FakeFirebaseFirestore();
     final txRepo = FirebaseTransactionRepository(
       dataSource: FirebaseTransactionDataSource(firestore: fakeFs),
+      cacheDataSource: FakeHiveTransactionCacheDataSource(),
       mapper: const FinancialTransactionMapper(),
       currentUserId: 'u1',
     );
