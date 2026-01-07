@@ -54,6 +54,8 @@ import 'package:bytebank/application/notifiers/chart_animation_notifier.dart';
 import 'package:bytebank/core/security/i_secure_storage.dart';
 import 'package:bytebank/infrastructure/services/secure_storage_service.dart';
 import 'package:bytebank/application/core/post_login_data_bootstrapper.dart';
+import 'package:bytebank/core/services/i_connectivity_service.dart';
+import 'package:bytebank/infrastructure/services/connectivity_service.dart';
 
 // This file contains the application's dependency injection container.
 // Call `initializeDependencies()` early in `main()` before running the app.
@@ -75,6 +77,10 @@ Future<void> initializeDependencies() async {
   // -- Secure Storage (Phase 1.1 - Tech Challenge Fase 04)
   // Register the secure storage service for sensitive data (tokens, pins, etc.)
   sl.registerLazySingleton<ISecureStorage>(() => SecureStorageService());
+
+  // -- Connectivity Service (Phase 3.2 - Tech Challenge Fase 04)
+  // Register connectivity service to monitor network status
+  sl.registerLazySingleton<IConnectivityService>(() => ConnectivityService());
 
   // -- Authentication infra: data source and repository
   sl.registerLazySingleton<FirebaseAuthDataSource>(

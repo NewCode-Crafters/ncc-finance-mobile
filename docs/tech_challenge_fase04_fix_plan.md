@@ -196,24 +196,63 @@ Dart 3.9.2 • DevTools 2.48.0
 - `Future.wait` com `eagerError: false` para paralelização sem interrupção precoce
 - Guard `_lastUserId != user.uid` no auth_wrapper para evitar re-execução desnecessária
 
-#### F3.2: Indicador de Conectividade
-- [ ] Adicionar dependência `connectivity_plus: ^6.0.0`
-- [ ] Criar `lib/core/services/connectivity_service.dart`
-- [ ] Adicionar listener global de conectividade
-- [ ] Mostrar banner amarelo quando offline: "Modo offline, mostrando dados salvos"
-- [ ] Ocultar banner quando online
+#### F3.2: Indicador de Conectividade ✅ CONCLUÍDA
+- [x] Adicionar dependência `connectivity_plus: ^6.0.0`
+- [x] Criar interface `lib/core/services/i_connectivity_service.dart`:
+  - Stream<bool> `isConnected` (true = online, false = offline)
+  - bool? `currentStatus` (status síncrono atual)
+  - void `dispose()` (limpeza de recursos)
+- [x] Criar implementação `lib/infrastructure/services/connectivity_service.dart`:
+  - Usa `connectivity_plus` para monitorar status de rede
+  - Considera wifi, mobile e ethernet como "conectado"
+  - Stream broadcast para múltiplos listeners
+  - Tratamento de erros com fallback otimista (assume online)
+- [x] Criar `test/fakes/fake_connectivity_service.dart`:
+  - Fake testável com método `setConnected(bool)` para simular mudanças
+  - Emite status inicial via microtask (simula comportamento async)
+- [x] Registrar no DI (`lib/core/di/injection_container.dart`):
+  ```dart
+  sl.registerLazySingleton<IConnectivityService>(() => ConnectivityService());
+  ```
+- [x] Criar widget `lib/presentation/widgets/connectivity_banner.dart`:
+  - StreamBuilder que escuta `isConnected`
+  - Banner amarelo (Colors.amber) com ícone `cloud_off`
+  - Mensagem: "Modo offline, mostrando dados salvos"
+  - Banner aparece apenas quando offline (Column com conditional rendering)
+- [x] Integrar no app (`lib/main.dart`):
+  - Usa MaterialApp `builder` para envolver todas as telas
+  - ConnectivityBanner obtém service via DI (`sl<IConnectivityService>()`)
+  - Banner global aparece em todas as rotas
+- [x] Criar testes unitários:
+  - `test/infrastructure/services/connectivity_service_test.dart`: Smoke tests (2 testes)
+  - `test/presentation/widgets/connectivity_banner_test.dart`: Widget tests completos (5 testes)
+    * Banner oculto quando online ✅
+    * Banner visível quando offline ✅
+    * Banner aparece ao perder conectividade ✅
+    * Banner desaparece ao restaurar conectividade ✅
+    * Banner tem estilo correto (amber background) ✅
+- [x] Validar: `flutter analyze` → **2 info** (avoid_dynamic_calls - esperado)
+- [x] Validar: `flutter test` → **173/173 pass** (+7 novos testes, 21s)
+- **Commit**: `[pending]` - feat(connectivity): add offline indicator with connectivity_plus
 
-**Critério de Aceite F3.1**:
-- ✅ Dashboard carrega mais rápido (dados pré-carregados)
-- ✅ Bootstrapper executa uma única vez por userId
-- ✅ Testes unitários cobrem todos os casos de uso (7 testes)
-- ⏳ Indicador de conectividade (F3.2 pendente)
-- ⏳ UX clara sobre modo offline (F3.2 pendente)
+**Arquitetura Implementada:**
+- Interface abstrata no `core/services` (Clean Architecture)
+- Implementação concreta na `infrastructure/services`
+- Fake testável em `test/fakes` (sem dependência do plugin)
+- Widget de apresentação na `presentation/widgets`
+- Integração global via MaterialApp builder
+
+**Benefícios Entregues:**
+- ✅ Feedback visual claro quando offline
+- ✅ Banner não-intrusivo (não bloqueia interação)
+- ✅ Funciona globalmente em todas as telas
+- ✅ 100% testável sem dependências de plataforma
+- ✅ Usa cache do Hive (implementado na FASE 2) para dados offline
 
 **Critério de Aceite F3.2**:
-- [ ] Indicador de conectividade visível
-- [ ] Banner offline aparece/desaparece corretamente
-- [ ] UX clara sobre modo offline
+- ✅ Indicador de conectividade visível
+- ✅ Banner offline aparece/desaparece corretamente
+- ✅ UX clara sobre modo offline
 
 ---
 
@@ -441,6 +480,70 @@ _(Atualizar conforme o projeto avança)_
 - ✅ Exemplo prático de Firestore Rules incluído
 
 **Próximo Passo**: FASE 2.1 - Implementar cache local com Hive
+
+### 06/01/2026 22:45 - FASE 3.2 CONCLUÍDA ✅
+**Commit**: `[pending]` - feat(connectivity): add offline indicator with connectivity_plus
+
+**Objetivo**: Adicionar indicador visual de conectividade (online/offline) com banner global
+
+**Arquivos Criados:**
+- `lib/core/services/i_connectivity_service.dart` - Interface abstrata para monitoramento de conectividade
+- `lib/infrastructure/services/connectivity_service.dart` - Implementação com connectivity_plus
+- `lib/presentation/widgets/connectivity_banner.dart` - Widget de banner offline
+- `test/fakes/fake_connectivity_service.dart` - Fake testável para testes
+- `test/infrastructure/services/connectivity_service_test.dart` - 2 smoke tests
+- `test/presentation/widgets/connectivity_banner_test.dart` - 5 widget tests
+
+**Arquivos Modificados:**
+- `pubspec.yaml` - Adicionado `connectivity_plus: ^6.0.0`
+- `lib/core/di/injection_container.dart` - Registrado `IConnectivityService` como lazy singleton
+- `lib/main.dart` - Integrado ConnectivityBanner via MaterialApp builder
+
+**Implementação Técnica:**
+- **Interface**: `Stream<bool> isConnected`, `bool? currentStatus`, `void dispose()`
+- **ConnectivityService**:
+  - Usa `connectivity_plus` para monitorar wifi/mobile/ethernet
+  - Stream broadcast para múltiplos listeners
+  - Tratamento de erros com fallback otimista (assume online)
+  - Atualiza status apenas quando muda (evita emissões duplicadas)
+- **ConnectivityBanner**:
+  - StreamBuilder com `initialData` do `currentStatus`
+  - Banner amarelo (Colors.amber) com ícone `cloud_off`
+  - Mensagem: "Modo offline, mostrando dados salvos"
+  - Usa Column com conditional rendering (banner aparece apenas offline)
+- **Integração Global**:
+  - MaterialApp `builder` envolve todas as telas
+  - Service obtido via DI (`sl<IConnectivityService>()`)
+
+**Testes Unitários (7 casos):**
+1. ✅ ConnectivityService: smoke test de instanciação
+2. ✅ ConnectivityService: verifica interface
+3. ✅ Banner oculto quando online
+4. ✅ Banner visível quando offline
+5. ✅ Banner aparece ao perder conectividade
+6. ✅ Banner desaparece ao restaurar conectividade
+7. ✅ Banner tem estilo correto (amber background)
+
+**Resultados:**
+- ✅ `flutter analyze`: 2 info (avoid_dynamic_calls - esperado)
+- ✅ `flutter test`: 173 testes (+7 novos), 100% pass (21s)
+- ✅ Arquitetura mantida: interface no `core`, implementação na `infrastructure`
+- ✅ DI configurado: service singleton global
+- ✅ Widget testado: 100% cobertura de comportamento
+
+**Benefícios Entregues:**
+- 📡 Feedback visual claro quando usuário está offline
+- 🎨 Banner não-intrusivo (não bloqueia interação)
+- 🌐 Funciona globalmente em todas as telas
+- ✅ 100% testável sem dependências de plataforma
+- 💾 Complementa cache do Hive (FASE 2) - usuário vê dados salvos offline
+
+**Integração com Cache (FASE 2):**
+- Cache híbrido (Hive) já implementado para Transactions
+- Banner informa usuário que está vendo dados do cache local
+- UX consistente: offline não é erro, é funcionalidade
+
+**Próximo Passo**: FASE 4 (opcional) - Migração para BLoC (longo prazo)
 
 ### 04/01/2026 20:30 - FASE 1.1 CONCLUÍDA ✅
 **Commit**: `f3b82d5` - feat(security): add flutter_secure_storage with clean architecture

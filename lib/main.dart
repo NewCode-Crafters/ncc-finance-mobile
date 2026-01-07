@@ -31,6 +31,8 @@ import 'package:bytebank/presentation/screens/profile/my_profile_screen.dart';
 import 'package:bytebank/presentation/screens/onboarding/onboarding_carousel_screen.dart';
 import 'package:bytebank/firebase_options.dart';
 import 'package:bytebank/presentation/theme/theme.dart';
+import 'package:bytebank/presentation/widgets/connectivity_banner.dart';
+import 'package:bytebank/core/services/i_connectivity_service.dart';
 import 'core/di/injection_container.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
@@ -96,6 +98,13 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Bytebank',
         theme: appTheme,
+        // Wrap all screens with ConnectivityBanner
+        builder: (context, child) {
+          return ConnectivityBanner(
+            connectivityService: sl<IConnectivityService>(),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
         localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
