@@ -190,19 +190,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ActionCard(
                   icon: Icons.swap_horiz,
                   label: 'Fazer uma\ntransação',
-                  onTap: () {
-                    Navigator.of(
+                  onTap: () async {
+                    final balanceNotifier = context.read<app_balance.BalanceNotifier>();
+                    await Navigator.of(
                       context,
                     ).pushNamed(CreateTransactionScreen.routeName);
+                    // Refresh data after returning from transaction creation
+                    final userId = FirebaseAuth.instance.currentUser?.uid;
+                    if (userId != null && mounted) {
+                      await balanceNotifier.fetchBalances(
+                        userId: userId,
+                      );
+                    }
                   },
                 ),
                 ActionCard(
                   icon: Icons.bar_chart,
                   label: 'Fazer um\ninvestimento',
-                  onTap: () {
-                    Navigator.of(
+                  onTap: () async {
+                    final balanceNotifier = context.read<app_balance.BalanceNotifier>();
+                    await Navigator.of(
                       context,
                     ).pushNamed(CreateInvestmentScreen.routeName);
+                    // Refresh data after returning from investment creation
+                    final userId = FirebaseAuth.instance.currentUser?.uid;
+                    if (userId != null && mounted) {
+                      await balanceNotifier.fetchBalances(
+                        userId: userId,
+                      );
+                    }
                   },
                 ),
                 ActionCard(

@@ -18,7 +18,8 @@ class TransactionsScreen extends StatefulWidget {
   State<TransactionsScreen> createState() => _TransactionsScreenState();
 }
 
-class _TransactionsScreenState extends State<TransactionsScreen> {
+class _TransactionsScreenState extends State<TransactionsScreen>
+    with WidgetsBindingObserver {
   final _searchController = TextEditingController();
   Timer? _searchDebounce;
   late final app_notifier.TransactionNotifier _transactionNotifier;
@@ -31,6 +32,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     _transactionNotifier = context.read<app_notifier.TransactionNotifier>();
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
+
+    // Add lifecycle observer to detect when app/screen resumes
+    WidgetsBinding.instance.addObserver(this);
 
     _searchController.addListener(() {
       final text = _searchController.text;
@@ -57,7 +61,22 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // Refresh when app comes back to foreground
+    if (state == AppLifecycleState.resumed) {
+      Future.microtask(() => _fetchData());
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _searchDebounce?.cancel();
     _searchController.dispose();
     _transactionNotifier.resetFilters();
