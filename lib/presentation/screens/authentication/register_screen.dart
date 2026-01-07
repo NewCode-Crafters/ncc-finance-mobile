@@ -92,11 +92,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         topRight: Radius.circular(150),
                       ),
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
                           padding: EdgeInsets.only(
                             top: compact ? 28 : 50,
                             right: 20,
@@ -151,7 +152,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ],
                             ),
                           ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

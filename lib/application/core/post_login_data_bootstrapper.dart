@@ -1,17 +1,20 @@
+import 'package:bytebank/application/notifiers/balance_notifier.dart';
+import 'package:bytebank/application/notifiers/profile_notifier.dart';
+
 /// Bootstraps critical data after user authentication.
 ///
 /// Executes ONE time per userId to pre-load balances and profile,
 /// preventing redundant fetches during rebuilds or hot reloads.
 class PostLoginDataBootstrapper {
-  final dynamic _balanceNotifier;
-  final dynamic _profileNotifier;
+  final BalanceNotifier _balanceNotifier;
+  final ProfileNotifier _profileNotifier;
 
   String? _lastBootstrappedUserId;
   bool _isBootstrapping = false;
 
   PostLoginDataBootstrapper({
-    required dynamic balanceNotifier,
-    required dynamic profileNotifier,
+    required BalanceNotifier balanceNotifier,
+    required ProfileNotifier profileNotifier,
   })  : _balanceNotifier = balanceNotifier,
         _profileNotifier = profileNotifier;
 
@@ -40,8 +43,8 @@ class PostLoginDataBootstrapper {
       // to ensure both futures complete even if one fails)
       await Future.wait<void>(
         [
-          _balanceNotifier.fetchBalances(userId: userId) as Future<void>,
-          _profileNotifier.fetchUserProfile(userId: userId) as Future<void>,
+          _balanceNotifier.fetchBalances(userId: userId),
+          _profileNotifier.fetchUserProfile(userId: userId),
         ],
         eagerError: false,
       );

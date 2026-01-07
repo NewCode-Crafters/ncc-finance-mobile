@@ -1,12 +1,87 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/foundation.dart';
 import 'package:bytebank/application/core/post_login_data_bootstrapper.dart';
+import 'package:bytebank/application/notifiers/balance_notifier.dart';
+import 'package:bytebank/application/notifiers/profile_notifier.dart';
+import 'package:bytebank/domain/use_cases/balances/get_balances_use_case.dart';
+import 'package:bytebank/domain/use_cases/balances/update_balance_use_case.dart';
+import 'package:bytebank/domain/use_cases/profile/get_user_profile_use_case.dart';
+import 'package:bytebank/domain/use_cases/profile/pick_and_upload_profile_picture_use_case.dart';
+import 'package:bytebank/domain/repositories/balance_repository.dart';
+import 'package:bytebank/domain/repositories/user_repository.dart';
+import 'package:bytebank/domain/entities/balance.dart';
+import 'package:bytebank/domain/entities/user_profile.dart';
+import 'package:bytebank/domain/entities/image_source_type.dart';
+import 'dart:typed_data';
+
+// Dummy repositories for testing
+class _DummyBalanceRepository implements IBalanceRepository {
+  @override
+  Future<Balance> createBalance({required String userId, required Balance balance}) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Balance> getBalanceById({required String userId, required String balanceId}) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Balance>> getBalances({required String userId}) async {
+    return [];
+  }
+
+  @override
+  Stream<List<Balance>> listenBalances({required String userId}) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Balance> updateBalance({required String userId, required Balance balance}) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updateBalanceByDelta({
+    required String userId,
+    required String balanceId,
+    required double delta,
+    Object? batch,
+  }) async {}
+}
+
+class _DummyUserRepository implements IUserRepository {
+  @override
+  Future<UserProfile?> getUserProfile({required String userId}) async {
+    return null;
+  }
+
+  @override
+  Future<String> uploadAvatar({
+    required String userId,
+    required Uint8List bytes,
+    required String filename,
+  }) async {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String?> pickAndUploadAvatar({required ImageSourceType source}) async {
+    throw UnimplementedError();
+  }
+}
 
 /// Fake BalanceNotifier for testing (tracks call count).
-class FakeBalanceNotifier extends ChangeNotifier {
+class FakeBalanceNotifier extends BalanceNotifier {
   int fetchBalancesCallCount = 0;
   String? lastFetchedUserId;
 
+  FakeBalanceNotifier()
+      : super(
+          GetBalancesUseCase(_DummyBalanceRepository()),
+          UpdateBalanceUseCase(_DummyBalanceRepository()),
+        );
+
+  @override
   Future<void> fetchBalances({required String userId}) async {
     fetchBalancesCallCount++;
     lastFetchedUserId = userId;
@@ -15,10 +90,17 @@ class FakeBalanceNotifier extends ChangeNotifier {
 }
 
 /// Fake ProfileNotifier for testing (tracks call count).
-class FakeProfileNotifier extends ChangeNotifier {
+class FakeProfileNotifier extends ProfileNotifier {
   int fetchProfileCallCount = 0;
   String? lastFetchedUserId;
 
+  FakeProfileNotifier()
+      : super(
+          getUserProfile: GetUserProfileUseCase(repository: _DummyUserRepository()),
+          pickAndUploadProfilePicture: PickAndUploadProfilePictureUseCase(repository: _DummyUserRepository()),
+        );
+
+  @override
   Future<void> fetchUserProfile({
     required String userId,
     bool forceRefresh = false,
@@ -30,7 +112,14 @@ class FakeProfileNotifier extends ChangeNotifier {
 }
 
 /// Fake BalanceNotifier that throws an error.
-class _FailingBalanceNotifier extends ChangeNotifier {
+class _FailingBalanceNotifier extends BalanceNotifier {
+  _FailingBalanceNotifier()
+      : super(
+          GetBalancesUseCase(_DummyBalanceRepository()),
+          UpdateBalanceUseCase(_DummyBalanceRepository()),
+        );
+
+  @override
   Future<void> fetchBalances({required String userId}) async {
     throw Exception('Simulated fetch error');
   }
