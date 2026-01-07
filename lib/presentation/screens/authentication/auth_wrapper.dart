@@ -1,16 +1,16 @@
 import 'package:bytebank/presentation/widgets/common/app_snackbar.dart';
 import 'package:bytebank/presentation/screens/onboarding/onboarding_carousel_screen.dart';
+import 'package:bytebank/application/core/post_login_data_bootstrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bytebank/application/notifiers/auth_notifier.dart';
-import 'package:bytebank/application/notifiers/balance_notifier.dart'
-    as app_balance;
 import 'package:bytebank/application/notifiers/investment_notifier.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:bytebank/presentation/screens/dashboard/dashboard_screen.dart';
 import 'package:bytebank/application/notifiers/transaction_notifier.dart'
     as app_notifier;
 import 'package:provider/provider.dart';
+import 'package:bytebank/core/di/injection_container.dart';
 
 /// AuthGate is responsible for routing based on the user's authentication state
 /// and for displaying global authentication-related messages (e.g., SnackBar).
@@ -144,17 +144,13 @@ class _AuthGateState extends State<AuthGate> {
         if (snapshot.hasData) {
           final user = snapshot.data!;
 
-          // Fetch profile and balances only when the logged user changes.
+          // Bootstrap critical data only when the logged user changes.
+          // Uses PostLoginDataBootstrapper to ensure ONE execution per userId.
           if (_lastUserId != user.uid) {
             _lastUserId = user.uid;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
-                context.read<ProfileNotifier>().fetchUserProfile(
-                  userId: user.uid,
-                );
-                context.read<app_balance.BalanceNotifier>().fetchBalances(
-                  userId: user.uid,
-                );
+                sl<PostLoginDataBootstrapper>().run(user.uid);
               }
             });
           }

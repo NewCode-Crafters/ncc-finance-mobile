@@ -53,6 +53,7 @@ import 'package:bytebank/application/notifiers/transaction_attachments_notifier.
 import 'package:bytebank/application/notifiers/chart_animation_notifier.dart';
 import 'package:bytebank/core/security/i_secure_storage.dart';
 import 'package:bytebank/infrastructure/services/secure_storage_service.dart';
+import 'package:bytebank/application/core/post_login_data_bootstrapper.dart';
 
 // This file contains the application's dependency injection container.
 // Call `initializeDependencies()` early in `main()` before running the app.
@@ -280,6 +281,15 @@ Future<void> initializeDependencies() async {
   );
   sl.registerLazySingleton<WatchAttachmentsUseCase>(
     () => WatchAttachmentsUseCase(sl<AttachmentRepository>()),
+  );
+
+  // -- Post-login data bootstrapper (Phase 3.1 - Tech Challenge Fase 04)
+  // Singleton bootstrapper to pre-load critical data after login
+  sl.registerLazySingleton<PostLoginDataBootstrapper>(
+    () => PostLoginDataBootstrapper(
+      balanceNotifier: sl<app_balance.BalanceNotifier>(),
+      profileNotifier: sl<ProfileNotifier>(),
+    ),
   );
 
   // -----------------------------------------------------------------------
