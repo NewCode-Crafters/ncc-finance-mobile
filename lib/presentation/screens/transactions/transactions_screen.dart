@@ -18,8 +18,7 @@ class TransactionsScreen extends StatefulWidget {
   State<TransactionsScreen> createState() => _TransactionsScreenState();
 }
 
-class _TransactionsScreenState extends State<TransactionsScreen>
-    with WidgetsBindingObserver {
+class _TransactionsScreenState extends State<TransactionsScreen> {
   final _searchController = TextEditingController();
   Timer? _searchDebounce;
   late final app_notifier.TransactionNotifier _transactionNotifier;
@@ -32,9 +31,6 @@ class _TransactionsScreenState extends State<TransactionsScreen>
     _transactionNotifier = context.read<app_notifier.TransactionNotifier>();
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-
-    // Add lifecycle observer to detect when app/screen resumes
-    WidgetsBinding.instance.addObserver(this);
 
     _searchController.addListener(() {
       final text = _searchController.text;
@@ -56,27 +52,15 @@ class _TransactionsScreenState extends State<TransactionsScreen>
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.microtask(() => _fetchData());
+      // Always fetch to ensure fresh data, but avoid if already loading
+      if (!_transactionNotifier.state.isLoading) {
+        Future.microtask(() => _fetchData());
+      }
     });
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    // Refresh when app comes back to foreground
-    if (state == AppLifecycleState.resumed) {
-      Future.microtask(() => _fetchData());
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     _searchDebounce?.cancel();
     _searchController.dispose();
     _transactionNotifier.resetFilters();
@@ -101,16 +85,22 @@ class _TransactionsScreenState extends State<TransactionsScreen>
       if (notifier.isFetchingMore) return;
       if (!notifier.hasMore) return;
       final pos = _scrollController.position;
+      // ignore: avoid_print
+      print('📜 Scroll: pixels=${pos.pixels.toStringAsFixed(0)}, extentAfter=${pos.extentAfter.toStringAsFixed(0)}, hasMore=${notifier.hasMore}');
       if (pos.atEdge && pos.pixels != 0) {
         final userId = FirebaseAuth.instance.currentUser?.uid;
         if (userId != null) {
+          // ignore: avoid_print
+          print('⬇️ Trigger: atEdge');
           Future.microtask(() => notifier.fetchNextPage(userId));
         }
         return;
       }
-      if (pos.extentAfter < 300) {
+      if (pos.extentAfter < 100) {
         final userId = FirebaseAuth.instance.currentUser?.uid;
         if (userId != null) {
+          // ignore: avoid_print
+          print('⬇️ Trigger: extentAfter < 100');
           Future.microtask(() => notifier.fetchNextPage(userId));
         }
       }
@@ -354,9 +344,12 @@ class _TransactionsScreenState extends State<TransactionsScreen>
                                 return const SizedBox.shrink();
                               }
 
+                              // Fallback trigger: load more when reaching last item
                               if (index == total - 1 &&
                                   !notifier.isFetchingMore &&
                                   notifier.hasMore) {
+                                // ignore: avoid_print
+                                print('⬇️ Trigger: itemBuilder index=$index/$total');
                                 Future.microtask(
                                   () => notifier.fetchNextPage(userId),
                                 );

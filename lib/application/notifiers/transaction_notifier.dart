@@ -100,7 +100,7 @@ class TransactionNotifier extends ChangeNotifier {
   // Pagination state (use last id for cursor)
   String? _lastStartAfterId;
   bool _isFetchingMore = false;
-  final int _pageSize = 10;
+  final int _pageSize = 4;
   bool _hasMore = true;
   DateTime? _lastFetchMoreAt;
   final Duration _fetchMoreThrottle = const Duration(milliseconds: 500);

@@ -17,6 +17,8 @@ import 'package:intl/intl.dart';
 import 'package:bytebank/presentation/widgets/common/main_app_bar.dart';
 import 'package:bytebank/application/notifiers/balance_notifier.dart'
     as app_balance;
+import 'package:bytebank/application/notifiers/transaction_notifier.dart'
+    as app_notifier;
 import 'package:bytebank/presentation/screens/investments/investments_screen.dart';
 import 'package:bytebank/application/notifiers/profile_notifier.dart';
 import 'package:provider/provider.dart';
@@ -63,6 +65,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final profileState = context.watch<ProfileNotifier>().state;
     final balanceState = context.watch<app_balance.BalanceNotifier>().state;
+    // Watch TransactionNotifier to rebuild when transactions change
+    context.watch<app_notifier.TransactionNotifier>();
 
     // Reusable text theme
     final textTheme = Theme.of(context).textTheme;
@@ -190,35 +194,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ActionCard(
                   icon: Icons.swap_horiz,
                   label: 'Fazer uma\ntransação',
-                  onTap: () async {
-                    final balanceNotifier = context.read<app_balance.BalanceNotifier>();
-                    await Navigator.of(
+                  onTap: () {
+                    Navigator.of(
                       context,
                     ).pushNamed(CreateTransactionScreen.routeName);
-                    // Refresh data after returning from transaction creation
-                    final userId = FirebaseAuth.instance.currentUser?.uid;
-                    if (userId != null && mounted) {
-                      await balanceNotifier.fetchBalances(
-                        userId: userId,
-                      );
-                    }
                   },
                 ),
                 ActionCard(
                   icon: Icons.bar_chart,
                   label: 'Fazer um\ninvestimento',
-                  onTap: () async {
-                    final balanceNotifier = context.read<app_balance.BalanceNotifier>();
-                    await Navigator.of(
+                  onTap: () {
+                    Navigator.of(
                       context,
                     ).pushNamed(CreateInvestmentScreen.routeName);
-                    // Refresh data after returning from investment creation
-                    final userId = FirebaseAuth.instance.currentUser?.uid;
-                    if (userId != null && mounted) {
-                      await balanceNotifier.fetchBalances(
-                        userId: userId,
-                      );
-                    }
                   },
                 ),
                 ActionCard(
@@ -234,7 +222,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 8),
             // Seção de transações com altura limitada
-            const SizedBox(
+            SizedBox(
               height: 400, // Altura fixa para a lista de transações
               child: TransactionsScreen(),
             ),

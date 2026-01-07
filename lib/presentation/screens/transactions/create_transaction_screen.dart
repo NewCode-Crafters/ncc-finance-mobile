@@ -93,17 +93,13 @@ class _CreateTransactionScreenState extends State<CreateTransactionScreen> {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
 
     try {
-      final balanceNotifier = context.read<app_balance.BalanceNotifier>();
       final transactionNotifier = context
           .read<app_notifier.TransactionNotifier>();
+      final balanceNotifier = context
+          .read<app_balance.BalanceNotifier>();
       final navigator = Navigator.of(context);
       final userId = FirebaseAuth.instance.currentUser!.uid;
-      final balanceId = context
-          .read<app_balance.BalanceNotifier>()
-          .state
-          .balances
-          .first
-          .id;
+      final balanceId = balanceNotifier.state.balances.first.id;
       final attachmentsNotifier = context
           .read<TransactionAttachmentsNotifier>();
 

@@ -123,7 +123,7 @@ class MyApp extends StatelessWidget {
           InvestmentsScreen.routeName: (context) => const InvestmentsScreen(),
           CreateInvestmentScreen.routeName: (context) =>
               const CreateInvestmentScreen(),
-          TransactionsScreen.routeName: (context) => const TransactionsScreen(),
+          TransactionsScreen.routeName: (context) => TransactionsScreen(),
           ViewTransactionScreen.routeName: (context) =>
               const ViewTransactionScreen(),
           CreateTransactionScreen.routeName: (context) =>
