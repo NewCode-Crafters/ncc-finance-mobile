@@ -4,78 +4,110 @@ import 'package:bytebank/domain/entities/user_profile.dart' as domain;
 import 'package:bytebank/domain/entities/image_source_type.dart';
 import 'package:bytebank/domain/use_cases/profile/get_user_profile_use_case.dart';
 import 'package:bytebank/domain/use_cases/profile/pick_and_upload_profile_picture_use_case.dart';
+import 'package:bytebank/application/core/async_status.dart';
 
+/// Immutable state for ProfileNotifier.
+///
+/// Uses [AsyncStatus] to track operation status (idle/loading/success/error).
 class ProfileState {
   final domain.UserProfile? userProfile;
-  final bool isLoading;
+  final AsyncStatus status;
   final String? errorMessage;
 
-  ProfileState({this.userProfile, this.isLoading = false, this.errorMessage});
+  const ProfileState({
+    this.userProfile,
+    this.status = AsyncStatus.idle,
+    this.errorMessage,
+  });
 
   ProfileState copyWith({
     domain.UserProfile? userProfile,
-    bool? isLoading,
+    AsyncStatus? status,
     String? errorMessage,
   }) {
     return ProfileState(
       userProfile: userProfile ?? this.userProfile,
-      isLoading: isLoading ?? this.isLoading,
+      status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
+
+  // Helper getters for common status checks
+  bool get isLoading => status.isLoading;
+  bool get isIdle => status.isIdle;
+  bool get isSuccess => status.isSuccess;
+  bool get isError => status.isError;
 }
 
 class ProfileNotifier extends ChangeNotifier {
   final GetUserProfileUseCase _getUserProfile;
   final PickAndUploadProfilePictureUseCase _pickAndUploadProfilePicture;
 
-  ProfileState _state = ProfileState();
+  ProfileState _state = const ProfileState();
 
   ProfileState get state => _state;
 
   ProfileNotifier({
     required GetUserProfileUseCase getUserProfile,
     required PickAndUploadProfilePictureUseCase pickAndUploadProfilePicture,
-  }) : _getUserProfile = getUserProfile,
-       _pickAndUploadProfilePicture = pickAndUploadProfilePicture;
+  })  : _getUserProfile = getUserProfile,
+        _pickAndUploadProfilePicture = pickAndUploadProfilePicture;
 
+  /// Fetches user profile for the given userId.
+  ///
+  /// State transitions:
+  /// - idle -> loading -> success (on success)
+  /// - idle -> loading -> error (on failure)
+  ///
+  /// Skips fetch if already loading or if profile is already loaded (unless forceRefresh).
   Future<void> fetchUserProfile({
     required String userId,
     bool forceRefresh = false,
   }) async {
-    if (_state.isLoading ||
-        (!forceRefresh &&
-            _state.userProfile != null &&
-            _state.userProfile!.uid == userId)) {
+    // Skip if already loading
+    if (_state.isLoading) return;
+
+    // Skip if profile already loaded for this user (unless force refresh)
+    if (!forceRefresh &&
+        _state.userProfile != null &&
+        _state.userProfile!.uid == userId) {
       return;
     }
 
-    Future.microtask(() {
-      _state = ProfileState(isLoading: true, userProfile: _state.userProfile);
-      notifyListeners();
-    });
+    _setState(_state.copyWith(status: AsyncStatus.loading));
 
     try {
       final domainProfile = await _getUserProfile.call(userId: userId);
-      _state = ProfileState(userProfile: domainProfile, isLoading: false);
+      _setState(
+        _state.copyWith(
+          userProfile: domainProfile,
+          status: AsyncStatus.success,
+          errorMessage: null,
+        ),
+      );
     } catch (e) {
-      _state = ProfileState(isLoading: false, userProfile: _state.userProfile);
+      _setState(
+        _state.copyWith(
+          status: AsyncStatus.error,
+          errorMessage: 'Failed to fetch profile: ${e.toString()}',
+        ),
+      );
     }
-
-    notifyListeners();
   }
 
-  // Helper used in tests
-  void setStateForTest(ProfileState newState) {
-    _state = newState;
-  }
-
+  /// Updates user avatar by picking and uploading an image.
+  ///
+  /// State transitions:
+  /// - current -> loading -> success (on success)
+  /// - current -> loading -> error (on failure)
   Future<void> updateUserAvatar({
     required String userId,
     required ImageSourceType source,
   }) async {
-    _state = ProfileState(isLoading: true, userProfile: _state.userProfile);
-    notifyListeners();
+    // Skip if already loading
+    if (_state.isLoading) return;
+
+    _setState(_state.copyWith(status: AsyncStatus.loading));
 
     try {
       final newPhotoUrl = await _pickAndUploadProfilePicture.call(
@@ -86,17 +118,41 @@ class ProfileNotifier extends ChangeNotifier {
         final updatedProfile = _state.userProfile?.copyWith(
           photoUrl: newPhotoUrl,
         );
-        _state = _state.copyWith(isLoading: false, userProfile: updatedProfile);
+        _setState(
+          _state.copyWith(
+            userProfile: updatedProfile,
+            status: AsyncStatus.success,
+            errorMessage: null,
+          ),
+        );
       } else {
-        _state = _state.copyWith(isLoading: false);
+        // User cancelled picker
+        _setState(_state.copyWith(status: AsyncStatus.idle));
       }
     } catch (e) {
-      _state = ProfileState(
-        isLoading: false,
-        userProfile: _state.userProfile,
-        errorMessage: 'Failed to upload avatar. Please try again.',
+      _setState(
+        _state.copyWith(
+          status: AsyncStatus.error,
+          errorMessage: 'Failed to upload avatar: ${e.toString()}',
+        ),
       );
     }
+  }
+
+  /// Internal method to update state and notify listeners.
+  ///
+  /// Only notifies if state actually changed (reduces redundant rebuilds).
+  void _setState(ProfileState newState) {
+    if (_state != newState) {
+      _state = newState;
+      notifyListeners();
+    }
+  }
+
+  // Helper used in tests
+  @visibleForTesting
+  void setStateForTest(ProfileState newState) {
+    _state = newState;
     notifyListeners();
   }
 }

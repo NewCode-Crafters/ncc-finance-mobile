@@ -676,3 +676,76 @@ print('🌐 REMOTE FETCH: Carregou ${dtos.length} transações do Firestore');
 // No fallback
 print('⚠️ OFFLINE FALLBACK: Retornando cache expirado (${cachedResult.transactions.length} transações)');
 ```
+
+---
+
+## 📜 LOG DE MELHORIAS OPCIONAIS - FASE 3
+
+### ✅ [05/01/2026] State Management - Padrão Imutável + AsyncStatus
+
+**Objetivo**: Padronizar estados imutáveis e reduzir rebuilds redundantes sem migrar para BLoC/Riverpod.
+
+**Implementação**:
+
+1. **Criado AsyncStatus Enum** (`lib/application/core/async_status.dart`):
+   - Estados: `idle`, `loading`, `success`, `error`
+   - Extension methods: `isIdle`, `isLoading`, `isSuccess`, `isError`
+   - Substituiu uso de booleans (`isLoading`, `hasError`) por enum type-safe
+
+2. **Refatorado BalanceNotifier** (`lib/application/notifiers/balance_notifier.dart`):
+   - Introduzido `BalanceState` imutável com `copyWith`
+   - Substituído `notifyListeners()` direto por `_setState()` guard
+   - Guard contra múltiplas requisições simultâneas (`if (_state.isLoading) return`)
+   - Transições previsíveis: idle → loading → success/error
+
+3. **Refatorado ProfileNotifier** (`lib/application/notifiers/profile_notifier.dart`):
+   - Introduzido `ProfileState` imutável com `copyWith`
+   - Lógica de skip se perfil já carregado (mesmo userId)
+   - Suporte a `forceRefresh` para recarregar perfis
+   - Tratamento de erro em `updateUserAvatar` (retorna a idle se usuário cancela picker)
+
+4. **Testes de Transições de Estado** (+16 novos testes):
+   - `test/application/notifiers/balance_notifier_state_test.dart` (6 testes):
+     * Estado inicial é idle
+     * Transição idle → loading → success
+     * Transição idle → loading → error
+     * Guard: skip fetch se já loading
+     * Múltiplos fetches atualizam estado corretamente
+     * `_setState` só notifica quando estado muda
+   - `test/application/notifiers/profile_notifier_state_test.dart` (10 testes):
+     * Estado inicial, transições success/error
+     * Guard: skip se já loading
+     * Skip se perfil já carregado para mesmo userId
+     * `forceRefresh` recarrega perfil
+     * Transições de `updateUserAvatar` (success/error)
+     * Tratamento de cancelamento do picker (volta para idle)
+
+5. **Documentação**:
+   - Adicionada seção "State Management" em `README.md` (inglês)
+   - Adicionada seção "Gerenciamento de Estado" em `README.pt_BR.md` (português)
+   - Exemplos de código: BalanceNotifier completo, uso na UI com Consumer
+   - Benefícios documentados: transições previsíveis, rebuilds reduzidos, testável, type-safe, consistente
+
+**Resultados**:
+- ✅ Testes: **189/189 PASS** (+16 novos testes)
+- ✅ Análise: 2 info (mesmo de antes, `avoid_dynamic_calls`)
+- ✅ Padrão aplicado em 2 notifiers críticos (BalanceNotifier, ProfileNotifier)
+- ✅ Redução de rebuilds desnecessários via `_setState` guard
+- ✅ Estados 100% testáveis sem dependências do Flutter
+
+**Impacto**:
+- 🎯 Manutenibilidade: Padrão consistente facilita onboarding e manutenção futura
+- 🎯 Performance: Rebuilds reduzidos (notifica só quando estado muda)
+- 🎯 Confiabilidade: Transições testadas garantem comportamento previsível
+- 🎯 Escalabilidade: Padrão pode ser aplicado a novos notifiers facilmente
+
+**Arquivos Modificados**:
+- `lib/application/core/async_status.dart` (novo)
+- `lib/application/notifiers/balance_notifier.dart` (refatorado)
+- `lib/application/notifiers/profile_notifier.dart` (refatorado)
+- `test/application/notifiers/balance_notifier_state_test.dart` (novo)
+- `test/application/notifiers/profile_notifier_state_test.dart` (novo)
+- `README.md` (documentação atualizada)
+- `README.pt_BR.md` (documentação atualizada)
+
+---

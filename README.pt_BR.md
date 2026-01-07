@@ -204,6 +204,101 @@ flutter run -d <device-id>
 | `build_runner`                                           | Ferramentas de geração de código.                                            |
 | `flutter_lints`                                          | Regras de lint recomendadas.                                                 |
 
+## Gerenciamento de Estado
+
+O app usa **Provider com ChangeNotifier** seguindo um padrão consistente de estados imutáveis.
+
+### Padrão
+
+Cada notifier segue esta estrutura:
+
+1. **Estados imutáveis** com método `copyWith` para transições controladas
+2. **AsyncStatus** para rastrear ciclo de vida de operações assíncronas (`idle`, `loading`, `success`, `error`)
+3. **Método `_setState`** que só notifica quando o estado realmente muda (reduz rebuilds desnecessários)
+
+### Exemplo: BalanceNotifier
+
+```dart
+// Estado imutável
+class BalanceState {
+  final AsyncStatus status;
+  final List<Balance> balances;
+  final String? errorMessage;
+  
+  BalanceState copyWith({
+    AsyncStatus? status,
+    List<Balance>? balances,
+    String? errorMessage,
+  }) => BalanceState(
+    status: status ?? this.status,
+    balances: balances ?? this.balances,
+    errorMessage: errorMessage ?? this.errorMessage,
+  );
+}
+
+// Notifier
+class BalanceNotifier extends ChangeNotifier {
+  BalanceState _state = BalanceState.initial();
+  BalanceState get state => _state;
+  
+  // Guarda contra rebuilds redundantes
+  void _setState(BalanceState newState) {
+    if (_state != newState) {
+      _state = newState;
+      notifyListeners();
+    }
+  }
+  
+  Future<void> fetchBalances() async {
+    if (_state.isLoading) return; // Previne múltiplas requisições simultâneas
+    
+    _setState(_state.copyWith(status: AsyncStatus.loading));
+    
+    final result = await _getBalancesUseCase();
+    result.fold(
+      (failure) => _setState(_state.copyWith(
+        status: AsyncStatus.error,
+        errorMessage: failure.message,
+      )),
+      (balances) => _setState(_state.copyWith(
+        status: AsyncStatus.success,
+        balances: balances,
+      )),
+    );
+  }
+}
+```
+
+### Benefícios
+
+- **Transições previsíveis**: Estados sempre transitam através de um caminho conhecido (idle → loading → success/error)
+- **Rebuilds reduzidos**: `_setState` garante que widgets só são reconstruídos quando necessário
+- **Testável**: Transições de estado podem ser testadas unitariamente sem dependências do Flutter
+- **Type-safe**: Estados imutáveis com tipos explícitos previnem bugs em tempo de compilação
+- **Consistente**: Mesmo padrão aplicado em todos os notifiers (BalanceNotifier, ProfileNotifier, etc.)
+
+### Uso na UI
+
+```dart
+Consumer<BalanceNotifier>(
+  builder: (context, notifier, child) {
+    if (notifier.state.isLoading) {
+      return CircularProgressIndicator();
+    }
+    if (notifier.state.isError) {
+      return Text('Erro: ${notifier.state.errorMessage}');
+    }
+    return ListView.builder(
+      itemCount: notifier.state.balances.length,
+      itemBuilder: (context, index) {
+        final balance = notifier.state.balances[index];
+        return BalanceCard(balance: balance);
+      },
+    );
+  },
+)
+```
+
 ## Testes unitários
 
 Os testes validam serviços e regras de negócio principais usando mocks e fakes do Firebase.

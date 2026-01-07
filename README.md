@@ -211,6 +211,97 @@ The table below highlights the most important packages used in this project and 
 | `build_runner`                                           | Tooling for code generation tasks (if used by the project).                |
 | `flutter_lints`                                          | Recommended lint rules for Flutter projects (developer tooling).           |
 
+## State Management
+
+Bytebank uses **Provider** with **ChangeNotifier** for state management, following a standardized pattern for predictable state transitions and reduced rebuilds.
+
+### Pattern overview
+
+All notifiers follow a consistent architecture:
+
+1. **Immutable state classes** with `copyWith` methods
+2. **AsyncStatus enum** tracking operation lifecycle: `idle → loading → success/error`
+3. **Internal `_setState` method** that only notifies listeners when state actually changes (reduces redundant rebuilds)
+4. **Guard clauses** preventing duplicate operations (e.g., skip fetch if already loading)
+
+### Example: BalanceNotifier
+
+```dart
+class BalanceState {
+  final List<Balance> balances;
+  final double totalBalance;
+  final AsyncStatus status;  // idle, loading, success, error
+  final String? errorMessage;
+
+  const BalanceState({
+    this.balances = const [],
+    this.totalBalance = 0.0,
+    this.status = AsyncStatus.idle,
+    this.errorMessage,
+  });
+
+  BalanceState copyWith({...}) { /* immutable updates */ }
+}
+
+class BalanceNotifier extends ChangeNotifier {
+  BalanceState _state = const BalanceState();
+  BalanceState get state => _state;
+
+  Future<void> fetchBalances({required String userId}) async {
+    if (_state.isLoading) return;  // Guard: skip if already loading
+
+    _setState(_state.copyWith(status: AsyncStatus.loading));
+
+    try {
+      final balances = await _getBalances.call(userId: userId);
+      _setState(_state.copyWith(
+        balances: balances,
+        status: AsyncStatus.success,
+      ));
+    } catch (e) {
+      _setState(_state.copyWith(
+        status: AsyncStatus.error,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  void _setState(BalanceState newState) {
+    if (_state != newState) {  // Only notify if changed
+      _state = newState;
+      notifyListeners();
+    }
+  }
+}
+```
+
+### Benefits
+
+- ✅ **Predictable transitions**: All operations follow `idle → loading → success/error` flow
+- ✅ **Reduced rebuilds**: `_setState` only notifies when state changes
+- ✅ **Testable**: State transitions are unit-tested (see `test/application/notifiers/*_state_test.dart`)
+- ✅ **Type-safe**: Immutable states prevent accidental mutations
+- ✅ **Consistent**: All notifiers follow the same pattern (BalanceNotifier, ProfileNotifier, etc.)
+
+### UI Integration
+
+Widgets use `context.watch<NotifierType>()` or `Consumer<NotifierType>` to react to state changes:
+
+```dart
+Consumer<BalanceNotifier>(
+  builder: (context, notifier, _) {
+    final state = notifier.state;
+
+    if (state.isLoading) return CircularProgressIndicator();
+    if (state.isError) return Text('Error: ${state.errorMessage}');
+
+    return BalanceListView(balances: state.balances);
+  },
+)
+```
+
+See `lib/application/notifiers/` for complete implementations and `test/application/notifiers/` for state transition tests.
+
 ## Unit tests
 
 Unit tests focus on core services and business rules. Tests use `fake_cloud_firestore`, `firebase_auth_mocks`, and `mockito` to isolate logic from Firebase and external services.
