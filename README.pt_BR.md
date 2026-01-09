@@ -234,5 +234,5 @@ O projeto adota uma mentalidade orientada a testes quando prático; a suíte vis
 
 ## Links externos
 
-- **Demo em vídeo:** https://youtu.be/MaEYtsVCi0Y
+- **Demo em vídeo:** https://youtu.be/eOtd2BXayDo
 - **Protótipo Figma:** https://www.figma.com/design/gB5nE8V4Le026J3y4FJxDQ/NCC-TC-3-prototipo?node-id=12085-1622
