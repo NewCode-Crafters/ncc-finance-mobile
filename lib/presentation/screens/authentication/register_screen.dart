@@ -73,92 +73,94 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Criar Conta')),
-      body: Stack(
-        children: [
-          SafeArea(
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          reverse: true,
+          child: SizedBox(
+            height: keyboardOpen 
+                ? null 
+                : MediaQuery.of(context).size.height -
+                    AppBar().preferredSize.height -
+                    MediaQuery.of(context).padding.top -
+                    MediaQuery.of(context).padding.bottom,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.85,
-                    maxWidth: MediaQuery.of(context).size.width,
+                Card(
+                  color: AppColors.lightGreenColor,
+                  elevation: 1,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(150),
+                    ),
                   ),
-                  child: Card(
-                    color: AppColors.lightGreenColor,
-                    elevation: 1,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(150),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: compact ? 20 : 50,
+                          right: 20,
+                        ),
+                        child: Text(
+                          'Crie uma nova conta',
+                          style: TextStyle(
+                            fontSize: compact ? 22 : 30,
+                            color: AppColors.brandTertiary,
+                            fontWeight: FontWeight.w900,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(
-                            top: compact ? 28 : 50,
-                            right: 20,
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: compact ? 6 : 10,
+                          bottom: compact ? 8 : 10,
+                        ),
+                        child: Text(
+                          'Preencha os campos abaixo para criar sua conta!',
+                          style: TextStyle(
+                            fontSize: compact ? 12 : 14,
+                            color: AppColors.brandTertiary,
+                            fontWeight: FontWeight.w700,
                           ),
-                          child: Text(
-                            'Crie uma nova conta',
-                            style: TextStyle(
-                              fontSize: compact ? 22 : 30,
-                              color: AppColors.brandTertiary,
-                              fontWeight: FontWeight.w900,
-                            ),
-                            textAlign: TextAlign.center,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: 1,
+                          left: 24,
+                          right: 24,
+                        ),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          child: _buildRegisterForm(
+                            isLoading: isLoading,
+                            compact: compact,
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                            top: compact ? 8 : 10,
-                            bottom: 10,
-                          ),
-                          child: Text(
-                            'Preencha os campos abaixo para criar sua conta!',
-                            style: TextStyle(
-                              fontSize: compact ? 12 : 14,
-                              color: AppColors.brandTertiary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            textAlign: TextAlign.center,
+                      ),
+                      // hide decorative image on compact screens so content fits
+                      if (!compact)
+                        const Padding(
+                          padding: EdgeInsets.all(0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Image(image: AssetImage(AppAssets.register)),
+                            ],
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            bottom: 1,
-                            left: 24,
-                            right: 24,
-                          ),
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.85,
-                            child: _buildRegisterForm(
-                              isLoading: isLoading,
-                              compact: compact,
-                            ),
-                          ),
-                        ),
-                        // hide decorative image on compact screens so content fits
-                        if (!compact)
-                          const Padding(
-                            padding: EdgeInsets.all(0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Image(image: AssetImage(AppAssets.register)),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
