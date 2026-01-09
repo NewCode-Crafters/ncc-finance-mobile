@@ -244,5 +244,5 @@ TDD note: The core business rules (balance updates, transaction effects, profile
 
 ## External links
 
-- **Video demo:** https://youtu.be/MaEYtsVCi0Y
+- **Video demo:** https://youtu.be/eOtd2BXayDo
 - **Figma prototype:** https://www.figma.com/design/gB5nE8V4Le026J3y4FJxDQ/NCC-TC-3-prototipo?node-id=12085-1622&t=649czXOSHu6ZTlJI-1
